@@ -54,8 +54,4 @@ contract DecentAutonomousAdmin is
             interfaceId == type(IDecentAutonomousAdmin).interfaceId ||
             super.supportsInterface(interfaceId);
     }
-
-    // //////////////////////////////////////////////////////////////
-    //                         Internal Functions
-    // //////////////////////////////////////////////////////////////
 }

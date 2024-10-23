@@ -5,11 +5,6 @@ import {IHats} from "./hats/full/IHats.sol";
 import {ISablierV2Lockup} from "./sablier/full/ISablierV2Lockup.sol";
 
 interface IDecentAutonomousAdmin {
-    struct SablierStreamInfo {
-        uint256 streamId;
-        ISablierV2Lockup sablierV2Lockup;
-    }
-
     struct TriggerStartArgs {
         address currentWearer;
         IHats userHatProtocol;
