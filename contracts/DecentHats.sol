@@ -224,9 +224,7 @@ contract DecentHats {
             hatId
         );
 
-        if (hat.wearer != address(0)) {
-            hatsProtocol.mintHat(hatId, hat.wearer);
-        }
+        hatsProtocol.mintHat(hatId, hat.wearer);
 
         for (uint256 i = 0; i < hat.sablierParams.length; ) {
             SablierStreamParams memory sablierParams = hat.sablierParams[i];
@@ -292,9 +290,7 @@ contract DecentHats {
             hat.termedParams[0].nominatedWearers
         );
 
-        if (hat.wearer != address(0)) {
-            hatsProtocol.mintHat(hatId, hat.wearer);
-        }
+        hatsProtocol.mintHat(hatId, hat.termedParams[0].nominatedWearers[0]);
 
         for (uint256 i = 0; i < hat.sablierParams.length; ) {
             SablierStreamParams memory sablierParams = hat.sablierParams[i];
