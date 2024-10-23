@@ -277,6 +277,14 @@ contract DecentHats {
         uint256 adminHatId,
         Hat calldata hat
     ) internal {
+        require(
+            hat.termedParams.length == 1,
+            "DecentHats: termedParams length must be 1"
+        );
+        require(
+            hat.termedParams[0].nominatedWearers.length == 1,
+            "DecentHats: nominatedWearers length must be 1"
+        );
         uint256 hatId = _createHat(
             hatsProtocol,
             adminHatId,
@@ -310,7 +318,7 @@ contract DecentHats {
             LockupLinear.CreateWithTimestamps memory params = LockupLinear
                 .CreateWithTimestamps({
                     sender: sablierParams.sender,
-                    recipient: hat.wearer,
+                    recipient: hat.termedParams[0].nominatedWearers[0],
                     totalAmount: sablierParams.totalAmount,
                     asset: IERC20(sablierParams.asset),
                     cancelable: sablierParams.cancelable,
