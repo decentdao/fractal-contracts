@@ -533,16 +533,7 @@ describe('DecentHats_0_1_0', () => {
                   wearer: ethers.ZeroAddress,
                   sablierParams: [],
                 },
-                hats: [
-                  {
-                    maxSupply: 1,
-                    details: '',
-                    imageURI: '',
-                    isMutable: false,
-                    wearer: ethers.ZeroAddress,
-                    sablierParams: [],
-                  },
-                ],
+                hats: [],
               },
             ],
           ),
@@ -625,18 +616,16 @@ describe('DecentHats_0_1_0', () => {
       });
 
       it('Actually creates the new hat', async () => {
-        const hatsCountBeforeCreate = await mockHats.count();
-        console.log({ hatsCountBeforeCreate });
-
         // First transfer the top hat to the Safe
         await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
 
+        const hatsCountBeforeCreate = await mockHats.count();
         expect(hatsCountBeforeCreate).to.equal(2); // Top hat + admin hat
 
         await createRoleHatPromise;
 
         const newHatId = await mockHats.count();
-        expect(newHatId).to.equal(3);
+        expect(newHatId).to.equal(3); // + newly created hat
       });
     });
   });
