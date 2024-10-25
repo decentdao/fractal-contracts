@@ -49,7 +49,7 @@ contract DecentHats_0_1_0 {
             0x5d0e6ce4fd951366cc55da93f6e79d8b81483109d79676a04bcc2bed6a4b5072;
     }
 
-    function updateKeyValuePairs(
+    function declareSafeHatTree(
         address _keyValuePairs,
         uint256 topHatId
     ) internal {
@@ -195,6 +195,54 @@ contract DecentHats_0_1_0 {
         }
     }
 
+    /**
+     * Creates a new role hat and any streams on it.
+     *
+     * This contract should be enabled a module on the Safe for which the role is to be created, and disable after.
+     * In order for the module to be able to create hats on behalf of the Safe, the Safe must first
+     * transfer its top hat to this contract. This function transfers the top hat back to the Safe after
+     * creating the role hat.
+     *
+     * The function simply calls `createHatAndAccountAndMintAndStreams` and then transfers the top hat back to the Safe.
+     *
+     * @dev Role hat creation, minting, smart account creation and stream creation are handled here in order
+     * to avoid a race condition where not more than one active proposal to create a new role can exist at a time.
+     * See: https://github.com/decentdao/decent-interface/issues/2402
+     */
+    function createRoleHat(
+        IHats hatsProtocol,
+        uint256 adminHatId,
+        Hat calldata hat,
+        uint256 topHatId,
+        address topHatAccount,
+        IERC6551Registry registry,
+        address hatsAccountImplementation,
+        bytes32 salt
+    ) public returns (uint256 hatId, address accountAddress) {
+        (hatId, accountAddress) = createHatAndAccountAndMintAndStreams(
+            hatsProtocol,
+            adminHatId,
+            hat,
+            topHatAccount,
+            registry,
+            hatsAccountImplementation,
+            salt
+        );
+
+        hatsProtocol.transferHat(topHatId, address(this), msg.sender);
+    }
+
+    /**
+     * For a safe without any roles previously created on it, this function should be called. It sets up the
+     * top hat and admin hat, as well as any other hats and their streams that are provided.
+     *
+     * This contract should be enabled a module on the Safe for which the role(s) are to be created, and disabled after.
+     *
+     * @dev In order for a Safe to seamlessly create roles even if it has never previously created a role and thus has
+     * no hat tree, we defer the creation of the hat tree and its setup to this contract. This way, in a single tx block,
+     * the resulting topHatId of the newly created hat can be used to create an admin hat and any other hats needed.
+     * We also make use of `KeyValuePairs` to associate the topHatId with the Safe.
+     */
     function createAndDeclareTree(CreateTreeParams calldata params) public {
         bytes32 salt = getSalt();
 
@@ -207,7 +255,7 @@ contract DecentHats_0_1_0 {
             salt
         );
 
-        updateKeyValuePairs(params.keyValuePairs, topHatId);
+        declareSafeHatTree(params.keyValuePairs, topHatId);
 
         (uint256 adminHatId, ) = createHatAndAccountAndMintAndStreams(
             params.hatsProtocol,
