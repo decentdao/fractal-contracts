@@ -60,6 +60,27 @@ contract DecentHats {
         string topHatDetails;
         string topHatImageURI;
     }
+    struct CreateRoleHatParams {
+        IHats hatsProtocol;
+        IERC6551Registry registry;
+        address topHatAccount;
+        address hatsAccountImplementation;
+        uint256 adminHatId;
+        uint256 topHatId;
+        Hat hat;
+    }
+
+    struct CreateTermedRoleHatParams {
+        IHats hatsProtocol;
+        IERC6551Registry registry;
+        IHatsModuleFactory hatsModuleFactory;
+        address topHatAccount;
+        address hatsAccountImplementation;
+        address hatsElectionEligibilityImplementation;
+        uint256 adminHatId;
+        uint256 topHatId;
+        Hat hat;
+    }
 
     /* /////////////////////////////////////////////////////////////////////////////
                         EXTERNAL FUNCTIONS
@@ -146,25 +167,59 @@ contract DecentHats {
      * to avoid a race condition where not more than one active proposal to create a new role can exist at a time.
      * See: https://github.com/decentdao/decent-interface/issues/2402
      */
-    function createRoleHat(
-        IHats hatsProtocol,
-        IERC6551Registry registry,
-        address topHatAccount,
-        address hatsAccountImplementation,
-        uint256 adminHatId,
-        uint256 topHatId,
-        Hat calldata hat
-    ) public returns (uint256 hatId, address accountAddress) {
-        (hatId, accountAddress) = _createHatAndAccountAndMintAndStreams(
-            hatsProtocol,
-            registry,
-            topHatAccount,
-            hatsAccountImplementation,
-            adminHatId,
-            hat
+    function createRoleHat(CreateRoleHatParams calldata params) external {
+        _createHatAndAccountAndMintAndStreams(
+            params.hatsProtocol,
+            params.registry,
+            params.topHatAccount,
+            params.hatsAccountImplementation,
+            params.adminHatId,
+            params.hat
         );
 
-        hatsProtocol.transferHat(topHatId, address(this), msg.sender);
+        params.hatsProtocol.transferHat(
+            params.topHatId,
+            address(this),
+            msg.sender
+        );
+    }
+
+    /**
+     * Creates a new terned role hat and any streams on it.
+     *
+     * This contract should be enabled a module on the Safe for which the role is to be created, and disable after.
+     * In order for the module to be able to create hats on behalf of the Safe, the Safe must first
+     * transfer its top hat to this contract. This function transfers the top hat back to the Safe after
+     * creating the role hat.
+     *
+     * The function simply calls `createTermedHatAndAccountAndMintAndStreams` and then transfers the top hat back to the Safe.
+     *
+     * @dev Termed Role hat creation, minting, and stream creation are handled here in order
+     * to avoid a race condition where not more than one active proposal to create a new termed role can exist at a time.
+     * See: https://github.com/decentdao/decent-interface/issues/2402
+     */
+    function createTermedRoleHat(
+        CreateTermedRoleHatParams calldata params
+    ) external {
+        _createTermedHatAndAccountAndMintAndStreams(
+            params.hatsProtocol,
+            params.topHatAccount,
+            _createElectionEligiblityModule(
+                params.hatsModuleFactory,
+                params.hatsElectionEligibilityImplementation,
+                params.hatsProtocol.getNextId(params.adminHatId),
+                params.topHatId,
+                params.hat.termedParams[0]
+            ),
+            params.adminHatId,
+            params.hat
+        );
+
+        params.hatsProtocol.transferHat(
+            params.topHatId,
+            address(this),
+            msg.sender
+        );
     }
 
     /* /////////////////////////////////////////////////////////////////////////////
