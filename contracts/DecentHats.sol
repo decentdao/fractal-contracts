@@ -64,6 +64,17 @@ contract DecentHats {
     /* /////////////////////////////////////////////////////////////////////////////
                         EXTERNAL FUNCTIONS
     ///////////////////////////////////////////////////////////////////////////// */
+    /**
+     * For a safe without any roles previously created on it, this function should be called. It sets up the
+     * top hat and admin hat, as well as any other hats and their streams that are provided.
+     *
+     * This contract should be enabled a module on the Safe for which the role(s) are to be created, and disabled after.
+     *
+     * @dev In order for a Safe to seamlessly create roles even if it has never previously created a role and thus has
+     * no hat tree, we defer the creation of the hat tree and its setup to this contract. This way, in a single tx block,
+     * the resulting topHatId of the newly created hat can be used to create an admin hat and any other hats needed.
+     * We also make use of `KeyValuePairs` to associate the topHatId with the Safe.
+     */
     function createAndDeclareTree(CreateTreeParams calldata params) public {
         (uint256 topHatId, address topHatAccount) = _createTopHatAndAccount(
             params.hatsProtocol,
@@ -73,7 +84,7 @@ contract DecentHats {
             params.hatsAccountImplementation
         );
 
-        _updateKeyValuePairs(params.keyValuePairs, topHatId);
+        _declareSafeHatTree(params.keyValuePairs, topHatId);
 
         (uint256 adminHatId, ) = _createAdminHatAndAccount(
             params.hatsProtocol,
@@ -121,11 +132,46 @@ contract DecentHats {
         params.hatsProtocol.transferHat(topHatId, address(this), msg.sender);
     }
 
+    /**
+     * Creates a new role hat and any streams on it.
+     *
+     * This contract should be enabled a module on the Safe for which the role is to be created, and disable after.
+     * In order for the module to be able to create hats on behalf of the Safe, the Safe must first
+     * transfer its top hat to this contract. This function transfers the top hat back to the Safe after
+     * creating the role hat.
+     *
+     * The function simply calls `createHatAndAccountAndMintAndStreams` and then transfers the top hat back to the Safe.
+     *
+     * @dev Role hat creation, minting, smart account creation and stream creation are handled here in order
+     * to avoid a race condition where not more than one active proposal to create a new role can exist at a time.
+     * See: https://github.com/decentdao/decent-interface/issues/2402
+     */
+    function createRoleHat(
+        IHats hatsProtocol,
+        IERC6551Registry registry,
+        address topHatAccount,
+        address hatsAccountImplementation,
+        uint256 adminHatId,
+        uint256 topHatId,
+        Hat calldata hat
+    ) public returns (uint256 hatId, address accountAddress) {
+        (hatId, accountAddress) = _createHatAndAccountAndMintAndStreams(
+            hatsProtocol,
+            registry,
+            topHatAccount,
+            hatsAccountImplementation,
+            adminHatId,
+            hat
+        );
+
+        hatsProtocol.transferHat(topHatId, address(this), msg.sender);
+    }
+
     /* /////////////////////////////////////////////////////////////////////////////
                         INTERAL FUNCTIONS
     ///////////////////////////////////////////////////////////////////////////// */
 
-    function _updateKeyValuePairs(
+    function _declareSafeHatTree(
         address _keyValuePairs,
         uint256 topHatId
     ) internal {
