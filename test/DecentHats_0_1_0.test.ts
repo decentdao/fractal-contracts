@@ -506,5 +506,127 @@ describe('DecentHats_0_1_0', () => {
         expect(stream2.endTime).to.equal(currentBlockTimestamp + 1296000);
       });
     });
+
+    describe('Creating a new hat on existing Tree', () => {
+      let createRoleHatPromise: Promise<ethers.ContractTransactionResponse>;
+      const topHatId = 0;
+
+      beforeEach(async () => {
+        await executeSafeTransaction({
+          safe: gnosisSafe,
+          to: decentHatsAddress,
+          transactionData: DecentHats_0_1_0__factory.createInterface().encodeFunctionData(
+            'createAndDeclareTree',
+            [
+              {
+                hatsProtocol: mockHatsAddress,
+                hatsAccountImplementation: mockHatsAccountImplementationAddress,
+                registry: await erc6551Registry.getAddress(),
+                keyValuePairs: await keyValuePairs.getAddress(),
+                topHatDetails: '',
+                topHatImageURI: '',
+                adminHat: {
+                  maxSupply: 1,
+                  details: '',
+                  imageURI: '',
+                  isMutable: false,
+                  wearer: ethers.ZeroAddress,
+                  sablierParams: [],
+                },
+                hats: [],
+              },
+            ],
+          ),
+          signers: [dao],
+        });
+
+        const currentBlockTimestamp = (await hre.ethers.provider.getBlock('latest'))!.timestamp;
+
+        createRoleHatPromise = executeSafeTransaction({
+          safe: gnosisSafe,
+          to: decentHatsAddress,
+          transactionData: DecentHats_0_1_0__factory.createInterface().encodeFunctionData(
+            'createRoleHat',
+            [
+              mockHatsAddress,
+              1,
+              {
+                maxSupply: 1,
+                details: '',
+                imageURI: '',
+                isMutable: true,
+                wearer: '0xdce7ca0555101f97451926944f5ae3b7adb2f5ae',
+                sablierParams: [
+                  {
+                    sablier: mockSablierAddress,
+                    sender: gnosisSafeAddress,
+                    totalAmount: ethers.parseEther('100'),
+                    asset: mockERC20Address,
+                    cancelable: true,
+                    transferable: false,
+                    timestamps: {
+                      start: currentBlockTimestamp,
+                      cliff: currentBlockTimestamp + 86400, // 1 day cliff
+                      end: currentBlockTimestamp + 2592000, // 30 days from now
+                    },
+                    broker: { account: ethers.ZeroAddress, fee: 0 },
+                  },
+                ],
+              },
+              0,
+              '0xdce7ca0555101f97451926944f5ae3b7adb2f5ae',
+              await erc6551Registry.getAddress(),
+              mockHatsAccountImplementationAddress,
+              '0x5d0e6ce4fd951366cc55da93f6e79d8b81483109d79676a04bcc2bed6a4b5072',
+            ],
+          ),
+          signers: [dao],
+        });
+      });
+
+      it('Reverts if the top hat is not transferred to the DecentHats module first', async () => {
+        await expect(createRoleHatPromise).to.be.reverted;
+      });
+
+      it('Emits an ExecutionSuccess event', async () => {
+        // First transfer the top hat to the Safe
+        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
+        await expect(await createRoleHatPromise).to.emit(gnosisSafe, 'ExecutionSuccess');
+      });
+
+      it('Emits an ExecutionFromModuleSuccess event', async () => {
+        // First transfer the top hat to the Safe
+        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
+        await expect(await createRoleHatPromise)
+          .to.emit(gnosisSafe, 'ExecutionFromModuleSuccess')
+          .withArgs(decentHatsAddress);
+      });
+
+      it('Transfers the top hat back to the Safe', async () => {
+        // First transfer the top hat to the Safe
+        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
+
+        const isModuleWearerOfTopHat = await mockHats.isWearerOfHat(decentHatsAddress, topHatId);
+        expect(isModuleWearerOfTopHat).to.equal(true);
+
+        await createRoleHatPromise;
+
+        const isSafeWearerOfTopHat = await mockHats.isWearerOfHat(gnosisSafeAddress, topHatId);
+        expect(isSafeWearerOfTopHat).to.equal(true);
+      });
+
+      it('Actually creates the new hat', async () => {
+        // First transfer the top hat to the Safe
+        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
+
+        const hatsCountBeforeCreate = await mockHats.count();
+        expect(hatsCountBeforeCreate).to.equal(2); // Top hat + admin hat
+
+        await createRoleHatPromise;
+
+        const newHatId = await mockHats.count();
+        expect(newHatId).to.equal(3); // + newly created hat
+      });
+    });
   });
 });
