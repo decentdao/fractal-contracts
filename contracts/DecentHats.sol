@@ -96,7 +96,7 @@ contract DecentHats {
      * the resulting topHatId of the newly created hat can be used to create an admin hat and any other hats needed.
      * We also make use of `KeyValuePairs` to associate the topHatId with the Safe.
      */
-    function createAndDeclareTree(CreateTreeParams calldata params) public {
+    function createAndDeclareTree(CreateTreeParams calldata params) external {
         (uint256 topHatId, address topHatAccount) = _createTopHatAndAccount(
             params.hatsProtocol,
             params.topHatDetails,
