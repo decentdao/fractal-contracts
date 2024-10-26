@@ -329,7 +329,7 @@ contract DecentHats {
         hatsProtocol.mintHat(hatId, hat.wearer);
 
         for (uint256 i = 0; i < hat.sablierParams.length; ) {
-            _createSablierStream(hat.sablierParams[i], hat.wearer);
+            _createSablierStream(hat.sablierParams[i], accountAddress);
             unchecked {
                 ++i;
             }
