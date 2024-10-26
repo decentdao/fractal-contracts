@@ -60,6 +60,7 @@ contract DecentHats {
         string topHatDetails;
         string topHatImageURI;
     }
+
     struct CreateRoleHatParams {
         IHats hatsProtocol;
         IERC6551Registry registry;
@@ -328,43 +329,7 @@ contract DecentHats {
         hatsProtocol.mintHat(hatId, hat.wearer);
 
         for (uint256 i = 0; i < hat.sablierParams.length; ) {
-            SablierStreamParams memory sablierParams = hat.sablierParams[i];
-
-            // Approve tokens for Sablier
-            IAvatar(msg.sender).execTransactionFromModule(
-                sablierParams.asset,
-                0,
-                abi.encodeWithSignature(
-                    "approve(address,uint256)",
-                    sablierParams.sablier,
-                    sablierParams.totalAmount
-                ),
-                Enum.Operation.Call
-            );
-
-            LockupLinear.CreateWithTimestamps memory params = LockupLinear
-                .CreateWithTimestamps({
-                    sender: sablierParams.sender,
-                    recipient: accountAddress,
-                    totalAmount: sablierParams.totalAmount,
-                    asset: IERC20(sablierParams.asset),
-                    cancelable: sablierParams.cancelable,
-                    transferable: sablierParams.transferable,
-                    timestamps: sablierParams.timestamps,
-                    broker: sablierParams.broker
-                });
-
-            // Proxy the Sablier call through IAvatar
-            IAvatar(msg.sender).execTransactionFromModule(
-                address(sablierParams.sablier),
-                0,
-                abi.encodeWithSignature(
-                    "createWithTimestamps((address,address,uint128,address,bool,bool,(uint40,uint40,uint40),(address,uint256)))",
-                    params
-                ),
-                Enum.Operation.Call
-            );
-
+            _createSablierStream(hat.sablierParams[i], hat.wearer);
             unchecked {
                 ++i;
             }
@@ -402,43 +367,10 @@ contract DecentHats {
         hatsProtocol.mintHat(hatId, hat.termedParams[0].nominatedWearers[0]);
 
         for (uint256 i = 0; i < hat.sablierParams.length; ) {
-            SablierStreamParams memory sablierParams = hat.sablierParams[i];
-
-            // Approve tokens for Sablier
-            IAvatar(msg.sender).execTransactionFromModule(
-                sablierParams.asset,
-                0,
-                abi.encodeWithSignature(
-                    "approve(address,uint256)",
-                    sablierParams.sablier,
-                    sablierParams.totalAmount
-                ),
-                Enum.Operation.Call
+            _createSablierStream(
+                hat.sablierParams[i],
+                hat.termedParams[0].nominatedWearers[0]
             );
-
-            LockupLinear.CreateWithTimestamps memory params = LockupLinear
-                .CreateWithTimestamps({
-                    sender: sablierParams.sender,
-                    recipient: hat.termedParams[0].nominatedWearers[0],
-                    totalAmount: sablierParams.totalAmount,
-                    asset: IERC20(sablierParams.asset),
-                    cancelable: sablierParams.cancelable,
-                    transferable: sablierParams.transferable,
-                    timestamps: sablierParams.timestamps,
-                    broker: sablierParams.broker
-                });
-
-            // Proxy the Sablier call through IAvatar
-            IAvatar(msg.sender).execTransactionFromModule(
-                address(sablierParams.sablier),
-                0,
-                abi.encodeWithSignature(
-                    "createWithTimestamps((address,address,uint128,address,bool,bool,(uint40,uint40,uint40),(address,uint256)))",
-                    params
-                ),
-                Enum.Operation.Call
-            );
-
             unchecked {
                 ++i;
             }
@@ -493,6 +425,46 @@ contract DecentHats {
             abi.encode(topHatId, uint256(0)),
             abi.encode(termedParams.termEndDateTs),
             uint256(SALT)
+        );
+    }
+
+    function _createSablierStream(
+        SablierStreamParams memory sablierParams,
+        address recipient
+    ) internal {
+        // Approve tokens for Sablier
+        IAvatar(msg.sender).execTransactionFromModule(
+            sablierParams.asset,
+            0,
+            abi.encodeWithSignature(
+                "approve(address,uint256)",
+                sablierParams.sablier,
+                sablierParams.totalAmount
+            ),
+            Enum.Operation.Call
+        );
+
+        LockupLinear.CreateWithTimestamps memory params = LockupLinear
+            .CreateWithTimestamps({
+                sender: sablierParams.sender,
+                recipient: recipient,
+                totalAmount: sablierParams.totalAmount,
+                asset: IERC20(sablierParams.asset),
+                cancelable: sablierParams.cancelable,
+                transferable: sablierParams.transferable,
+                timestamps: sablierParams.timestamps,
+                broker: sablierParams.broker
+            });
+
+        // Proxy the Sablier call through IAvatar
+        IAvatar(msg.sender).execTransactionFromModule(
+            address(sablierParams.sablier),
+            0,
+            abi.encodeWithSignature(
+                "createWithTimestamps((address,address,uint128,address,bool,bool,(uint40,uint40,uint40),(address,uint256)))",
+                params
+            ),
+            Enum.Operation.Call
         );
     }
 }
