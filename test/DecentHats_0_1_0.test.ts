@@ -1,6 +1,8 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import hre, { ethers } from 'hardhat';
+/* eslint-disable-next-line import/no-extraneous-dependencies */
+import { ethers } from 'ethers';
+import hre from 'hardhat';
 import {
   GnosisSafeL2,
   GnosisSafeL2__factory,
