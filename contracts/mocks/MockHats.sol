@@ -58,4 +58,8 @@ contract MockHats is IHats {
     function getHatEligibilityModule(
         uint256 _hatId
     ) external view returns (address eligibility) {}
+
+    function getNextId(uint256) external view returns (uint256 nextId) {
+        nextId = count;
+    }
 }
