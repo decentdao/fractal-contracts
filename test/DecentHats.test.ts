@@ -69,12 +69,15 @@ describe('DecentHats', () => {
 
       mockHats = await new MockHats__factory(deployer).deploy();
       mockHatsAddress = await mockHats.getAddress();
+
       const mockHatsElectionEligibilityImplementation =
         await new MockHatsElectionEligibility__factory(deployer).deploy();
       mockHatsElectionEligibilityImplementationAddress =
         await mockHatsElectionEligibilityImplementation.getAddress();
+
       const mockHatsModuleFactory = await new MockHatsModuleFactory__factory(deployer).deploy();
       mockHatsModuleFactoryAddress = await mockHatsModuleFactory.getAddress();
+
       keyValuePairs = await new KeyValuePairs__factory(deployer).deploy();
       erc6551Registry = await new ERC6551Registry__factory(deployer).deploy();
       mockHatsAccountImplementation = await new MockHatsAccount__factory(deployer).deploy();
@@ -311,6 +314,93 @@ describe('DecentHats', () => {
             expect(await topHatAccount.tokenImplementation()).eq(mockHatsAddress);
           }
         });
+      });
+    });
+    describe('Creating a new Top Hat and Tree with Termed Roles', () => {
+      let createAndDeclareTreeTx: ethers.ContractTransactionResponse;
+
+      beforeEach(async () => {
+        createAndDeclareTreeTx = await executeSafeTransaction({
+          safe: gnosisSafe,
+          to: decentHatsAddress,
+          transactionData: DecentHats__factory.createInterface().encodeFunctionData(
+            'createAndDeclareTree',
+            [
+              {
+                hatsProtocol: mockHatsAddress,
+                hatsAccountImplementation: mockHatsAccountImplementationAddress,
+                registry: await erc6551Registry.getAddress(),
+                keyValuePairs: await keyValuePairs.getAddress(),
+                topHatDetails: '',
+                topHatImageURI: '',
+                decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
+                moduleProxyFactory: await moduleProxyFactory.getAddress(),
+                adminHat: {
+                  maxSupply: 1,
+                  details: '',
+                  imageURI: '',
+                  isMutable: false,
+                  wearer: ethers.ZeroAddress,
+                  sablierParams: [],
+                  isTermed: false,
+                  termedParams: [],
+                },
+                hats: [
+                  {
+                    maxSupply: 1,
+                    details: '',
+                    imageURI: '',
+                    isMutable: false,
+                    wearer: ethers.ZeroAddress,
+                    sablierParams: [],
+                    isTermed: true,
+                    termedParams: [
+                      {
+                        termEndDateTs: BigInt(Date.now() + 100000),
+                        nominatedWearers: ['0x14dC79964da2C08b23698B3D3cc7Ca32193d9955'],
+                      },
+                    ],
+                  },
+                  {
+                    maxSupply: 1,
+                    details: '',
+                    imageURI: '',
+                    isMutable: false,
+                    wearer: ethers.ZeroAddress,
+                    sablierParams: [],
+                    isTermed: true,
+                    termedParams: [
+                      {
+                        termEndDateTs: BigInt(Date.now() + 100000),
+                        nominatedWearers: ['0x14dC79964da2C08b23698B3D3cc7Ca32193d9955'],
+                      },
+                    ],
+                  },
+                ],
+                hatsModuleFactory: mockHatsModuleFactoryAddress,
+                hatsElectionEligibilityImplementation:
+                  mockHatsElectionEligibilityImplementationAddress,
+              },
+            ],
+          ),
+          signers: [dao],
+        });
+      });
+
+      it('Emits an ExecutionSuccess event', async () => {
+        await expect(createAndDeclareTreeTx).to.emit(gnosisSafe, 'ExecutionSuccess');
+      });
+
+      it('Emits an ExecutionFromModuleSuccess event', async () => {
+        await expect(createAndDeclareTreeTx)
+          .to.emit(gnosisSafe, 'ExecutionFromModuleSuccess')
+          .withArgs(decentHatsAddress);
+      });
+
+      it('Emits some hatsTreeId ValueUpdated events', async () => {
+        await expect(createAndDeclareTreeTx)
+          .to.emit(keyValuePairs, 'ValueUpdated')
+          .withArgs(gnosisSafeAddress, 'topHatId', '0');
       });
     });
 
