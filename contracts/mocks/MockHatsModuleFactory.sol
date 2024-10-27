@@ -2,22 +2,19 @@
 pragma solidity ^0.8.19;
 
 import {IHatsModuleFactory} from "../interfaces/hats/full/IHatsModuleFactory.sol";
+import {MockHatsElectionEligibility} from "./MockHatsElectionEligibility.sol";
 
 contract MockHatsModuleFactory is IHatsModuleFactory {
     function createHatsModule(
-        address _implementation,
-        uint256 _hatId,
-        bytes calldata _otherImmutableArgs,
-        bytes calldata _initData,
-        uint256 _saltNonce
-    ) external pure returns (address _instance) {
-        // Silence unused variable warnings
-        _implementation;
-        _hatId;
-        _otherImmutableArgs;
-        _initData;
-        _saltNonce;
-        return address(0);
+        address,
+        uint256,
+        bytes calldata,
+        bytes calldata,
+        uint256
+    ) external override returns (address _instance) {
+        // Deploy a new instance of MockHatsElectionEligibility
+        MockHatsElectionEligibility newModule = new MockHatsElectionEligibility();
+        _instance = address(newModule);
     }
 
     function getHatsModuleAddress(
@@ -25,14 +22,7 @@ contract MockHatsModuleFactory is IHatsModuleFactory {
         uint256 _hatId,
         bytes calldata _otherImmutableArgs,
         uint256 _saltNonce
-    ) external pure returns (address) {
-        // Silence unused variable warnings
-        _implementation;
-        _hatId;
-        _otherImmutableArgs;
-        _saltNonce;
-        return address(0);
-    }
+    ) external view returns (address) {}
 
     function HATS() external view override returns (address) {}
 

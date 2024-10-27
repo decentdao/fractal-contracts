@@ -1,41 +1,37 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
+import {IHatsElectionEligibility} from "../interfaces/hats/full/IHatsElectionEligibility.sol";
 
-contract MockHatsElectionEligibility {
-    uint128 private _currentTermEnd;
-    uint128 private _nextTermEnd;
-    mapping(uint128 => bool) private _electionStatus;
+contract MockHatsElectionEligibility is IHatsElectionEligibility {
+    function currentTermEnd() external view returns (uint128) {}
 
-    event ElectionOpened(uint128 nextTermEnd);
-    event ElectionCompleted(uint128 termEnd, address[] winners);
-    event NewTermStarted(uint128 termEnd);
+    function nextTermEnd() external view returns (uint128) {}
 
-    // Mock function to simulate starting the next term
-    function startNextTerm() external {
-        _currentTermEnd = _nextTermEnd;
-        _nextTermEnd = 0;
+    function electionStatus(
+        uint128 termEnd
+    ) external view returns (bool isElectionOpen) {}
 
-        emit NewTermStarted(_currentTermEnd);
-    }
+    function electionResults(
+        uint128 termEnd,
+        address candidate
+    ) external view returns (bool elected) {}
 
-    function currentTermEnd() external view returns (uint128) {
-        return _currentTermEnd;
-    }
+    function BALLOT_BOX_HAT() external pure returns (uint256) {}
 
-    function electionStatus(uint128 termEnd) external view returns (bool) {
-        return _electionStatus[termEnd];
-    }
+    function ADMIN_HAT() external pure returns (uint256) {}
 
-    // Functions to set the mock data for testing
-    function setCurrentTermEnd(uint128 termEnd) external {
-        _currentTermEnd = termEnd;
-    }
+    function elect(uint128 _termEnd, address[] calldata _winners) external {}
 
-    function setNextTermEnd(uint128 termEnd) external {
-        _nextTermEnd = termEnd;
-    }
+    function recall(uint128 _termEnd, address[] calldata _recallees) external {}
 
-    function setElectionStatus(uint128 termEnd, bool status) external {
-        _electionStatus[termEnd] = status;
+    function setNextTerm(uint128 _newTermEnd) external {}
+
+    function startNextTerm() external {}
+
+    function getWearerStatus(
+        address,
+        uint256
+    ) external pure returns (bool eligible, bool standing) {
+        return (true, true);
     }
 }
