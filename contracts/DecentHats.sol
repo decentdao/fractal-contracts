@@ -93,6 +93,12 @@ contract DecentHats {
      *
      * @notice This contract should be enabled a module on the Safe for which the role(s) are to be created, and disabled after.
      *
+     * @dev For each hat that is included, if the hat is:
+     *  - termed, its stream funds on are targeted directly at the nominated wearer. The wearer should directly call `withdraw-`
+     *    on the Sablier contract.
+     *  - untermed, its stream funds are targeted at the hat's smart account. In order to withdraw funds from the stream, the
+     * hat's smart account must be the one call to `withdraw-` on the Sablier contract, setting the recipient arg to its wearer.
+     *
      * @dev In order for a Safe to seamlessly create roles even if it has never previously created a role and thus has
      * no hat tree, we defer the creation of the hat tree and its setup to this contract. This way, in a single tx block,
      * the resulting topHatId of the newly created hat can be used to create an admin hat and any other hats needed.
@@ -166,6 +172,9 @@ contract DecentHats {
      *
      * @dev The function simply calls `_createHatAndAccountAndMintAndStreams` and then transfers the top hat back to the Safe.
      *
+     * @dev Stream funds on Roles are targeted at the hat's smart account. In order to withdraw funds from the stream, the
+     * hat's smart account must be the one call to `withdraw-` on the Sablier contract, setting the recipient arg to its wearer.
+     *
      * @dev Role hat creation, minting, smart account creation and stream creation are handled here in order
      * to avoid a race condition where not more than one active proposal to create a new role can exist at a time.
      * See: https://github.com/decentdao/decent-interface/issues/2402
@@ -197,6 +206,9 @@ contract DecentHats {
      * creating the role hat.
      *
      * @dev The function simply calls `_createTermedHatAndAccountAndMintAndStreams` and then transfers the top hat back to the Safe.
+     *
+     * @dev Stream funds on Termed Roles are targeted directly at the nominated wearer.
+     * The wearer should directly call `withdraw-` on the Sablier contract.
      *
      * @dev Termed Role hat creation, minting, and stream creation are handled here in order
      * to avoid a race condition where not more than one active proposal to create a new termed role can exist at a time.
