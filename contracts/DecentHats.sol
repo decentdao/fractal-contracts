@@ -88,7 +88,8 @@ contract DecentHats {
     ///////////////////////////////////////////////////////////////////////////// */
     /**
      * @notice For a safe without any roles previously created on it, this function should be called. It sets up the
-     * top hat and admin hat, as well as any other hats and their streams that are provided.
+     * top hat and admin hat, as well as any other hats and their streams that are provided, then transfers the top hat
+     * to the calling safe.
      *
      * @notice This contract should be enabled a module on the Safe for which the role(s) are to be created, and disabled after.
      *
@@ -159,10 +160,11 @@ contract DecentHats {
      *
      * @notice This contract should be enabled a module on the Safe for which the role is to be created, and disabled after.
      *
-     * @dev In order for the module to be able to create hats on behalf of the Safe, the Safe must first transfer its top hat to this contract. This function transfers the top hat back to the Safe after
+     * @dev In order for the module to be able to create hats on behalf of the Safe, the Safe must first
+     * transfer its top hat to this contract. This function transfers the top hat back to the Safe after
      * creating the role hat.
      *
-     * @dev The function simply calls `createHatAndAccountAndMintAndStreams` and then transfers the top hat back to the Safe.
+     * @dev The function simply calls `_createHatAndAccountAndMintAndStreams` and then transfers the top hat back to the Safe.
      *
      * @dev Role hat creation, minting, smart account creation and stream creation are handled here in order
      * to avoid a race condition where not more than one active proposal to create a new role can exist at a time.
@@ -186,14 +188,15 @@ contract DecentHats {
     }
 
     /**
-     * Creates a new terned role hat and any streams on it.
+     * @notice Creates a new termed role hat and any streams on it.
      *
-     * This contract should be enabled a module on the Safe for which the role is to be created, and disable after.
-     * In order for the module to be able to create hats on behalf of the Safe, the Safe must first
+     * @notice This contract should be enabled a module on the Safe for which the role is to be created, and disable after.
+     *
+     * @dev In order for the module to be able to create hats on behalf of the Safe, the Safe must first
      * transfer its top hat to this contract. This function transfers the top hat back to the Safe after
      * creating the role hat.
      *
-     * The function simply calls `createTermedHatAndAccountAndMintAndStreams` and then transfers the top hat back to the Safe.
+     * @dev The function simply calls `_createTermedHatAndAccountAndMintAndStreams` and then transfers the top hat back to the Safe.
      *
      * @dev Termed Role hat creation, minting, and stream creation are handled here in order
      * to avoid a race condition where not more than one active proposal to create a new termed role can exist at a time.
