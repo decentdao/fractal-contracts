@@ -87,6 +87,8 @@ describe('DecentAutonomousAdminHat', function () {
 
       // Verify the hat is now worn by the nominated wearer
       expect((await hatsProtocol.isWearerOfHat(nominatedWearer.address, userHatId)) === true);
+
+      expect((await hatsProtocol.isWearerOfHat(currentWearer.address, userHatId)) === false);
     });
     it('should correctly invalidate random address as current wearer', async function () {
       const args = {

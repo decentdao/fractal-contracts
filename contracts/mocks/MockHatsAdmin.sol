@@ -159,8 +159,12 @@ contract MockHatsAutoAdmin is IHats {
 
     function checkHatWearerStatus(
         uint256 _hatId,
-        address _wearer
-    ) external override returns (bool updated) {}
+        address
+    ) external override returns (bool updated) {
+        // 'burns' the hat if the wearer is no longer eligible
+        wearer[_hatId] = address(0);
+        return true;
+    }
 
     function renounceHat(uint256 _hatId) external override {}
 
