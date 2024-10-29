@@ -2,7 +2,6 @@
 pragma solidity 0.8.28;
 
 import {IHats} from "./hats/full/IHats.sol";
-import {ISablierV2Lockup} from "./sablier/full/ISablierV2Lockup.sol";
 
 interface IDecentAutonomousAdmin {
     struct TriggerStartArgs {
