@@ -8,7 +8,6 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC6551Registry} from "./interfaces/IERC6551Registry.sol";
 import {IHats} from "./interfaces/hats/full/IHats.sol";
 import {LockupLinear, Broker} from "./interfaces/sablier/full/types/DataTypes.sol";
-import {DecentAutonomousAdmin} from "./DecentAutonomousAdmin.sol";
 import {IHatsModuleFactory} from "./interfaces/hats/full/IHatsModuleFactory.sol";
 import {IHatsElectionEligibility} from "./interfaces/hats/full/IHatsElectionEligibility.sol";
 import {ModuleProxyFactory} from "@gnosis.pm/zodiac/contracts/factory/ModuleProxyFactory.sol";
