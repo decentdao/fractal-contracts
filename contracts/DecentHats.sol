@@ -15,7 +15,6 @@ import {ModuleProxyFactory} from "@gnosis.pm/zodiac/contracts/factory/ModuleProx
 import {ISablierV2LockupLinear} from "./interfaces/sablier/ISablierV2LockupLinear.sol";
 
 contract DecentHats {
-    string public constant NAME = "DecentHats";
     bytes32 public constant SALT =
         0x5d0e6ce4fd951366cc55da93f6e79d8b81483109d79676a04bcc2bed6a4b5072;
 
