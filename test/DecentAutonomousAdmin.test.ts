@@ -99,9 +99,9 @@ describe('DecentAutonomousAdminHat', function () {
       };
 
       // revert if not the current wearer
-      await expect(adminHat.connect(randomUser).triggerStartNextTerm(args)).to.be.revertedWith(
-        'Not current wearer',
-      );
+      await expect(
+        adminHat.connect(randomUser).triggerStartNextTerm(args),
+      ).to.be.revertedWithCustomError(adminHat, 'NotCurrentWearer');
     });
   });
 });
