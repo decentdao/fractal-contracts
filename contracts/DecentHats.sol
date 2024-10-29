@@ -30,7 +30,7 @@ contract DecentHats {
         bool transferable;
     }
 
-    struct TermedParams {
+    struct TermedParam {
         uint128 termEndDateTs;
         address[] nominatedWearers;
     }
@@ -40,10 +40,9 @@ contract DecentHats {
         string details;
         string imageURI;
         SablierStreamParams[] sablierParams;
-        TermedParams[] termedParams;
+        TermedParam termedParam;
         uint32 maxSupply;
         bool isMutable;
-        bool isTermed;
     }
 
     struct CreateTreeParams {
@@ -127,7 +126,8 @@ contract DecentHats {
         );
 
         for (uint256 i = 0; i < params.hats.length; ) {
-            if (params.hats[i].isTermed) {
+            // {assuption} if 0 nominatedWearers, then it is not a termed role
+            if (params.hats[i].termedParam.nominatedWearers.length > 0) {
                 // Create election module and set as eligiblity
                 _createTermedHatAndAccountAndMintAndStreams(
                     params.hatsProtocol,
@@ -137,7 +137,7 @@ contract DecentHats {
                         params.hatsElectionEligibilityImplementation,
                         params.hatsProtocol.getNextId(adminHatId),
                         topHatId,
-                        params.hats[i].termedParams[0]
+                        params.hats[i].termedParam
                     ),
                     adminHatId,
                     params.hats[i]
@@ -225,7 +225,7 @@ contract DecentHats {
                 params.hatsElectionEligibilityImplementation,
                 params.hatsProtocol.getNextId(params.adminHatId),
                 params.topHatId,
-                params.hat.termedParams[0]
+                params.hat.termedParam
             ),
             params.adminHatId,
             params.hat
@@ -359,11 +359,7 @@ contract DecentHats {
         Hat calldata hat
     ) internal {
         require(
-            hat.termedParams.length == 1,
-            "DecentHats: termedParams length must be 1"
-        );
-        require(
-            hat.termedParams[0].nominatedWearers.length == 1,
+            hat.termedParam.nominatedWearers.length == 1,
             "DecentHats: nominatedWearers length must be 1"
         );
         uint256 hatId = _createHat(
@@ -375,16 +371,16 @@ contract DecentHats {
         );
 
         IHatsElectionEligibility(eligibilityAddress).elect(
-            hat.termedParams[0].termEndDateTs,
-            hat.termedParams[0].nominatedWearers
+            hat.termedParam.termEndDateTs,
+            hat.termedParam.nominatedWearers
         );
 
-        hatsProtocol.mintHat(hatId, hat.termedParams[0].nominatedWearers[0]);
+        hatsProtocol.mintHat(hatId, hat.termedParam.nominatedWearers[0]);
 
         for (uint256 i = 0; i < hat.sablierParams.length; ) {
             _createSablierStream(
                 hat.sablierParams[i],
-                hat.termedParams[0].nominatedWearers[0]
+                hat.termedParam.nominatedWearers[0]
             );
             unchecked {
                 ++i;
@@ -432,13 +428,13 @@ contract DecentHats {
         address hatsElectionEligibilityImplementation,
         uint256 hatId,
         uint256 topHatId,
-        TermedParams calldata termedParams
+        TermedParam calldata termedParam
     ) internal returns (address electionModuleAddress) {
         electionModuleAddress = hatsModuleFactory.createHatsModule(
             hatsElectionEligibilityImplementation,
             hatId,
             abi.encode(topHatId, uint256(0)),
-            abi.encode(termedParams.termEndDateTs),
+            abi.encode(termedParam.termEndDateTs),
             uint256(SALT)
         );
     }
