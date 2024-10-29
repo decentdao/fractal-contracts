@@ -821,7 +821,7 @@ describe('DecentHats', () => {
       });
     });
 
-    describe('Creating a new hat on existing Tree', () => {
+    describe('Creating a new Termed hat on existing tree', () => {
       let createRoleHatPromise: Promise<ethers.ContractTransactionResponse>;
       const topHatId = 0;
 
