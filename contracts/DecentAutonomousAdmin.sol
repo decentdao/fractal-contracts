@@ -27,7 +27,7 @@ contract DecentAutonomousAdmin is
         ) revert NotCurrentWearer();
 
         IHatsElectionEligibility hatsElectionModule = IHatsElectionEligibility(
-            hatsEligibilityModuleAddress
+            args.hatsProtocol.getHatEligibilityModule(args.hatId)
         );
 
         hatsElectionModule.startNextTerm();
