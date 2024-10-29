@@ -20,7 +20,7 @@ describe('DecentAutonomousAdminHat', function () {
   // Contract instances
   let hatsProtocol: MockHats;
   let hatsElectionModule: MockHatsElectionEligibility;
-  let adminHat: DecentAutonomousAdmin;
+  let decentAutonomousAdminInstance: DecentAutonomousAdmin;
 
   // Variables
   let userHatId: bigint;
@@ -49,14 +49,14 @@ describe('DecentAutonomousAdminHat', function () {
     const adminHatId = createAdminTxReceipt?.toJSON().logs[0].args[0];
 
     // Deploy DecentAutonomousAdminHat contract with the admin hat ID
-    adminHat = await new DecentAutonomousAdmin__factory(deployer).deploy();
-    const adminHatAddress = await adminHat.getAddress();
+    decentAutonomousAdminInstance = await new DecentAutonomousAdmin__factory(deployer).deploy();
+    const adminHatAddress = await decentAutonomousAdminInstance.getAddress();
     // Mint the admin hat to adminHatWearer
     await hatsProtocol.mintHat(adminHatId, adminHatAddress);
 
     // Create User Hat under the admin hat
     const createUserTx = await hatsProtocol.createHat(
-      hre.ethers.ZeroAddress, // Admin address (adminHat contract), currently unused
+      hre.ethers.ZeroAddress, // Admin address (decentAutonomousAdminInstance contract), currently unused
       'Details', // Hat details
       100, // Max supply
       await hatsElectionModule.getAddress(), // Eligibility module (election module)
@@ -81,8 +81,8 @@ describe('DecentAutonomousAdminHat', function () {
         nominatedWearer: nominatedWearer.address,
       };
 
-      // Call triggerStartNextTerm on the adminHat contract
-      await adminHat.triggerStartNextTerm(args);
+      // Call triggerStartNextTerm on the decentAutonomousAdminInstance contract
+      await decentAutonomousAdminInstance.triggerStartNextTerm(args);
 
       // Verify the hat is now worn by the nominated wearer
       expect((await hatsProtocol.isWearerOfHat(nominatedWearer.address, userHatId)) === true);
@@ -100,8 +100,8 @@ describe('DecentAutonomousAdminHat', function () {
 
       // revert if not the current wearer
       await expect(
-        adminHat.connect(randomUser).triggerStartNextTerm(args),
-      ).to.be.revertedWithCustomError(adminHat, 'NotCurrentWearer');
+        decentAutonomousAdminInstance.connect(randomUser).triggerStartNextTerm(args),
+      ).to.be.revertedWithCustomError(decentAutonomousAdminInstance, 'NotCurrentWearer');
     });
   });
 });
