@@ -32,7 +32,7 @@ contract DecentHats {
 
     struct TermedParam {
         uint128 termEndDateTs;
-        address[] nominatedWearers;
+        address nominatedWearer;
     }
 
     struct Hat {
@@ -127,7 +127,7 @@ contract DecentHats {
 
         for (uint256 i = 0; i < params.hats.length; ) {
             // {assuption} if 0 nominatedWearers, then it is not a termed role
-            if (params.hats[i].termedParam.nominatedWearers.length > 0) {
+            if (params.hats[i].termedParam.nominatedWearer != address(0)) {
                 // Create election module and set as eligiblity
                 _createTermedHatAndAccountAndMintAndStreams(
                     params.hatsProtocol,
@@ -358,10 +358,6 @@ contract DecentHats {
         uint256 adminHatId,
         Hat calldata hat
     ) internal {
-        require(
-            hat.termedParam.nominatedWearers.length == 1,
-            "DecentHats: nominatedWearers length must be 1"
-        );
         uint256 hatId = _createHat(
             hatsProtocol,
             adminHatId,
@@ -370,17 +366,19 @@ contract DecentHats {
             eligibilityAddress
         );
 
+        address[] memory nominatedWearers = new address[](1);
+        nominatedWearers[0] = hat.termedParam.nominatedWearer;
         IHatsElectionEligibility(eligibilityAddress).elect(
             hat.termedParam.termEndDateTs,
-            hat.termedParam.nominatedWearers
+            nominatedWearers
         );
 
-        hatsProtocol.mintHat(hatId, hat.termedParam.nominatedWearers[0]);
+        hatsProtocol.mintHat(hatId, hat.termedParam.nominatedWearer);
 
         for (uint256 i = 0; i < hat.sablierParams.length; ) {
             _createSablierStream(
                 hat.sablierParams[i],
-                hat.termedParam.nominatedWearers[0]
+                hat.termedParam.nominatedWearer
             );
             unchecked {
                 ++i;

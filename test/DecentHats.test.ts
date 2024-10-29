@@ -186,7 +186,7 @@ describe('DecentHats', () => {
                   sablierParams: [],
                   termedParam: {
                     termEndDateTs: 0,
-                    nominatedWearers: [],
+                    nominatedWearer: ethers.ZeroAddress,
                   },
                 },
                 hats: [
@@ -199,7 +199,7 @@ describe('DecentHats', () => {
                     sablierParams: [],
                     termedParam: {
                       termEndDateTs: 0,
-                      nominatedWearers: [],
+                      nominatedWearer: ethers.ZeroAddress,
                     },
                   },
                   {
@@ -211,7 +211,7 @@ describe('DecentHats', () => {
                     sablierParams: [],
                     termedParam: {
                       termEndDateTs: 0,
-                      nominatedWearers: [],
+                      nominatedWearer: ethers.ZeroAddress,
                     },
                   },
                 ],
@@ -271,7 +271,7 @@ describe('DecentHats', () => {
 
                     termedParam: {
                       termEndDateTs: 0,
-                      nominatedWearers: [],
+                      nominatedWearer: ethers.ZeroAddress,
                     },
                   },
                   hats: [],
@@ -346,7 +346,7 @@ describe('DecentHats', () => {
                   sablierParams: [],
                   termedParam: {
                     termEndDateTs: 0,
-                    nominatedWearers: [],
+                    nominatedWearer: ethers.ZeroAddress,
                   },
                 },
                 hats: [
@@ -359,7 +359,7 @@ describe('DecentHats', () => {
                     sablierParams: [],
                     termedParam: {
                       termEndDateTs: BigInt(Date.now() + 100000),
-                      nominatedWearers: ['0x14dC79964da2C08b23698B3D3cc7Ca32193d9955'],
+                      nominatedWearer: '0x14dC79964da2C08b23698B3D3cc7Ca32193d9955',
                     },
                   },
                   {
@@ -371,7 +371,7 @@ describe('DecentHats', () => {
                     sablierParams: [],
                     termedParam: {
                       termEndDateTs: BigInt(Date.now() + 100000),
-                      nominatedWearers: ['0x14dC79964da2C08b23698B3D3cc7Ca32193d9955'],
+                      nominatedWearer: '0x14dC79964da2C08b23698B3D3cc7Ca32193d9955',
                     },
                   },
                 ],
@@ -433,7 +433,7 @@ describe('DecentHats', () => {
                   sablierParams: [],
                   termedParam: {
                     termEndDateTs: 0,
-                    nominatedWearers: [],
+                    nominatedWearer: ethers.ZeroAddress,
                   },
                 },
                 hats: [
@@ -461,7 +461,7 @@ describe('DecentHats', () => {
                     ],
                     termedParam: {
                       termEndDateTs: 0,
-                      nominatedWearers: [],
+                      nominatedWearer: ethers.ZeroAddress,
                     },
                   },
                   {
@@ -473,7 +473,7 @@ describe('DecentHats', () => {
                     sablierParams: [],
                     termedParam: {
                       termEndDateTs: 0,
-                      nominatedWearers: [],
+                      nominatedWearer: ethers.ZeroAddress,
                     },
                   },
                 ],
@@ -566,7 +566,7 @@ describe('DecentHats', () => {
                   sablierParams: [],
                   termedParam: {
                     termEndDateTs: 0,
-                    nominatedWearers: [],
+                    nominatedWearer: ethers.ZeroAddress,
                   },
                 },
                 hats: [
@@ -608,7 +608,7 @@ describe('DecentHats', () => {
                     ],
                     termedParam: {
                       termEndDateTs: 0,
-                      nominatedWearers: [],
+                      nominatedWearer: ethers.ZeroAddress,
                     },
                   },
                 ],
@@ -698,7 +698,7 @@ describe('DecentHats', () => {
                     sablierParams: [],
                     termedParam: {
                       termEndDateTs: 0,
-                      nominatedWearers: [],
+                      nominatedWearer: ethers.ZeroAddress,
                     },
                   },
                   hatsModuleFactory: mockHatsModuleFactoryAddress,
@@ -740,7 +740,7 @@ describe('DecentHats', () => {
 
                   termedParam: {
                     termEndDateTs: 0,
-                    nominatedWearers: [],
+                    nominatedWearer: ethers.ZeroAddress,
                   },
                   sablierParams: [
                     {
@@ -840,7 +840,7 @@ describe('DecentHats', () => {
 
                     termedParam: {
                       termEndDateTs: 0,
-                      nominatedWearers: [],
+                      nominatedWearer: ethers.ZeroAddress,
                     },
                   },
                   hatsModuleFactory: mockHatsModuleFactoryAddress,
@@ -884,7 +884,7 @@ describe('DecentHats', () => {
                   wearer: '0xdce7ca0555101f97451926944f5ae3b7adb2f5ae',
                   termedParam: {
                     termEndDateTs: BigInt(Date.now() + 100000),
-                    nominatedWearers: ['0xdce7ca0555101f97451926944f5ae3b7adb2f5ae'],
+                    nominatedWearer: '0xdce7ca0555101f97451926944f5ae3b7adb2f5ae',
                   },
                   sablierParams: [
                     {
