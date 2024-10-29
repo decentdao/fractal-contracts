@@ -4,8 +4,8 @@ import hre from 'hardhat';
 import {
   DecentAutonomousAdmin,
   DecentAutonomousAdmin__factory,
-  MockHatsAutoAdmin,
-  MockHatsAutoAdmin__factory,
+  MockHats,
+  MockHats__factory,
   MockHatsElectionEligibility,
   MockHatsElectionEligibility__factory,
 } from '../typechain-types';
@@ -18,7 +18,7 @@ describe('DecentAutonomousAdminHat', function () {
   let nominatedWearer: SignerWithAddress;
 
   // Contract instances
-  let hatsProtocol: MockHatsAutoAdmin;
+  let hatsProtocol: MockHats;
   let hatsElectionModule: MockHatsElectionEligibility;
   let adminHat: DecentAutonomousAdmin;
 
@@ -30,14 +30,14 @@ describe('DecentAutonomousAdminHat', function () {
     [deployer, currentWearer, nominatedWearer, randomUser] = await hre.ethers.getSigners();
 
     // Deploy MockHatsAutoAdmin (Mock Hats Protocol)
-    hatsProtocol = await new MockHatsAutoAdmin__factory(deployer).deploy();
+    hatsProtocol = await new MockHats__factory(deployer).deploy();
 
     // Deploy MockHatsElectionEligibility (Eligibility Module)
     hatsElectionModule = await new MockHatsElectionEligibility__factory(deployer).deploy();
 
     // Create Admin Hat
     const createAdminTx = await hatsProtocol.createHat(
-      await hatsProtocol.getAddress(), // Admin address (self-administered)
+      hre.ethers.ZeroAddress, // Admin address (self-administered), currently unused
       'Details', // Hat details
       100, // Max supply
       hre.ethers.ZeroAddress, // Eligibility module (none)
@@ -56,7 +56,7 @@ describe('DecentAutonomousAdminHat', function () {
 
     // Create User Hat under the admin hat
     const createUserTx = await hatsProtocol.createHat(
-      adminHatAddress, // Admin address (adminHat contract)
+      hre.ethers.ZeroAddress, // Admin address (adminHat contract), currently unused
       'Details', // Hat details
       100, // Max supply
       await hatsElectionModule.getAddress(), // Eligibility module (election module)
@@ -76,10 +76,9 @@ describe('DecentAutonomousAdminHat', function () {
     it('should correctly validate current wearer and transfer', async function () {
       const args = {
         currentWearer: currentWearer.address,
-        userHatProtocol: await hatsProtocol.getAddress(),
-        userHatId: userHatId,
+        hatsProtocol: await hatsProtocol.getAddress(),
+        hatId: userHatId,
         nominatedWearer: nominatedWearer.address,
-        sablierStreamInfo: [], // No Sablier stream info for this test
       };
 
       // Call triggerStartNextTerm on the adminHat contract
@@ -93,8 +92,8 @@ describe('DecentAutonomousAdminHat', function () {
     it('should correctly invalidate random address as current wearer', async function () {
       const args = {
         currentWearer: randomUser.address,
-        userHatProtocol: await hatsProtocol.getAddress(),
-        userHatId: userHatId,
+        hatsProtocol: await hatsProtocol.getAddress(),
+        hatId: userHatId,
         nominatedWearer: nominatedWearer.address,
         sablierStreamInfo: [], // No Sablier stream info for this test
       };

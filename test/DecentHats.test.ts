@@ -10,13 +10,13 @@ import {
   DecentHats__factory,
   KeyValuePairs,
   KeyValuePairs__factory,
-  MockHats__factory,
   ERC6551Registry__factory,
   MockHatsAccount__factory,
   ERC6551Registry,
   DecentHats,
   MockHatsAccount,
   MockHats,
+  MockHats__factory,
   MockSablierV2LockupLinear__factory,
   MockSablierV2LockupLinear,
   MockERC20__factory,
@@ -300,18 +300,16 @@ describe('DecentHats', () => {
 
       describe('Creating Hats Accounts', () => {
         it('Generates the correct Addresses for the current Hats', async () => {
-          const currentCount = await mockHats.count();
-
+          const currentCount = await mockHats.hatId();
           for (let i = 0n; i < currentCount; i++) {
-            const topHatAccount = await getHatAccount(
+            const hatAccount = await getHatAccount(
               i,
               erc6551Registry,
               mockHatsAccountImplementationAddress,
               mockHatsAddress,
             );
-
-            expect(await topHatAccount.tokenId()).eq(i);
-            expect(await topHatAccount.tokenImplementation()).eq(mockHatsAddress);
+            expect(await hatAccount.tokenId()).eq(i);
+            expect(await hatAccount.tokenImplementation()).eq(mockHatsAddress);
           }
         });
       });
@@ -813,12 +811,12 @@ describe('DecentHats', () => {
         // First transfer the top hat to the Safe
         await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
 
-        const hatsCountBeforeCreate = await mockHats.count();
+        const hatsCountBeforeCreate = await mockHats.hatId();
         expect(hatsCountBeforeCreate).to.equal(2); // Top hat + admin hat
 
         await createRoleHatPromise;
 
-        const newHatId = await mockHats.count();
+        const newHatId = await mockHats.hatId();
         expect(newHatId).to.equal(3); // + newly created hat
       });
     });
@@ -957,12 +955,12 @@ describe('DecentHats', () => {
         // First transfer the top hat to the Safe
         await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
 
-        const hatsCountBeforeCreate = await mockHats.count();
+        const hatsCountBeforeCreate = await mockHats.hatId();
         expect(hatsCountBeforeCreate).to.equal(2); // Top hat + admin hat
 
         await createRoleHatPromise;
 
-        const newHatId = await mockHats.count();
+        const newHatId = await mockHats.hatId();
         expect(newHatId).to.equal(3); // + newly created hat
       });
     });

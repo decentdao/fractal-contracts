@@ -254,7 +254,7 @@ describe('DecentHats_0_1_0', () => {
 
       describe('Creating Hats Accounts', () => {
         it('Generates the correct Addresses for the current Hats', async () => {
-          const currentCount = await mockHats.count();
+          const currentCount = await mockHats.hatId();
 
           for (let i = 0n; i < currentCount; i++) {
             const topHatAccount = await getHatAccount(
@@ -621,12 +621,12 @@ describe('DecentHats_0_1_0', () => {
         // First transfer the top hat to the Safe
         await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
 
-        const hatsCountBeforeCreate = await mockHats.count();
+        const hatsCountBeforeCreate = await mockHats.hatId();
         expect(hatsCountBeforeCreate).to.equal(2); // Top hat + admin hat
 
         await createRoleHatPromise;
 
-        const newHatId = await mockHats.count();
+        const newHatId = await mockHats.hatId();
         expect(newHatId).to.equal(3); // + newly created hat
       });
     });

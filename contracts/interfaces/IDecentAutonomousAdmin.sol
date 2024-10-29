@@ -6,8 +6,8 @@ import {IHats} from "./hats/full/IHats.sol";
 interface IDecentAutonomousAdmin {
     struct TriggerStartArgs {
         address currentWearer;
-        IHats userHatProtocol;
-        uint256 userHatId;
+        IHats hatsProtocol;
+        uint256 hatId;
         address nominatedWearer;
     }
 

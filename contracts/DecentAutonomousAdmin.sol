@@ -22,15 +22,12 @@ contract DecentAutonomousAdmin is
     // //////////////////////////////////////////////////////////////
     function triggerStartNextTerm(TriggerStartArgs calldata args) public {
         require(
-            args.userHatProtocol.isWearerOfHat(
-                args.currentWearer,
-                args.userHatId
-            ),
+            args.hatsProtocol.isWearerOfHat(args.currentWearer, args.hatId),
             "Not current wearer"
         );
         address hatsEligibilityModuleAddress = args
-            .userHatProtocol
-            .getHatEligibilityModule(args.userHatId);
+            .hatsProtocol
+            .getHatEligibilityModule(args.hatId);
 
         IHatsElectionEligibility hatsElectionModule = IHatsElectionEligibility(
             hatsEligibilityModuleAddress
@@ -39,12 +36,9 @@ contract DecentAutonomousAdmin is
         hatsElectionModule.startNextTerm();
 
         // This will burn the hat since wearer is no longer eligible
-        args.userHatProtocol.checkHatWearerStatus(
-            args.userHatId,
-            args.currentWearer
-        );
+        args.hatsProtocol.checkHatWearerStatus(args.hatId, args.currentWearer);
         // This will mint the hat to the nominated wearer
-        args.userHatProtocol.mintHat(args.userHatId, args.nominatedWearer);
+        args.hatsProtocol.mintHat(args.hatId, args.nominatedWearer);
     }
 
     function supportsInterface(
