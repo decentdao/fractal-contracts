@@ -130,12 +130,12 @@ contract DecentHats {
                 _createTermedHatAndAccountAndMintAndStreams(
                     params.hatsProtocol,
                     topHatAccount,
-                    _createElectionEligiblityModule(
-                        params.hatsModuleFactory,
+                    params.hatsModuleFactory.createHatsModule(
                         params.hatsElectionEligibilityImplementation,
                         params.hatsProtocol.getNextId(adminHatId),
-                        topHatId,
-                        params.hats[i].termedParam
+                        abi.encode(topHatId, uint256(0)),
+                        abi.encode(params.hats[i].termedParam.termEndDateTs),
+                        uint256(SALT)
                     ),
                     adminHatId,
                     params.hats[i]
@@ -218,12 +218,12 @@ contract DecentHats {
         _createTermedHatAndAccountAndMintAndStreams(
             params.hatsProtocol,
             params.topHatAccount,
-            _createElectionEligiblityModule(
-                params.hatsModuleFactory,
+            params.hatsModuleFactory.createHatsModule(
                 params.hatsElectionEligibilityImplementation,
                 params.hatsProtocol.getNextId(params.adminHatId),
-                params.topHatId,
-                params.hat.termedParam
+                abi.encode(params.topHatId, uint256(0)),
+                abi.encode(params.hat.termedParam.termEndDateTs),
+                uint256(SALT)
             ),
             params.adminHatId,
             params.hat
@@ -403,22 +403,6 @@ contract DecentHats {
                 abi.encodeWithSignature("setUp(bytes)", bytes("")),
                 uint256(keccak256(abi.encodePacked(SALT, adminHatId)))
             )
-        );
-    }
-
-    function _createElectionEligiblityModule(
-        IHatsModuleFactory hatsModuleFactory,
-        address hatsElectionEligibilityImplementation,
-        uint256 hatId,
-        uint256 topHatId,
-        TermedParam calldata termedParam
-    ) internal returns (address electionModuleAddress) {
-        electionModuleAddress = hatsModuleFactory.createHatsModule(
-            hatsElectionEligibilityImplementation,
-            hatId,
-            abi.encode(topHatId, uint256(0)),
-            abi.encode(termedParam.termEndDateTs),
-            uint256(SALT)
         );
     }
 
