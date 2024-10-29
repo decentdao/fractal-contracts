@@ -4,6 +4,7 @@ pragma solidity 0.8.28;
 import {IHats} from "./hats/full/IHats.sol";
 
 interface IDecentAutonomousAdmin {
+    error NotCurrentWearer();
     struct TriggerStartArgs {
         address currentWearer;
         IHats hatsProtocol;

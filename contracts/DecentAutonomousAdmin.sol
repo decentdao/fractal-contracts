@@ -21,13 +21,10 @@ contract DecentAutonomousAdmin is
     //                         Public Functions
     // //////////////////////////////////////////////////////////////
     function triggerStartNextTerm(TriggerStartArgs calldata args) public {
-        require(
-            args.hatsProtocol.isWearerOfHat(args.currentWearer, args.hatId),
-            "Not current wearer"
-        );
-        address hatsEligibilityModuleAddress = args
-            .hatsProtocol
-            .getHatEligibilityModule(args.hatId);
+        if (
+            args.hatsProtocol.isWearerOfHat(args.currentWearer, args.hatId) ==
+            false
+        ) revert NotCurrentWearer();
 
         IHatsElectionEligibility hatsElectionModule = IHatsElectionEligibility(
             hatsEligibilityModuleAddress
