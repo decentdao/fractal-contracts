@@ -261,22 +261,6 @@ contract DecentHats {
         );
     }
 
-    function _createAccount(
-        IERC6551Registry _registry,
-        address _hatsAccountImplementation,
-        address protocolAddress,
-        uint256 hatId
-    ) internal returns (address) {
-        return
-            _registry.createAccount(
-                _hatsAccountImplementation,
-                SALT,
-                block.chainid,
-                protocolAddress,
-                hatId
-            );
-    }
-
     function _createTopHatAndAccount(
         IHats _hatsProtocol,
         string memory _topHatDetails,
@@ -290,9 +274,10 @@ contract DecentHats {
             _topHatImageURI
         );
 
-        topHatAccount = _createAccount(
-            _registry,
+        topHatAccount = _registry.createAccount(
             _hatsAccountImplementation,
+            SALT,
+            block.chainid,
             address(_hatsProtocol),
             topHatId
         );
@@ -315,9 +300,11 @@ contract DecentHats {
             hat.isMutable,
             hat.imageURI
         );
-        accountAddress = _createAccount(
-            registry,
+
+        accountAddress = registry.createAccount(
             hatsAccountImplementation,
+            SALT,
+            block.chainid,
             address(hatsProtocol),
             hatId
         );
@@ -389,9 +376,10 @@ contract DecentHats {
             hat.imageURI
         );
 
-        accountAddress = _createAccount(
-            registry,
+        accountAddress = registry.createAccount(
             hatsAccountImplementation,
+            SALT,
+            block.chainid,
             address(hatsProtocol),
             adminHatId
         );
