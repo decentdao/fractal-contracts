@@ -97,7 +97,7 @@ describe('DecentAutonomousAdminHat', function () {
         sablierStreamInfo: [], // No Sablier stream info for this test
       };
 
-      // Verify the hat is now worn by the current wearer
+      // revert if not the current wearer
       await expect(adminHat.connect(randomUser).triggerStartNextTerm(args)).to.be.revertedWith(
         'Not current wearer',
       );
