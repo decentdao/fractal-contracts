@@ -130,10 +130,10 @@ contract DecentHats {
                 _createTermedHatAndAccountAndMintAndStreams(
                     params.hatsProtocol,
                     topHatAccount,
-                    params.hatsModuleFactory.createHatsModule(
+                    params.hatsModuleFactory.createHatsModule( // Create election module and set as eligibility
                         params.hatsElectionEligibilityImplementation,
                         params.hatsProtocol.getNextId(adminHatId),
-                        abi.encode(topHatId, uint256(0)),
+                        abi.encode(topHatId, uint256(0)), // [BALLOT_BOX_ID, ADMIN_HAT_ID]
                         abi.encode(params.hats[i].termedParam.termEndDateTs),
                         uint256(SALT)
                     ),
@@ -218,10 +218,10 @@ contract DecentHats {
         _createTermedHatAndAccountAndMintAndStreams(
             params.hatsProtocol,
             params.topHatAccount,
-            params.hatsModuleFactory.createHatsModule(
+            params.hatsModuleFactory.createHatsModule( // Create election module and set as eligibility
                 params.hatsElectionEligibilityImplementation,
                 params.hatsProtocol.getNextId(params.adminHatId),
-                abi.encode(params.topHatId, uint256(0)),
+                abi.encode(params.topHatId, uint256(0)), // [BALLOT_BOX_ID, ADMIN_HAT_ID]
                 abi.encode(params.hat.termedParam.termEndDateTs),
                 uint256(SALT)
             ),
