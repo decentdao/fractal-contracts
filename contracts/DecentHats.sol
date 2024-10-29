@@ -261,25 +261,6 @@ contract DecentHats {
         );
     }
 
-    function _createHat(
-        IHats _hatsProtocol,
-        uint256 adminHatId,
-        Hat memory _hat,
-        address toggle,
-        address eligibility
-    ) internal returns (uint256) {
-        return
-            _hatsProtocol.createHat(
-                adminHatId,
-                _hat.details,
-                _hat.maxSupply,
-                eligibility,
-                toggle,
-                _hat.isMutable,
-                _hat.imageURI
-            );
-    }
-
     function _createAccount(
         IERC6551Registry _registry,
         address _hatsAccountImplementation,
@@ -325,12 +306,14 @@ contract DecentHats {
         uint256 adminHatId,
         Hat calldata hat
     ) internal returns (uint256 hatId, address accountAddress) {
-        hatId = _createHat(
-            hatsProtocol,
+        hatId = hatsProtocol.createHat(
             adminHatId,
-            hat,
+            hat.details,
+            hat.maxSupply,
             topHatAccount,
-            topHatAccount
+            topHatAccount,
+            hat.isMutable,
+            hat.imageURI
         );
         accountAddress = _createAccount(
             registry,
@@ -356,12 +339,14 @@ contract DecentHats {
         uint256 adminHatId,
         Hat calldata hat
     ) internal {
-        uint256 hatId = _createHat(
-            hatsProtocol,
+        uint256 hatId = hatsProtocol.createHat(
             adminHatId,
-            hat,
+            hat.details,
+            hat.maxSupply,
+            eligibilityAddress,
             topHatAccount,
-            eligibilityAddress
+            hat.isMutable,
+            hat.imageURI
         );
 
         address[] memory nominatedWearers = new address[](1);
@@ -394,12 +379,14 @@ contract DecentHats {
         uint256 topHatId,
         Hat calldata hat
     ) internal returns (uint256 adminHatId, address accountAddress) {
-        adminHatId = _createHat(
-            hatsProtocol,
+        adminHatId = hatsProtocol.createHat(
             topHatId,
-            hat,
+            hat.details,
+            hat.maxSupply,
             topHatAccount,
-            topHatAccount
+            topHatAccount,
+            hat.isMutable,
+            hat.imageURI
         );
 
         accountAddress = _createAccount(
