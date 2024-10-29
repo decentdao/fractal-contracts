@@ -822,5 +822,149 @@ describe('DecentHats', () => {
         expect(newHatId).to.equal(3); // + newly created hat
       });
     });
+
+    describe('Creating a new hat on existing Tree', () => {
+      let createRoleHatPromise: Promise<ethers.ContractTransactionResponse>;
+      const topHatId = 0;
+
+      beforeEach(async () => {
+        try {
+          await executeSafeTransaction({
+            safe: gnosisSafe,
+            to: decentHatsAddress,
+            transactionData: DecentHats__factory.createInterface().encodeFunctionData(
+              'createAndDeclareTree',
+              [
+                {
+                  hatsProtocol: mockHatsAddress,
+                  hatsAccountImplementation: mockHatsAccountImplementationAddress,
+                  registry: await erc6551Registry.getAddress(),
+                  keyValuePairs: await keyValuePairs.getAddress(),
+                  topHatDetails: '',
+                  topHatImageURI: '',
+                  adminHat: {
+                    maxSupply: 1,
+                    details: '',
+                    imageURI: '',
+                    isMutable: false,
+                    wearer: ethers.ZeroAddress,
+                    sablierParams: [],
+                    isTermed: false,
+                    termedParams: [],
+                  },
+                  hatsModuleFactory: mockHatsModuleFactoryAddress,
+                  hatsElectionEligibilityImplementation:
+                    mockHatsElectionEligibilityImplementationAddress,
+                  moduleProxyFactory: await moduleProxyFactory.getAddress(),
+                  decentAutonomousAdminMasterCopy:
+                    await decentAutonomousAdminMasterCopy.getAddress(),
+                  hats: [],
+                },
+              ],
+            ),
+            signers: [dao],
+          });
+        } catch (e) {
+          console.error('Error creating tree', e);
+        }
+        const currentBlockTimestamp = (await hre.ethers.provider.getBlock('latest'))!.timestamp;
+
+        createRoleHatPromise = executeSafeTransaction({
+          safe: gnosisSafe,
+          to: decentHatsAddress,
+          transactionData: DecentHats__factory.createInterface().encodeFunctionData(
+            'createTermedRoleHat',
+            [
+              {
+                hatsProtocol: mockHatsAddress,
+                registry: await erc6551Registry.getAddress(),
+                topHatAccount: '0xdce7ca0555101f97451926944f5ae3b7adb2f5ae',
+                hatsAccountImplementation: mockHatsAccountImplementationAddress,
+                hatsElectionEligibilityImplementation:
+                  mockHatsElectionEligibilityImplementationAddress,
+                hatsModuleFactory: mockHatsModuleFactoryAddress,
+                adminHatId: 1,
+                topHatId,
+                hat: {
+                  maxSupply: 1,
+                  details: '',
+                  imageURI: '',
+                  isMutable: true,
+                  wearer: '0xdce7ca0555101f97451926944f5ae3b7adb2f5ae',
+                  isTermed: true,
+                  termedParams: [
+                    {
+                      termEndDateTs: BigInt(Date.now() + 100000),
+                      nominatedWearers: ['0xdce7ca0555101f97451926944f5ae3b7adb2f5ae'],
+                    },
+                  ],
+                  sablierParams: [
+                    {
+                      sablier: mockSablierAddress,
+                      sender: gnosisSafeAddress,
+                      totalAmount: ethers.parseEther('100'),
+                      asset: mockERC20Address,
+                      cancelable: true,
+                      transferable: false,
+                      timestamps: {
+                        start: currentBlockTimestamp,
+                        cliff: currentBlockTimestamp + 86400, // 1 day cliff
+                        end: currentBlockTimestamp + 2592000, // 30 days from now
+                      },
+                      broker: { account: ethers.ZeroAddress, fee: 0 },
+                    },
+                  ],
+                },
+              },
+            ],
+          ),
+          signers: [dao],
+        });
+      });
+
+      it('Reverts if the top hat is not transferred to the DecentHats module first', async () => {
+        await expect(createRoleHatPromise).to.be.reverted;
+      });
+
+      it('Emits an ExecutionSuccess event', async () => {
+        // First transfer the top hat to the Safe
+        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
+        await expect(await createRoleHatPromise).to.emit(gnosisSafe, 'ExecutionSuccess');
+      });
+
+      it('Emits an ExecutionFromModuleSuccess event', async () => {
+        // First transfer the top hat to the Safe
+        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
+        await expect(await createRoleHatPromise)
+          .to.emit(gnosisSafe, 'ExecutionFromModuleSuccess')
+          .withArgs(decentHatsAddress);
+      });
+
+      it('Transfers the top hat back to the Safe', async () => {
+        // First transfer the top hat to the Safe
+        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
+
+        const isModuleWearerOfTopHat = await mockHats.isWearerOfHat(decentHatsAddress, topHatId);
+        expect(isModuleWearerOfTopHat).to.equal(true);
+
+        await createRoleHatPromise;
+
+        const isSafeWearerOfTopHat = await mockHats.isWearerOfHat(gnosisSafeAddress, topHatId);
+        expect(isSafeWearerOfTopHat).to.equal(true);
+      });
+
+      it('Actually creates the new hat', async () => {
+        // First transfer the top hat to the Safe
+        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
+
+        const hatsCountBeforeCreate = await mockHats.count();
+        expect(hatsCountBeforeCreate).to.equal(2); // Top hat + admin hat
+
+        await createRoleHatPromise;
+
+        const newHatId = await mockHats.count();
+        expect(newHatId).to.equal(3); // + newly created hat
+      });
+    });
   });
 });
