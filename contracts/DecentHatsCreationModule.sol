@@ -17,17 +17,12 @@ contract DecentHatsCreationModule {
     bytes32 public constant SALT =
         0x5d0e6ce4fd951366cc55da93f6e79d8b81483109d79676a04bcc2bed6a4b5072;
 
-    struct TopHatInfo {
-        uint256 topHatId;
-        address topHatAccount;
-    }
-
-    struct TopHat {
+    struct TopHatParams {
         string details;
         string imageURI;
     }
 
-    struct AdminHat {
+    struct AdminHatParams {
         string details;
         string imageURI;
         bool isMutable;
@@ -44,7 +39,7 @@ contract DecentHatsCreationModule {
         bool transferable;
     }
 
-    struct Hat {
+    struct HatParams {
         address wearer;
         string details;
         string imageURI;
@@ -63,9 +58,9 @@ contract DecentHatsCreationModule {
         address hatsAccountImplementation;
         address keyValuePairs;
         address hatsElectionEligibilityImplementation;
-        TopHat topHat;
-        AdminHat adminHat;
-        Hat[] hats;
+        TopHatParams topHat;
+        AdminHatParams adminHat;
+        HatParams[] hats;
     }
 
     /* /////////////////////////////////////////////////////////////////////////////
@@ -95,7 +90,7 @@ contract DecentHatsCreationModule {
         IERC6551Registry registry = params.registry;
 
         // Create Top Hat
-        TopHatInfo memory topHatInfo = processTopHat(
+        (uint256 topHatId, address topHatAccount) = processTopHat(
             hatsProtocol,
             registry,
             hatsAccountImplementation,
@@ -108,22 +103,25 @@ contract DecentHatsCreationModule {
             hatsProtocol,
             registry,
             hatsAccountImplementation,
-            topHatInfo,
+            topHatId,
+            topHatAccount,
             params.moduleProxyFactory,
             params.decentAutonomousAdminMasterCopy,
             params.adminHat
         );
 
         for (uint256 i = 0; i < params.hats.length; ) {
+            HatParams memory hat = params.hats[i];
             processHat(
                 hatsProtocol,
                 registry,
                 hatsAccountImplementation,
-                topHatInfo,
+                topHatId,
+                topHatAccount,
                 params.hatsModuleFactory,
                 params.hatsElectionEligibilityImplementation,
                 adminHatId,
-                params.hats[i]
+                hat
             );
 
             unchecked {
@@ -131,11 +129,7 @@ contract DecentHatsCreationModule {
             }
         }
 
-        hatsProtocol.transferHat(
-            topHatInfo.topHatId,
-            address(this),
-            msg.sender
-        );
+        hatsProtocol.transferHat(topHatId, address(this), msg.sender);
     }
 
     /* /////////////////////////////////////////////////////////////////////////////
@@ -147,29 +141,29 @@ contract DecentHatsCreationModule {
         IERC6551Registry registry,
         address hatsAccountImplementation,
         address keyValuePairs,
-        TopHat memory topHat
-    ) internal returns (TopHatInfo memory topHatInfo) {
+        TopHatParams memory topHat
+    ) internal returns (uint256 topHatId, address topHatAccount) {
         // Mint top hat
-        topHatInfo.topHatId = hatsProtocol.mintTopHat(
+        topHatId = hatsProtocol.mintTopHat(
             address(this),
             topHat.details,
             topHat.imageURI
         );
 
         // Create top hat account
-        topHatInfo.topHatAccount = registry.createAccount(
+        topHatAccount = registry.createAccount(
             hatsAccountImplementation,
             SALT,
             block.chainid,
             address(hatsProtocol),
-            topHatInfo.topHatId
+            topHatId
         );
 
         // Declare Top Hat ID to Safe via KeyValuePairs
         string[] memory keys = new string[](1);
         string[] memory values = new string[](1);
         keys[0] = "topHatId";
-        values[0] = Strings.toString(topHatInfo.topHatId);
+        values[0] = Strings.toString(topHatId);
         IAvatar(msg.sender).execTransactionFromModule(
             keyValuePairs,
             0,
@@ -186,18 +180,19 @@ contract DecentHatsCreationModule {
         IHats hatsProtocol,
         IERC6551Registry registry,
         address hatsAccountImplementation,
-        TopHatInfo memory topHatInfo,
+        uint256 topHatId,
+        address topHatAccount,
         ModuleProxyFactory moduleProxyFactory,
         address decentAutonomousAdminMasterCopy,
-        AdminHat memory adminHat
+        AdminHatParams memory adminHat
     ) internal returns (uint256 adminHatId) {
         // Create Admin Hat
         adminHatId = hatsProtocol.createHat(
-            topHatInfo.topHatId,
+            topHatId,
             adminHat.details,
             1, // only one Admin Hat
-            topHatInfo.topHatAccount,
-            topHatInfo.topHatAccount,
+            topHatAccount,
+            topHatAccount,
             adminHat.isMutable,
             adminHat.imageURI
         );
@@ -234,18 +229,20 @@ contract DecentHatsCreationModule {
         IHats hatsProtocol,
         IERC6551Registry registry,
         address hatsAccountImplementation,
-        TopHatInfo memory topHatInfo,
+        uint256 topHatId,
+        address topHatAccount,
         IHatsModuleFactory hatsModuleFactory,
         address hatsElectionEligibilityImplementation,
         uint256 adminHatId,
-        Hat memory hat
+        HatParams memory hat
     ) internal {
         // Create eligibility module if needed
         address eligibilityAddress = createEligibilityModule(
             hatsProtocol,
             hatsModuleFactory,
             hatsElectionEligibilityImplementation,
-            topHatInfo,
+            topHatId,
+            topHatAccount,
             adminHatId,
             hat.termEndDateTs
         );
@@ -256,7 +253,7 @@ contract DecentHatsCreationModule {
             adminHatId,
             hat,
             eligibilityAddress,
-            topHatInfo.topHatAccount
+            topHatAccount
         );
 
         // Get the stream recipient (based on termed or not)
@@ -278,7 +275,8 @@ contract DecentHatsCreationModule {
         IHats hatsProtocol,
         IHatsModuleFactory hatsModuleFactory,
         address hatsElectionEligibilityImplementation,
-        TopHatInfo memory topHatInfo,
+        uint256 topHatId,
+        address topHatAccount,
         uint256 adminHatId,
         uint128 termEndDateTs
     ) internal returns (address) {
@@ -287,19 +285,19 @@ contract DecentHatsCreationModule {
                 hatsModuleFactory.createHatsModule(
                     hatsElectionEligibilityImplementation,
                     hatsProtocol.getNextId(adminHatId),
-                    abi.encode(topHatInfo.topHatId, uint256(0)), // [BALLOT_BOX_ID, ADMIN_HAT_ID]
+                    abi.encode(topHatId, uint256(0)), // [BALLOT_BOX_ID, ADMIN_HAT_ID]
                     abi.encode(termEndDateTs),
                     uint256(SALT)
                 );
         }
-        return topHatInfo.topHatAccount;
+        return topHatAccount;
     }
 
     // Exists to avoid stack too deep errors
     function createAndMintHat(
         IHats hatsProtocol,
         uint256 adminHatId,
-        Hat memory hat,
+        HatParams memory hat,
         address eligibilityAddress,
         address topHatAccount
     ) internal returns (uint256) {
