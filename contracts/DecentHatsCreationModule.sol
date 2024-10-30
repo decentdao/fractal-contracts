@@ -230,132 +230,6 @@ contract DecentHatsCreationModule {
         hatsProtocol.mintHat(adminHatId, autonomousAdminModule);
     }
 
-    function createEligibilityModule(
-        IHats hatsProtocol,
-        IHatsModuleFactory hatsModuleFactory,
-        address hatsElectionEligibilityImplementation,
-        TopHatInfo memory topHatInfo,
-        uint256 adminHatId,
-        uint128 termEndDateTs
-    ) internal returns (address) {
-        if (termEndDateTs != 0) {
-            return
-                hatsModuleFactory.createHatsModule(
-                    hatsElectionEligibilityImplementation,
-                    hatsProtocol.getNextId(adminHatId),
-                    abi.encode(topHatInfo.topHatId, uint256(0)), // [BALLOT_BOX_ID, ADMIN_HAT_ID]
-                    abi.encode(termEndDateTs),
-                    uint256(SALT)
-                );
-        }
-        return topHatInfo.topHatAccount;
-    }
-
-    function createAndMintHat(
-        IHats hatsProtocol,
-        uint256 adminHatId,
-        Hat memory hat,
-        address eligibilityAddress,
-        address topHatAccount
-    ) internal returns (uint256) {
-        uint256 hatId = hatsProtocol.createHat(
-            adminHatId,
-            hat.details,
-            hat.maxSupply,
-            eligibilityAddress,
-            topHatAccount,
-            hat.isMutable,
-            hat.imageURI
-        );
-
-        // If the hat is termed, nominate the wearer as the eligible member
-        if (hat.termEndDateTs != 0) {
-            address[] memory nominatedWearers = new address[](1);
-            nominatedWearers[0] = hat.wearer;
-            IHatsElectionEligibility(eligibilityAddress).elect(
-                hat.termEndDateTs,
-                nominatedWearers
-            );
-        }
-
-        hatsProtocol.mintHat(hatId, hat.wearer);
-        return hatId;
-    }
-
-    function setupStreamRecipient(
-        IERC6551Registry registry,
-        address hatsAccountImplementation,
-        address hatsProtocol,
-        uint128 termEndDateTs,
-        address wearer,
-        uint256 hatId
-    ) internal returns (address) {
-        // If the hat is termed, the wearer is the stream recipient
-        if (termEndDateTs != 0) {
-            return wearer;
-        }
-
-        // Otherwise, the Hat's smart account is the stream recipient
-        return
-            registry.createAccount(
-                hatsAccountImplementation,
-                SALT,
-                block.chainid,
-                hatsProtocol,
-                hatId
-            );
-    }
-
-    function processSablierStream(
-        SablierStreamParams memory streamParams,
-        address streamRecipient
-    ) internal {
-        // Approve tokens for Sablier via a proxy call through the Safe
-        IAvatar(msg.sender).execTransactionFromModule(
-            streamParams.asset,
-            0,
-            abi.encodeWithSignature(
-                "approve(address,uint256)",
-                streamParams.sablier,
-                streamParams.totalAmount
-            ),
-            Enum.Operation.Call
-        );
-
-        // Proxy the Sablier call through the Safe
-        IAvatar(msg.sender).execTransactionFromModule(
-            address(streamParams.sablier),
-            0,
-            abi.encodeWithSignature(
-                "createWithTimestamps((address,address,uint128,address,bool,bool,(uint40,uint40,uint40),(address,uint256)))",
-                LockupLinear.CreateWithTimestamps({
-                    sender: streamParams.sender,
-                    recipient: streamRecipient,
-                    totalAmount: streamParams.totalAmount,
-                    asset: IERC20(streamParams.asset),
-                    cancelable: streamParams.cancelable,
-                    transferable: streamParams.transferable,
-                    timestamps: streamParams.timestamps,
-                    broker: streamParams.broker
-                })
-            ),
-            Enum.Operation.Call
-        );
-    }
-
-    function createSablierStreams(
-        SablierStreamParams[] memory streamParams,
-        address streamRecipient
-    ) internal {
-        for (uint256 i = 0; i < streamParams.length; ) {
-            processSablierStream(streamParams[i], streamRecipient);
-
-            unchecked {
-                ++i;
-            }
-        }
-    }
-
     function processHat(
         IHats hatsProtocol,
         IERC6551Registry registry,
@@ -397,5 +271,136 @@ contract DecentHatsCreationModule {
 
         // Create streams
         createSablierStreams(hat.sablierStreamsParams, streamRecipient);
+    }
+
+    // Exists to avoid stack too deep errors
+    function createEligibilityModule(
+        IHats hatsProtocol,
+        IHatsModuleFactory hatsModuleFactory,
+        address hatsElectionEligibilityImplementation,
+        TopHatInfo memory topHatInfo,
+        uint256 adminHatId,
+        uint128 termEndDateTs
+    ) internal returns (address) {
+        if (termEndDateTs != 0) {
+            return
+                hatsModuleFactory.createHatsModule(
+                    hatsElectionEligibilityImplementation,
+                    hatsProtocol.getNextId(adminHatId),
+                    abi.encode(topHatInfo.topHatId, uint256(0)), // [BALLOT_BOX_ID, ADMIN_HAT_ID]
+                    abi.encode(termEndDateTs),
+                    uint256(SALT)
+                );
+        }
+        return topHatInfo.topHatAccount;
+    }
+
+    // Exists to avoid stack too deep errors
+    function createAndMintHat(
+        IHats hatsProtocol,
+        uint256 adminHatId,
+        Hat memory hat,
+        address eligibilityAddress,
+        address topHatAccount
+    ) internal returns (uint256) {
+        uint256 hatId = hatsProtocol.createHat(
+            adminHatId,
+            hat.details,
+            hat.maxSupply,
+            eligibilityAddress,
+            topHatAccount,
+            hat.isMutable,
+            hat.imageURI
+        );
+
+        // If the hat is termed, nominate the wearer as the eligible member
+        if (hat.termEndDateTs != 0) {
+            address[] memory nominatedWearers = new address[](1);
+            nominatedWearers[0] = hat.wearer;
+            IHatsElectionEligibility(eligibilityAddress).elect(
+                hat.termEndDateTs,
+                nominatedWearers
+            );
+        }
+
+        hatsProtocol.mintHat(hatId, hat.wearer);
+        return hatId;
+    }
+
+    // Exists to avoid stack too deep errors
+    function setupStreamRecipient(
+        IERC6551Registry registry,
+        address hatsAccountImplementation,
+        address hatsProtocol,
+        uint128 termEndDateTs,
+        address wearer,
+        uint256 hatId
+    ) internal returns (address) {
+        // If the hat is termed, the wearer is the stream recipient
+        if (termEndDateTs != 0) {
+            return wearer;
+        }
+
+        // Otherwise, the Hat's smart account is the stream recipient
+        return
+            registry.createAccount(
+                hatsAccountImplementation,
+                SALT,
+                block.chainid,
+                hatsProtocol,
+                hatId
+            );
+    }
+
+    // Exists to avoid stack too deep errors
+    function processSablierStream(
+        SablierStreamParams memory streamParams,
+        address streamRecipient
+    ) internal {
+        // Approve tokens for Sablier via a proxy call through the Safe
+        IAvatar(msg.sender).execTransactionFromModule(
+            streamParams.asset,
+            0,
+            abi.encodeWithSignature(
+                "approve(address,uint256)",
+                streamParams.sablier,
+                streamParams.totalAmount
+            ),
+            Enum.Operation.Call
+        );
+
+        // Proxy the Sablier call through the Safe
+        IAvatar(msg.sender).execTransactionFromModule(
+            address(streamParams.sablier),
+            0,
+            abi.encodeWithSignature(
+                "createWithTimestamps((address,address,uint128,address,bool,bool,(uint40,uint40,uint40),(address,uint256)))",
+                LockupLinear.CreateWithTimestamps({
+                    sender: streamParams.sender,
+                    recipient: streamRecipient,
+                    totalAmount: streamParams.totalAmount,
+                    asset: IERC20(streamParams.asset),
+                    cancelable: streamParams.cancelable,
+                    transferable: streamParams.transferable,
+                    timestamps: streamParams.timestamps,
+                    broker: streamParams.broker
+                })
+            ),
+            Enum.Operation.Call
+        );
+    }
+
+    // Exists to avoid stack too deep errors
+    function createSablierStreams(
+        SablierStreamParams[] memory streamParams,
+        address streamRecipient
+    ) internal {
+        for (uint256 i = 0; i < streamParams.length; ) {
+            processSablierStream(streamParams[i], streamRecipient);
+
+            unchecked {
+                ++i;
+            }
+        }
     }
 }
