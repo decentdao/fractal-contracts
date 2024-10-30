@@ -172,54 +172,44 @@ describe('DecentHats', () => {
             [
               {
                 hatsProtocol: mockHatsAddress,
-                hatsAccountImplementation: mockHatsAccountImplementationAddress,
                 registry: await erc6551Registry.getAddress(),
-                keyValuePairs: await keyValuePairs.getAddress(),
-                topHatDetails: '',
-                topHatImageURI: '',
-                decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
+                hatsModuleFactory: mockHatsModuleFactoryAddress,
                 moduleProxyFactory: await moduleProxyFactory.getAddress(),
+                decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
+                hatsAccountImplementation: mockHatsAccountImplementationAddress,
+                keyValuePairs: await keyValuePairs.getAddress(),
+                hatsElectionEligibilityImplementation:
+                  mockHatsElectionEligibilityImplementationAddress,
+
+                topHat: {
+                  details: '',
+                  imageURI: '',
+                },
                 adminHat: {
-                  maxSupply: 1,
                   details: '',
                   imageURI: '',
                   isMutable: false,
-                  wearer: ethers.ZeroAddress,
-                  sablierParams: [],
-                  termedParam: {
-                    termEndDateTs: 0,
-                    nominatedWearer: ethers.ZeroAddress,
-                  },
                 },
                 hats: [
                   {
-                    maxSupply: 1,
+                    wearer: ethers.ZeroAddress,
                     details: '',
                     imageURI: '',
+                    maxSupply: 1,
                     isMutable: false,
-                    wearer: ethers.ZeroAddress,
-                    sablierParams: [],
-                    termedParam: {
-                      termEndDateTs: 0,
-                      nominatedWearer: ethers.ZeroAddress,
-                    },
+                    termEndDateTs: 0,
+                    sablierStreamsParams: [],
                   },
                   {
-                    maxSupply: 1,
+                    wearer: ethers.ZeroAddress,
                     details: '',
                     imageURI: '',
+                    maxSupply: 1,
                     isMutable: false,
-                    wearer: ethers.ZeroAddress,
-                    sablierParams: [],
-                    termedParam: {
-                      termEndDateTs: 0,
-                      nominatedWearer: ethers.ZeroAddress,
-                    },
+                    termEndDateTs: 0,
+                    sablierStreamsParams: [],
                   },
                 ],
-                hatsModuleFactory: mockHatsModuleFactoryAddress,
-                hatsElectionEligibilityImplementation:
-                  mockHatsElectionEligibilityImplementationAddress,
               },
             ],
           ),
@@ -258,23 +248,17 @@ describe('DecentHats', () => {
                   hatsAccountImplementation: mockHatsAccountImplementationAddress,
                   registry: await erc6551Registry.getAddress(),
                   keyValuePairs: await keyValuePairs.getAddress(),
-                  topHatDetails: '',
-                  topHatImageURI: '',
+                  topHat: {
+                    details: '',
+                    imageURI: '',
+                  },
                   decentAutonomousAdminMasterCopy:
                     await decentAutonomousAdminMasterCopy.getAddress(),
                   moduleProxyFactory: await moduleProxyFactory.getAddress(),
                   adminHat: {
-                    maxSupply: 1,
                     details: '',
                     imageURI: '',
                     isMutable: false,
-                    wearer: ethers.ZeroAddress,
-                    sablierParams: [],
-
-                    termedParam: {
-                      termEndDateTs: 0,
-                      nominatedWearer: ethers.ZeroAddress,
-                    },
                   },
                   hats: [],
                   hatsModuleFactory: mockHatsModuleFactoryAddress,
@@ -335,21 +319,16 @@ describe('DecentHats', () => {
                 hatsAccountImplementation: mockHatsAccountImplementationAddress,
                 registry: await erc6551Registry.getAddress(),
                 keyValuePairs: await keyValuePairs.getAddress(),
-                topHatDetails: '',
-                topHatImageURI: '',
+                topHat: {
+                  details: '',
+                  imageURI: '',
+                },
                 decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
                 moduleProxyFactory: await moduleProxyFactory.getAddress(),
                 adminHat: {
-                  maxSupply: 1,
                   details: '',
                   imageURI: '',
                   isMutable: true,
-                  wearer: ethers.ZeroAddress,
-                  sablierParams: [],
-                  termedParam: {
-                    termEndDateTs: 0,
-                    nominatedWearer: ethers.ZeroAddress,
-                  },
                 },
                 hats: [
                   {
@@ -357,24 +336,18 @@ describe('DecentHats', () => {
                     details: '',
                     imageURI: '',
                     isMutable: false,
-                    wearer: ethers.ZeroAddress,
-                    sablierParams: [],
-                    termedParam: {
-                      termEndDateTs: BigInt(Date.now() + 100000),
-                      nominatedWearer: '0x14dC79964da2C08b23698B3D3cc7Ca32193d9955',
-                    },
+                    wearer: '0x14dC79964da2C08b23698B3D3cc7Ca32193d9955',
+                    sablierStreamsParams: [],
+                    termEndDateTs: BigInt(Date.now() + 100000),
                   },
                   {
                     maxSupply: 1,
                     details: '',
                     imageURI: '',
                     isMutable: false,
-                    wearer: ethers.ZeroAddress,
-                    sablierParams: [],
-                    termedParam: {
-                      termEndDateTs: BigInt(Date.now() + 100000),
-                      nominatedWearer: '0x14dC79964da2C08b23698B3D3cc7Ca32193d9955',
-                    },
+                    wearer: '0x14dC79964da2C08b23698B3D3cc7Ca32193d9955',
+                    sablierStreamsParams: [],
+                    termEndDateTs: BigInt(Date.now() + 100000),
                   },
                 ],
                 hatsModuleFactory: mockHatsModuleFactoryAddress,
@@ -422,21 +395,16 @@ describe('DecentHats', () => {
                 hatsAccountImplementation: mockHatsAccountImplementationAddress,
                 registry: await erc6551Registry.getAddress(),
                 keyValuePairs: await keyValuePairs.getAddress(),
-                topHatDetails: '',
-                topHatImageURI: '',
+                topHat: {
+                  details: '',
+                  imageURI: '',
+                },
                 decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
                 moduleProxyFactory: await moduleProxyFactory.getAddress(),
                 adminHat: {
-                  maxSupply: 1,
                   details: '',
                   imageURI: '',
                   isMutable: false,
-                  wearer: ethers.ZeroAddress,
-                  sablierParams: [],
-                  termedParam: {
-                    termEndDateTs: 0,
-                    nominatedWearer: ethers.ZeroAddress,
-                  },
                 },
                 hats: [
                   {
@@ -445,7 +413,7 @@ describe('DecentHats', () => {
                     imageURI: '',
                     isMutable: false,
                     wearer: ethers.ZeroAddress,
-                    sablierParams: [
+                    sablierStreamsParams: [
                       {
                         sablier: mockSablierAddress,
                         sender: gnosisSafeAddress,
@@ -461,10 +429,7 @@ describe('DecentHats', () => {
                         broker: { account: ethers.ZeroAddress, fee: 0 },
                       },
                     ],
-                    termedParam: {
-                      termEndDateTs: 0,
-                      nominatedWearer: ethers.ZeroAddress,
-                    },
+                    termEndDateTs: 0,
                   },
                   {
                     maxSupply: 1,
@@ -472,11 +437,8 @@ describe('DecentHats', () => {
                     imageURI: '',
                     isMutable: false,
                     wearer: ethers.ZeroAddress,
-                    sablierParams: [],
-                    termedParam: {
-                      termEndDateTs: 0,
-                      nominatedWearer: ethers.ZeroAddress,
-                    },
+                    sablierStreamsParams: [],
+                    termEndDateTs: 0,
                   },
                 ],
                 hatsModuleFactory: mockHatsModuleFactoryAddress,
@@ -555,21 +517,16 @@ describe('DecentHats', () => {
                 hatsAccountImplementation: mockHatsAccountImplementationAddress,
                 registry: await erc6551Registry.getAddress(),
                 keyValuePairs: await keyValuePairs.getAddress(),
-                topHatDetails: '',
-                topHatImageURI: '',
+                topHat: {
+                  details: '',
+                  imageURI: '',
+                },
                 decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
                 moduleProxyFactory: await moduleProxyFactory.getAddress(),
                 adminHat: {
-                  maxSupply: 1,
                   details: '',
                   imageURI: '',
                   isMutable: false,
-                  wearer: ethers.ZeroAddress,
-                  sablierParams: [],
-                  termedParam: {
-                    termEndDateTs: 0,
-                    nominatedWearer: ethers.ZeroAddress,
-                  },
                 },
                 hats: [
                   {
@@ -578,7 +535,7 @@ describe('DecentHats', () => {
                     imageURI: '',
                     isMutable: false,
                     wearer: ethers.ZeroAddress,
-                    sablierParams: [
+                    sablierStreamsParams: [
                       {
                         sablier: mockSablierAddress,
                         sender: gnosisSafeAddress,
@@ -608,10 +565,7 @@ describe('DecentHats', () => {
                         broker: { account: ethers.ZeroAddress, fee: 0 },
                       },
                     ],
-                    termedParam: {
-                      termEndDateTs: 0,
-                      nominatedWearer: ethers.ZeroAddress,
-                    },
+                    termEndDateTs: 0,
                   },
                 ],
                 hatsModuleFactory: mockHatsModuleFactoryAddress,
