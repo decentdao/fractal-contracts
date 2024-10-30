@@ -229,7 +229,7 @@ describe('DecentHatsCreationModule', () => {
       it('Emits some hatsTreeId ValueUpdated events', async () => {
         await expect(createAndDeclareTreeTx)
           .to.emit(keyValuePairs, 'ValueUpdated')
-          .withArgs(gnosisSafeAddress, 'topHatId', '0');
+          .withArgs(gnosisSafeAddress, 'topHatId', '1');
       });
 
       describe('Multiple calls', () => {
@@ -283,26 +283,28 @@ describe('DecentHatsCreationModule', () => {
         it('Creates Top Hats with sequential IDs', async () => {
           await expect(createAndDeclareTreeTx2)
             .to.emit(keyValuePairs, 'ValueUpdated')
-            .withArgs(gnosisSafeAddress, 'topHatId', '4');
+            .withArgs(gnosisSafeAddress, 'topHatId', '2');
         });
       });
 
       describe('Creating Hats Accounts', () => {
         it('Generates the correct Addresses for the current Hats', async () => {
           const currentCount = await mockHats.hatId();
-          for (let i = 0n; i < currentCount; i++) {
+          for (let i = 1001n; i < currentCount; i++) {
             const hatAccount = await getHatAccount(
               i,
               erc6551Registry,
               mockHatsAccountImplementationAddress,
               mockHatsAddress,
             );
+
             expect(await hatAccount.tokenId()).eq(i);
             expect(await hatAccount.tokenImplementation()).eq(mockHatsAddress);
           }
         });
       });
     });
+
     describe('Creating a new Top Hat and Tree with Termed Roles', () => {
       let createAndDeclareTreeTx: ethers.ContractTransactionResponse;
 
@@ -372,7 +374,7 @@ describe('DecentHatsCreationModule', () => {
       it('Emits some hatsTreeId ValueUpdated events', async () => {
         await expect(createAndDeclareTreeTx)
           .to.emit(keyValuePairs, 'ValueUpdated')
-          .withArgs(gnosisSafeAddress, 'topHatId', '0');
+          .withArgs(gnosisSafeAddress, 'topHatId', '1');
       });
     });
 
@@ -463,7 +465,7 @@ describe('DecentHatsCreationModule', () => {
       it('Emits some hatsTreeId ValueUpdated events', async () => {
         await expect(createAndDeclareTreeTx)
           .to.emit(keyValuePairs, 'ValueUpdated')
-          .withArgs(gnosisSafeAddress, 'topHatId', '0');
+          .withArgs(gnosisSafeAddress, 'topHatId', '1');
       });
 
       it('Creates a Sablier stream for the hat with stream parameters', async () => {

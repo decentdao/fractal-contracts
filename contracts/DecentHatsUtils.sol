@@ -38,6 +38,51 @@ contract DecentHatsUtils {
         bool isMutable;
     }
 
+    function _processHat(
+        IHats hatsProtocol,
+        IERC6551Registry registry,
+        address hatsAccountImplementation,
+        uint256 topHatId,
+        address topHatAccount,
+        IHatsModuleFactory hatsModuleFactory,
+        address hatsElectionsEligibilityImplementation,
+        uint256 adminHatId,
+        HatParams memory hat
+    ) internal {
+        // Create eligibility module if needed
+        address eligibilityAddress = _createEligibilityModule(
+            hatsProtocol,
+            hatsModuleFactory,
+            hatsElectionsEligibilityImplementation,
+            topHatId,
+            topHatAccount,
+            adminHatId,
+            hat.termEndDateTs
+        );
+
+        // Create and Mint the Role Hat
+        uint256 hatId = _createAndMintHat(
+            hatsProtocol,
+            adminHatId,
+            hat,
+            eligibilityAddress,
+            topHatAccount
+        );
+
+        // Get the stream recipient (based on termed or not)
+        address streamRecipient = _setupStreamRecipient(
+            registry,
+            hatsAccountImplementation,
+            address(hatsProtocol),
+            hat.termEndDateTs,
+            hat.wearer,
+            hatId
+        );
+
+        // Create streams
+        _processSablierStreams(hat.sablierStreamsParams, streamRecipient);
+    }
+
     function _createEligibilityModule(
         IHats hatsProtocol,
         IHatsModuleFactory hatsModuleFactory,
@@ -46,7 +91,7 @@ contract DecentHatsUtils {
         address topHatAccount,
         uint256 adminHatId,
         uint128 termEndDateTs
-    ) internal returns (address) {
+    ) private returns (address) {
         if (termEndDateTs != 0) {
             return
                 hatsModuleFactory.createHatsModule(
@@ -60,10 +105,89 @@ contract DecentHatsUtils {
         return topHatAccount;
     }
 
+    function _createAndMintHat(
+        IHats hatsProtocol,
+        uint256 adminHatId,
+        HatParams memory hat,
+        address eligibilityAddress,
+        address topHatAccount
+    ) private returns (uint256) {
+        uint256 hatId = hatsProtocol.getNextId(adminHatId);
+        IAvatar(msg.sender).execTransactionFromModule(
+            address(hatsProtocol),
+            0,
+            abi.encodeWithSignature(
+                "createHat(uint256,string,uint32,address,address,bool,string)",
+                adminHatId,
+                hat.details,
+                hat.maxSupply,
+                eligibilityAddress,
+                topHatAccount,
+                hat.isMutable,
+                hat.imageURI
+            ),
+            Enum.Operation.Call
+        );
+
+        // If the hat is termed, nominate the wearer as the eligible member
+        if (hat.termEndDateTs != 0) {
+            address[] memory nominatedWearers = new address[](1);
+            nominatedWearers[0] = hat.wearer;
+
+            IAvatar(msg.sender).execTransactionFromModule(
+                eligibilityAddress,
+                0,
+                abi.encodeWithSignature(
+                    "elect(uint128,address[])",
+                    hat.termEndDateTs,
+                    nominatedWearers
+                ),
+                Enum.Operation.Call
+            );
+        }
+
+        IAvatar(msg.sender).execTransactionFromModule(
+            address(hatsProtocol),
+            0,
+            abi.encodeWithSignature(
+                "mintHat(uint256,address)",
+                hatId,
+                hat.wearer
+            ),
+            Enum.Operation.Call
+        );
+        return hatId;
+    }
+
+    // Exists to avoid stack too deep errors
+    function _setupStreamRecipient(
+        IERC6551Registry registry,
+        address hatsAccountImplementation,
+        address hatsProtocol,
+        uint128 termEndDateTs,
+        address wearer,
+        uint256 hatId
+    ) private returns (address) {
+        // If the hat is termed, the wearer is the stream recipient
+        if (termEndDateTs != 0) {
+            return wearer;
+        }
+
+        // Otherwise, the Hat's smart account is the stream recipient
+        return
+            registry.createAccount(
+                hatsAccountImplementation,
+                SALT,
+                block.chainid,
+                hatsProtocol,
+                hatId
+            );
+    }
+
     function _processSablierStreams(
         SablierStreamParams[] memory streamParams,
         address streamRecipient
-    ) internal {
+    ) private {
         for (uint256 i = 0; i < streamParams.length; ) {
             SablierStreamParams memory sablierStreamParams = streamParams[i];
 

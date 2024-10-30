@@ -238,6 +238,8 @@ export const executeSafeTransaction = async ({
   return tx;
 };
 
+export const SALT = '0x5d0e6ce4fd951366cc55da93f6e79d8b81483109d79676a04bcc2bed6a4b5072';
+
 export const getHatAccount = async (
   hatId: bigint,
   erc6551RegistryImplementation: ERC6551Registry,
@@ -245,11 +247,9 @@ export const getHatAccount = async (
   mockHatsAddress: string,
   signer?: ethers.Signer,
 ) => {
-  const salt = '0x5d0e6ce4fd951366cc55da93f6e79d8b81483109d79676a04bcc2bed6a4b5072';
-
   const hatAccountAddress = await erc6551RegistryImplementation.account(
     mockHatsAccountImplementationAddress,
-    salt,
+    SALT,
     await hre.getChainId(),
     mockHatsAddress,
     hatId,

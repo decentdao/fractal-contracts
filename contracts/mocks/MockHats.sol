@@ -4,7 +4,8 @@ pragma solidity =0.8.19;
 import {IHats} from "../interfaces/hats/full/IHats.sol";
 
 contract MockHats is IHats {
-    uint256 public hatId = 0;
+    uint32 public lastTopHatId = 0;
+    uint256 public hatId = 1000;
     mapping(uint256 => address) public wearers;
     mapping(uint256 => address) public eligibility;
 
@@ -15,9 +16,10 @@ contract MockHats is IHats {
         string memory,
         string memory
     ) external returns (uint256 topHatId) {
-        topHatId = hatId;
-        hatId++;
+        topHatId = ++lastTopHatId;
         wearers[topHatId] = _target;
+        wearers[hatId] = _target;
+        hatId++;
     }
 
     function createHat(

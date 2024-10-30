@@ -23,7 +23,7 @@ import {
 } from '../typechain-types';
 
 import { getGnosisSafeL2Singleton, getGnosisSafeProxyFactory } from './GlobalSafeDeployments.test';
-import { executeSafeTransaction, getHatAccount, predictGnosisSafeAddress } from './helpers';
+import { executeSafeTransaction, getHatAccount, predictGnosisSafeAddress, SALT } from './helpers';
 
 describe('DecentHats_0_1_0', () => {
   let dao: SignerWithAddress;
@@ -199,7 +199,7 @@ describe('DecentHats_0_1_0', () => {
       it('Emits some hatsTreeId ValueUpdated events', async () => {
         await expect(createAndDeclareTreeTx)
           .to.emit(keyValuePairs, 'ValueUpdated')
-          .withArgs(gnosisSafeAddress, 'topHatId', '0');
+          .withArgs(gnosisSafeAddress, 'topHatId', '1');
       });
 
       describe('Multiple calls', () => {
@@ -248,7 +248,7 @@ describe('DecentHats_0_1_0', () => {
         it('Creates Top Hats with sequential IDs', async () => {
           await expect(createAndDeclareTreeTx2)
             .to.emit(keyValuePairs, 'ValueUpdated')
-            .withArgs(gnosisSafeAddress, 'topHatId', '4');
+            .withArgs(gnosisSafeAddress, 'topHatId', '2');
         });
       });
 
@@ -256,7 +256,7 @@ describe('DecentHats_0_1_0', () => {
         it('Generates the correct Addresses for the current Hats', async () => {
           const currentCount = await mockHats.hatId();
 
-          for (let i = 0n; i < currentCount; i++) {
+          for (let i = 1001n; i < currentCount; i++) {
             const topHatAccount = await getHatAccount(
               i,
               erc6551Registry,
@@ -352,7 +352,7 @@ describe('DecentHats_0_1_0', () => {
       it('Emits some hatsTreeId ValueUpdated events', async () => {
         await expect(createAndDeclareTreeTx)
           .to.emit(keyValuePairs, 'ValueUpdated')
-          .withArgs(gnosisSafeAddress, 'topHatId', '0');
+          .withArgs(gnosisSafeAddress, 'topHatId', '1');
       });
 
       it('Creates a Sablier stream for the hat with stream parameters', async () => {
@@ -511,7 +511,7 @@ describe('DecentHats_0_1_0', () => {
 
     describe('Creating a new hat on existing Tree', () => {
       let createRoleHatPromise: Promise<ethers.ContractTransactionResponse>;
-      const topHatId = 0;
+      const topHatId = 1;
 
       beforeEach(async () => {
         await executeSafeTransaction({
@@ -544,6 +544,13 @@ describe('DecentHats_0_1_0', () => {
 
         const currentBlockTimestamp = (await hre.ethers.provider.getBlock('latest'))!.timestamp;
 
+        const topHatAccount = await getHatAccount(
+          BigInt(topHatId),
+          erc6551Registry,
+          mockHatsAccountImplementationAddress,
+          mockHatsAddress,
+        );
+
         createRoleHatPromise = executeSafeTransaction({
           safe: gnosisSafe,
           to: decentHatsAddress,
@@ -557,7 +564,7 @@ describe('DecentHats_0_1_0', () => {
                 details: '',
                 imageURI: '',
                 isMutable: true,
-                wearer: '0xdce7ca0555101f97451926944f5ae3b7adb2f5ae',
+                wearer: await topHatAccount.getAddress(),
                 sablierParams: [
                   {
                     sablier: mockSablierAddress,
@@ -575,11 +582,11 @@ describe('DecentHats_0_1_0', () => {
                   },
                 ],
               },
-              0,
-              '0xdce7ca0555101f97451926944f5ae3b7adb2f5ae',
+              topHatId,
+              await topHatAccount.getAddress(),
               await erc6551Registry.getAddress(),
               mockHatsAccountImplementationAddress,
-              '0x5d0e6ce4fd951366cc55da93f6e79d8b81483109d79676a04bcc2bed6a4b5072',
+              SALT,
             ],
           ),
           signers: [dao],
@@ -622,12 +629,12 @@ describe('DecentHats_0_1_0', () => {
         await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
 
         const hatsCountBeforeCreate = await mockHats.hatId();
-        expect(hatsCountBeforeCreate).to.equal(2); // Top hat + admin hat
+        expect(hatsCountBeforeCreate).to.equal(1002); // Top hat + admin hat
 
         await createRoleHatPromise;
 
         const newHatId = await mockHats.hatId();
-        expect(newHatId).to.equal(3); // + newly created hat
+        expect(newHatId).to.equal(1003); // + newly created hat
       });
     });
   });

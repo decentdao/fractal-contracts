@@ -105,8 +105,6 @@ contract DecentHatsCreationModule is DecentHatsUtils {
                 ++i;
             }
         }
-
-        hatsProtocol.transferHat(topHatId, address(this), msg.sender);
     }
 
     /* /////////////////////////////////////////////////////////////////////////////
@@ -120,11 +118,24 @@ contract DecentHatsCreationModule is DecentHatsUtils {
         address keyValuePairs,
         TopHatParams memory topHat
     ) internal returns (uint256 topHatId, address topHatAccount) {
-        // Mint top hat
-        topHatId = hatsProtocol.mintTopHat(
-            address(this),
-            topHat.details,
-            topHat.imageURI
+        (, bytes memory lastTopHatId) = address(hatsProtocol).call(
+            abi.encodeWithSignature("lastTopHatId()")
+        );
+
+        // topHatId = abi.decode(lastTopHatId, (uint256)) << 224;
+        topHatId = uint256(bytes32(lastTopHatId)) + 1;
+
+        IAvatar(msg.sender).execTransactionFromModule(
+            // Mint top hat to the safe
+            address(hatsProtocol),
+            0,
+            abi.encodeWithSignature(
+                "mintTopHat(address,string,string)",
+                msg.sender,
+                topHat.details,
+                topHat.imageURI
+            ),
+            Enum.Operation.Call
         );
 
         // Create top hat account
@@ -164,14 +175,21 @@ contract DecentHatsCreationModule is DecentHatsUtils {
         AdminHatParams memory adminHat
     ) internal returns (uint256 adminHatId) {
         // Create Admin Hat
-        adminHatId = hatsProtocol.createHat(
-            topHatId,
-            adminHat.details,
-            1, // only one Admin Hat
-            topHatAccount,
-            topHatAccount,
-            adminHat.isMutable,
-            adminHat.imageURI
+        adminHatId = hatsProtocol.getNextId(topHatId);
+        IAvatar(msg.sender).execTransactionFromModule(
+            address(hatsProtocol),
+            0,
+            abi.encodeWithSignature(
+                "createHat(uint256,string,uint32,address,address,bool,string)",
+                topHatId,
+                adminHat.details,
+                1, // only one Admin Hat
+                topHatAccount,
+                topHatAccount,
+                adminHat.isMutable,
+                adminHat.imageURI
+            ),
+            Enum.Operation.Call
         );
 
         // Create Admin Hat's ERC6551 Account
@@ -199,108 +217,15 @@ contract DecentHatsCreationModule is DecentHatsUtils {
         );
 
         // Mint Hat to the Decent Autonomous Admin Module
-        hatsProtocol.mintHat(adminHatId, autonomousAdminModule);
-    }
-
-    function _processHat(
-        IHats hatsProtocol,
-        IERC6551Registry registry,
-        address hatsAccountImplementation,
-        uint256 topHatId,
-        address topHatAccount,
-        IHatsModuleFactory hatsModuleFactory,
-        address hatsElectionsEligibilityImplementation,
-        uint256 adminHatId,
-        HatParams memory hat
-    ) internal {
-        // Create eligibility module if needed
-        address eligibilityAddress = _createEligibilityModule(
-            hatsProtocol,
-            hatsModuleFactory,
-            hatsElectionsEligibilityImplementation,
-            topHatId,
-            topHatAccount,
-            adminHatId,
-            hat.termEndDateTs
-        );
-
-        // Create and Mint the Role Hat
-        uint256 hatId = _createAndMintHat(
-            hatsProtocol,
-            adminHatId,
-            hat,
-            eligibilityAddress,
-            topHatAccount
-        );
-
-        // Get the stream recipient (based on termed or not)
-        address streamRecipient = _setupStreamRecipient(
-            registry,
-            hatsAccountImplementation,
+        IAvatar(msg.sender).execTransactionFromModule(
             address(hatsProtocol),
-            hat.termEndDateTs,
-            hat.wearer,
-            hatId
+            0,
+            abi.encodeWithSignature(
+                "mintHat(uint256,address)",
+                adminHatId,
+                autonomousAdminModule
+            ),
+            Enum.Operation.Call
         );
-
-        // Create streams
-        _processSablierStreams(hat.sablierStreamsParams, streamRecipient);
-    }
-
-    // Exists to avoid stack too deep errors
-    function _createAndMintHat(
-        IHats hatsProtocol,
-        uint256 adminHatId,
-        HatParams memory hat,
-        address eligibilityAddress,
-        address topHatAccount
-    ) internal returns (uint256) {
-        uint256 hatId = hatsProtocol.createHat(
-            adminHatId,
-            hat.details,
-            hat.maxSupply,
-            eligibilityAddress,
-            topHatAccount,
-            hat.isMutable,
-            hat.imageURI
-        );
-
-        // If the hat is termed, nominate the wearer as the eligible member
-        if (hat.termEndDateTs != 0) {
-            address[] memory nominatedWearers = new address[](1);
-            nominatedWearers[0] = hat.wearer;
-            IHatsElectionsEligibility(eligibilityAddress).elect(
-                hat.termEndDateTs,
-                nominatedWearers
-            );
-        }
-
-        hatsProtocol.mintHat(hatId, hat.wearer);
-        return hatId;
-    }
-
-    // Exists to avoid stack too deep errors
-    function _setupStreamRecipient(
-        IERC6551Registry registry,
-        address hatsAccountImplementation,
-        address hatsProtocol,
-        uint128 termEndDateTs,
-        address wearer,
-        uint256 hatId
-    ) internal returns (address) {
-        // If the hat is termed, the wearer is the stream recipient
-        if (termEndDateTs != 0) {
-            return wearer;
-        }
-
-        // Otherwise, the Hat's smart account is the stream recipient
-        return
-            registry.createAccount(
-                hatsAccountImplementation,
-                SALT,
-                block.chainid,
-                hatsProtocol,
-                hatId
-            );
     }
 }
