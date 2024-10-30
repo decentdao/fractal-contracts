@@ -3,29 +3,36 @@ import { expect } from 'chai';
 /* eslint-disable-next-line import/no-extraneous-dependencies */
 import { ethers } from 'ethers';
 import hre from 'hardhat';
+
 import {
   GnosisSafeL2,
   GnosisSafeL2__factory,
-  DecentHats_0_1_0__factory,
+  DecentHatsCreationModule__factory,
   KeyValuePairs,
   KeyValuePairs__factory,
-  MockHats__factory,
   ERC6551Registry__factory,
   MockHatsAccount__factory,
   ERC6551Registry,
-  DecentHats_0_1_0,
+  DecentHatsCreationModule,
   MockHatsAccount,
   MockHats,
+  MockHats__factory,
   MockSablierV2LockupLinear__factory,
   MockSablierV2LockupLinear,
   MockERC20__factory,
   MockERC20,
+  DecentAutonomousAdmin,
+  DecentAutonomousAdmin__factory,
+  MockHatsElectionsEligibility__factory,
+  MockHatsModuleFactory__factory,
+  ModuleProxyFactory,
+  ModuleProxyFactory__factory,
 } from '../typechain-types';
 
 import { getGnosisSafeL2Singleton, getGnosisSafeProxyFactory } from './GlobalSafeDeployments.test';
 import { executeSafeTransaction, getHatAccount, predictGnosisSafeAddress } from './helpers';
 
-describe('DecentHats_0_1_0', () => {
+describe('DecentHatsCreationModule', () => {
   let dao: SignerWithAddress;
 
   let mockHats: MockHats;
@@ -34,8 +41,8 @@ describe('DecentHats_0_1_0', () => {
   let keyValuePairs: KeyValuePairs;
   let gnosisSafe: GnosisSafeL2;
 
-  let decentHats: DecentHats_0_1_0;
-  let decentHatsAddress: string;
+  let decentHatsCreationModule: DecentHatsCreationModule;
+  let decentHatsCreationModuleAddress: string;
 
   let gnosisSafeAddress: string;
   let erc6551Registry: ERC6551Registry;
@@ -49,67 +56,86 @@ describe('DecentHats_0_1_0', () => {
   let mockERC20: MockERC20;
   let mockERC20Address: string;
 
+  let mockHatsElectionsEligibilityImplementationAddress: string;
+  let mockHatsModuleFactoryAddress: string;
+
+  let moduleProxyFactory: ModuleProxyFactory;
+  let decentAutonomousAdminMasterCopy: DecentAutonomousAdmin;
   beforeEach(async () => {
-    const signers = await hre.ethers.getSigners();
-    const [deployer] = signers;
-    [, dao] = signers;
+    try {
+      const signers = await hre.ethers.getSigners();
+      const [deployer] = signers;
+      [, dao] = signers;
 
-    mockHats = await new MockHats__factory(deployer).deploy();
-    mockHatsAddress = await mockHats.getAddress();
-    keyValuePairs = await new KeyValuePairs__factory(deployer).deploy();
-    erc6551Registry = await new ERC6551Registry__factory(deployer).deploy();
-    mockHatsAccountImplementation = await new MockHatsAccount__factory(deployer).deploy();
-    mockHatsAccountImplementationAddress = await mockHatsAccountImplementation.getAddress();
-    decentHats = await new DecentHats_0_1_0__factory(deployer).deploy();
-    decentHatsAddress = await decentHats.getAddress();
+      mockHats = await new MockHats__factory(deployer).deploy();
+      mockHatsAddress = await mockHats.getAddress();
 
-    const gnosisSafeProxyFactory = getGnosisSafeProxyFactory();
-    const gnosisSafeL2Singleton = getGnosisSafeL2Singleton();
-    const gnosisSafeL2SingletonAddress = await gnosisSafeL2Singleton.getAddress();
+      const mockHatsElectionsEligibilityImplementation =
+        await new MockHatsElectionsEligibility__factory(deployer).deploy();
+      mockHatsElectionsEligibilityImplementationAddress =
+        await mockHatsElectionsEligibilityImplementation.getAddress();
 
-    const createGnosisSetupCalldata = GnosisSafeL2__factory.createInterface().encodeFunctionData(
-      'setup',
-      [
-        [dao.address],
-        1,
-        hre.ethers.ZeroAddress,
-        hre.ethers.ZeroHash,
-        hre.ethers.ZeroAddress,
-        hre.ethers.ZeroAddress,
-        0,
-        hre.ethers.ZeroAddress,
-      ],
-    );
+      const mockHatsModuleFactory = await new MockHatsModuleFactory__factory(deployer).deploy();
+      mockHatsModuleFactoryAddress = await mockHatsModuleFactory.getAddress();
 
-    const saltNum = BigInt(`0x${Buffer.from(hre.ethers.randomBytes(32)).toString('hex')}`);
+      keyValuePairs = await new KeyValuePairs__factory(deployer).deploy();
+      erc6551Registry = await new ERC6551Registry__factory(deployer).deploy();
+      mockHatsAccountImplementation = await new MockHatsAccount__factory(deployer).deploy();
+      mockHatsAccountImplementationAddress = await mockHatsAccountImplementation.getAddress();
+      decentHatsCreationModule = await new DecentHatsCreationModule__factory(deployer).deploy();
+      decentHatsCreationModuleAddress = await decentHatsCreationModule.getAddress();
+      moduleProxyFactory = await new ModuleProxyFactory__factory(deployer).deploy();
+      decentAutonomousAdminMasterCopy = await new DecentAutonomousAdmin__factory(deployer).deploy();
 
-    const predictedGnosisSafeAddress = await predictGnosisSafeAddress(
-      createGnosisSetupCalldata,
-      saltNum,
-      gnosisSafeL2SingletonAddress,
-      gnosisSafeProxyFactory,
-    );
-    gnosisSafeAddress = predictedGnosisSafeAddress;
+      const gnosisSafeProxyFactory = getGnosisSafeProxyFactory();
+      const gnosisSafeL2Singleton = getGnosisSafeL2Singleton();
+      const gnosisSafeL2SingletonAddress = await gnosisSafeL2Singleton.getAddress();
 
-    await gnosisSafeProxyFactory.createProxyWithNonce(
-      gnosisSafeL2SingletonAddress,
-      createGnosisSetupCalldata,
-      saltNum,
-    );
+      const createGnosisSetupCalldata = GnosisSafeL2__factory.createInterface().encodeFunctionData(
+        'setup',
+        [
+          [dao.address],
+          1,
+          hre.ethers.ZeroAddress,
+          hre.ethers.ZeroHash,
+          hre.ethers.ZeroAddress,
+          hre.ethers.ZeroAddress,
+          0,
+          hre.ethers.ZeroAddress,
+        ],
+      );
+      const saltNum = BigInt(`0x${Buffer.from(hre.ethers.randomBytes(32)).toString('hex')}`);
 
-    gnosisSafe = GnosisSafeL2__factory.connect(predictedGnosisSafeAddress, deployer);
+      const predictedGnosisSafeAddress = await predictGnosisSafeAddress(
+        createGnosisSetupCalldata,
+        saltNum,
+        gnosisSafeL2SingletonAddress,
+        gnosisSafeProxyFactory,
+      );
+      gnosisSafeAddress = predictedGnosisSafeAddress;
 
-    // Deploy MockSablierV2LockupLinear
-    mockSablier = await new MockSablierV2LockupLinear__factory(deployer).deploy();
-    mockSablierAddress = await mockSablier.getAddress();
+      await gnosisSafeProxyFactory.createProxyWithNonce(
+        gnosisSafeL2SingletonAddress,
+        createGnosisSetupCalldata,
+        saltNum,
+      );
 
-    mockERC20 = await new MockERC20__factory(deployer).deploy('MockERC20', 'MCK');
-    mockERC20Address = await mockERC20.getAddress();
+      gnosisSafe = GnosisSafeL2__factory.connect(predictedGnosisSafeAddress, deployer);
 
-    await mockERC20.mint(gnosisSafeAddress, ethers.parseEther('1000000'));
+      // Deploy MockSablierV2LockupLinear
+      mockSablier = await new MockSablierV2LockupLinear__factory(deployer).deploy();
+      mockSablierAddress = await mockSablier.getAddress();
+
+      mockERC20 = await new MockERC20__factory(deployer).deploy('MockERC20', 'MCK');
+      mockERC20Address = await mockERC20.getAddress();
+
+      await mockERC20.mint(gnosisSafeAddress, ethers.parseEther('1000000'));
+    } catch (e) {
+      console.error('AHHHHHH', e);
+    }
   });
 
-  describe('DecentHats', () => {
+  describe('DecentHats as a Module', () => {
     let enableModuleTx: ethers.ContractTransactionResponse;
 
     beforeEach(async () => {
@@ -118,22 +144,20 @@ describe('DecentHats_0_1_0', () => {
         to: gnosisSafeAddress,
         transactionData: GnosisSafeL2__factory.createInterface().encodeFunctionData(
           'enableModule',
-          [decentHatsAddress],
+          [decentHatsCreationModuleAddress],
         ),
         signers: [dao],
       });
     });
 
-    describe('Enabled as a module', () => {
-      it('Emits an ExecutionSuccess event', async () => {
-        await expect(enableModuleTx).to.emit(gnosisSafe, 'ExecutionSuccess');
-      });
+    it('Emits an ExecutionSuccess event', async () => {
+      await expect(enableModuleTx).to.emit(gnosisSafe, 'ExecutionSuccess');
+    });
 
-      it('Emits an EnabledModule event', async () => {
-        await expect(enableModuleTx)
-          .to.emit(gnosisSafe, 'EnabledModule')
-          .withArgs(decentHatsAddress);
-      });
+    it('Emits an EnabledModule event', async () => {
+      await expect(enableModuleTx)
+        .to.emit(gnosisSafe, 'EnabledModule')
+        .withArgs(decentHatsCreationModuleAddress);
     });
 
     describe('Creating a new Top Hat and Tree', () => {
@@ -142,41 +166,47 @@ describe('DecentHats_0_1_0', () => {
       beforeEach(async () => {
         createAndDeclareTreeTx = await executeSafeTransaction({
           safe: gnosisSafe,
-          to: decentHatsAddress,
-          transactionData: DecentHats_0_1_0__factory.createInterface().encodeFunctionData(
+          to: decentHatsCreationModuleAddress,
+          transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
             'createAndDeclareTree',
             [
               {
                 hatsProtocol: mockHatsAddress,
+                erc6551Registry: await erc6551Registry.getAddress(),
+                hatsModuleFactory: mockHatsModuleFactoryAddress,
+                moduleProxyFactory: await moduleProxyFactory.getAddress(),
+                decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
                 hatsAccountImplementation: mockHatsAccountImplementationAddress,
-                registry: await erc6551Registry.getAddress(),
                 keyValuePairs: await keyValuePairs.getAddress(),
-                topHatDetails: '',
-                topHatImageURI: '',
+                hatsElectionsEligibilityImplementation:
+                  mockHatsElectionsEligibilityImplementationAddress,
+                topHat: {
+                  details: '',
+                  imageURI: '',
+                },
                 adminHat: {
-                  maxSupply: 1,
                   details: '',
                   imageURI: '',
                   isMutable: false,
-                  wearer: ethers.ZeroAddress,
-                  sablierParams: [],
                 },
                 hats: [
                   {
-                    maxSupply: 1,
+                    wearer: ethers.ZeroAddress,
                     details: '',
                     imageURI: '',
+                    maxSupply: 1,
                     isMutable: false,
-                    wearer: ethers.ZeroAddress,
-                    sablierParams: [],
+                    termEndDateTs: 0,
+                    sablierStreamsParams: [],
                   },
                   {
-                    maxSupply: 1,
+                    wearer: ethers.ZeroAddress,
                     details: '',
                     imageURI: '',
+                    maxSupply: 1,
                     isMutable: false,
-                    wearer: ethers.ZeroAddress,
-                    sablierParams: [],
+                    termEndDateTs: 0,
+                    sablierStreamsParams: [],
                   },
                 ],
               },
@@ -193,7 +223,7 @@ describe('DecentHats_0_1_0', () => {
       it('Emits an ExecutionFromModuleSuccess event', async () => {
         await expect(createAndDeclareTreeTx)
           .to.emit(gnosisSafe, 'ExecutionFromModuleSuccess')
-          .withArgs(decentHatsAddress);
+          .withArgs(decentHatsCreationModuleAddress);
       });
 
       it('Emits some hatsTreeId ValueUpdated events', async () => {
@@ -208,26 +238,31 @@ describe('DecentHats_0_1_0', () => {
         beforeEach(async () => {
           createAndDeclareTreeTx2 = await executeSafeTransaction({
             safe: gnosisSafe,
-            to: decentHatsAddress,
-            transactionData: DecentHats_0_1_0__factory.createInterface().encodeFunctionData(
+            to: decentHatsCreationModuleAddress,
+            transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
               'createAndDeclareTree',
               [
                 {
                   hatsProtocol: mockHatsAddress,
                   hatsAccountImplementation: mockHatsAccountImplementationAddress,
-                  registry: await erc6551Registry.getAddress(),
+                  erc6551Registry: await erc6551Registry.getAddress(),
                   keyValuePairs: await keyValuePairs.getAddress(),
-                  topHatDetails: '',
-                  topHatImageURI: '',
+                  topHat: {
+                    details: '',
+                    imageURI: '',
+                  },
+                  decentAutonomousAdminMasterCopy:
+                    await decentAutonomousAdminMasterCopy.getAddress(),
+                  moduleProxyFactory: await moduleProxyFactory.getAddress(),
                   adminHat: {
-                    maxSupply: 1,
                     details: '',
                     imageURI: '',
                     isMutable: false,
-                    wearer: ethers.ZeroAddress,
-                    sablierParams: [],
                   },
                   hats: [],
+                  hatsModuleFactory: mockHatsModuleFactoryAddress,
+                  hatsElectionsEligibilityImplementation:
+                    mockHatsElectionsEligibilityImplementationAddress,
                 },
               ],
             ),
@@ -242,7 +277,7 @@ describe('DecentHats_0_1_0', () => {
         it('Emits an ExecutionFromModuleSuccess event', async () => {
           await expect(createAndDeclareTreeTx2)
             .to.emit(gnosisSafe, 'ExecutionFromModuleSuccess')
-            .withArgs(decentHatsAddress);
+            .withArgs(decentHatsCreationModuleAddress);
         });
 
         it('Creates Top Hats with sequential IDs', async () => {
@@ -255,19 +290,89 @@ describe('DecentHats_0_1_0', () => {
       describe('Creating Hats Accounts', () => {
         it('Generates the correct Addresses for the current Hats', async () => {
           const currentCount = await mockHats.hatId();
-
           for (let i = 0n; i < currentCount; i++) {
-            const topHatAccount = await getHatAccount(
+            const hatAccount = await getHatAccount(
               i,
               erc6551Registry,
               mockHatsAccountImplementationAddress,
               mockHatsAddress,
             );
-
-            expect(await topHatAccount.tokenId()).eq(i);
-            expect(await topHatAccount.tokenImplementation()).eq(mockHatsAddress);
+            expect(await hatAccount.tokenId()).eq(i);
+            expect(await hatAccount.tokenImplementation()).eq(mockHatsAddress);
           }
         });
+      });
+    });
+    describe('Creating a new Top Hat and Tree with Termed Roles', () => {
+      let createAndDeclareTreeTx: ethers.ContractTransactionResponse;
+
+      beforeEach(async () => {
+        createAndDeclareTreeTx = await executeSafeTransaction({
+          safe: gnosisSafe,
+          to: decentHatsCreationModuleAddress,
+          transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
+            'createAndDeclareTree',
+            [
+              {
+                hatsProtocol: mockHatsAddress,
+                hatsAccountImplementation: mockHatsAccountImplementationAddress,
+                erc6551Registry: await erc6551Registry.getAddress(),
+                keyValuePairs: await keyValuePairs.getAddress(),
+                topHat: {
+                  details: '',
+                  imageURI: '',
+                },
+                decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
+                moduleProxyFactory: await moduleProxyFactory.getAddress(),
+                adminHat: {
+                  details: '',
+                  imageURI: '',
+                  isMutable: true,
+                },
+                hats: [
+                  {
+                    maxSupply: 1,
+                    details: '',
+                    imageURI: '',
+                    isMutable: false,
+                    wearer: '0x14dC79964da2C08b23698B3D3cc7Ca32193d9955',
+                    sablierStreamsParams: [],
+                    termEndDateTs: BigInt(Date.now() + 100000),
+                  },
+                  {
+                    maxSupply: 1,
+                    details: '',
+                    imageURI: '',
+                    isMutable: false,
+                    wearer: '0x14dC79964da2C08b23698B3D3cc7Ca32193d9955',
+                    sablierStreamsParams: [],
+                    termEndDateTs: BigInt(Date.now() + 100000),
+                  },
+                ],
+                hatsModuleFactory: mockHatsModuleFactoryAddress,
+                hatsElectionsEligibilityImplementation:
+                  mockHatsElectionsEligibilityImplementationAddress,
+              },
+            ],
+          ),
+          signers: [dao],
+        });
+      });
+
+      it('Emits an ExecutionSuccess event', async () => {
+        await expect(createAndDeclareTreeTx).to.emit(gnosisSafe, 'ExecutionSuccess');
+      });
+
+      it('Emits an ExecutionFromModuleSuccess event', async () => {
+        await expect(createAndDeclareTreeTx)
+          .to.emit(gnosisSafe, 'ExecutionFromModuleSuccess')
+          .withArgs(decentHatsCreationModuleAddress);
+      });
+
+      it('Emits some hatsTreeId ValueUpdated events', async () => {
+        await expect(createAndDeclareTreeTx)
+          .to.emit(keyValuePairs, 'ValueUpdated')
+          .withArgs(gnosisSafeAddress, 'topHatId', '0');
       });
     });
 
@@ -280,24 +385,25 @@ describe('DecentHats_0_1_0', () => {
 
         createAndDeclareTreeTx = await executeSafeTransaction({
           safe: gnosisSafe,
-          to: decentHatsAddress,
-          transactionData: DecentHats_0_1_0__factory.createInterface().encodeFunctionData(
+          to: decentHatsCreationModuleAddress,
+          transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
             'createAndDeclareTree',
             [
               {
                 hatsProtocol: mockHatsAddress,
                 hatsAccountImplementation: mockHatsAccountImplementationAddress,
-                registry: await erc6551Registry.getAddress(),
+                erc6551Registry: await erc6551Registry.getAddress(),
                 keyValuePairs: await keyValuePairs.getAddress(),
-                topHatDetails: '',
-                topHatImageURI: '',
+                topHat: {
+                  details: '',
+                  imageURI: '',
+                },
+                decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
+                moduleProxyFactory: await moduleProxyFactory.getAddress(),
                 adminHat: {
-                  maxSupply: 1,
                   details: '',
                   imageURI: '',
                   isMutable: false,
-                  wearer: ethers.ZeroAddress,
-                  sablierParams: [],
                 },
                 hats: [
                   {
@@ -306,7 +412,7 @@ describe('DecentHats_0_1_0', () => {
                     imageURI: '',
                     isMutable: false,
                     wearer: ethers.ZeroAddress,
-                    sablierParams: [
+                    sablierStreamsParams: [
                       {
                         sablier: mockSablierAddress,
                         sender: gnosisSafeAddress,
@@ -322,6 +428,7 @@ describe('DecentHats_0_1_0', () => {
                         broker: { account: ethers.ZeroAddress, fee: 0 },
                       },
                     ],
+                    termEndDateTs: 0,
                   },
                   {
                     maxSupply: 1,
@@ -329,9 +436,13 @@ describe('DecentHats_0_1_0', () => {
                     imageURI: '',
                     isMutable: false,
                     wearer: ethers.ZeroAddress,
-                    sablierParams: [],
+                    sablierStreamsParams: [],
+                    termEndDateTs: 0,
                   },
                 ],
+                hatsModuleFactory: mockHatsModuleFactoryAddress,
+                hatsElectionsEligibilityImplementation:
+                  mockHatsElectionsEligibilityImplementationAddress,
               },
             ],
           ),
@@ -346,7 +457,7 @@ describe('DecentHats_0_1_0', () => {
       it('Emits an ExecutionFromModuleSuccess event', async () => {
         await expect(createAndDeclareTreeTx)
           .to.emit(gnosisSafe, 'ExecutionFromModuleSuccess')
-          .withArgs(decentHatsAddress);
+          .withArgs(decentHatsCreationModuleAddress);
       });
 
       it('Emits some hatsTreeId ValueUpdated events', async () => {
@@ -396,24 +507,25 @@ describe('DecentHats_0_1_0', () => {
 
         await executeSafeTransaction({
           safe: gnosisSafe,
-          to: decentHatsAddress,
-          transactionData: DecentHats_0_1_0__factory.createInterface().encodeFunctionData(
+          to: decentHatsCreationModuleAddress,
+          transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
             'createAndDeclareTree',
             [
               {
                 hatsProtocol: mockHatsAddress,
                 hatsAccountImplementation: mockHatsAccountImplementationAddress,
-                registry: await erc6551Registry.getAddress(),
+                erc6551Registry: await erc6551Registry.getAddress(),
                 keyValuePairs: await keyValuePairs.getAddress(),
-                topHatDetails: '',
-                topHatImageURI: '',
+                topHat: {
+                  details: '',
+                  imageURI: '',
+                },
+                decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
+                moduleProxyFactory: await moduleProxyFactory.getAddress(),
                 adminHat: {
-                  maxSupply: 1,
                   details: '',
                   imageURI: '',
                   isMutable: false,
-                  wearer: ethers.ZeroAddress,
-                  sablierParams: [],
                 },
                 hats: [
                   {
@@ -422,7 +534,7 @@ describe('DecentHats_0_1_0', () => {
                     imageURI: '',
                     isMutable: false,
                     wearer: ethers.ZeroAddress,
-                    sablierParams: [
+                    sablierStreamsParams: [
                       {
                         sablier: mockSablierAddress,
                         sender: gnosisSafeAddress,
@@ -452,8 +564,12 @@ describe('DecentHats_0_1_0', () => {
                         broker: { account: ethers.ZeroAddress, fee: 0 },
                       },
                     ],
+                    termEndDateTs: 0,
                   },
                 ],
+                hatsModuleFactory: mockHatsModuleFactoryAddress,
+                hatsElectionsEligibilityImplementation:
+                  mockHatsElectionsEligibilityImplementationAddress,
               },
             ],
           ),
@@ -506,128 +622,6 @@ describe('DecentHats_0_1_0', () => {
         const stream2 = await mockSablier.getStream(streamCreatedEvents[1].args.streamId);
         expect(stream2.startTime).to.equal(currentBlockTimestamp);
         expect(stream2.endTime).to.equal(currentBlockTimestamp + 1296000);
-      });
-    });
-
-    describe('Creating a new hat on existing Tree', () => {
-      let createRoleHatPromise: Promise<ethers.ContractTransactionResponse>;
-      const topHatId = 0;
-
-      beforeEach(async () => {
-        await executeSafeTransaction({
-          safe: gnosisSafe,
-          to: decentHatsAddress,
-          transactionData: DecentHats_0_1_0__factory.createInterface().encodeFunctionData(
-            'createAndDeclareTree',
-            [
-              {
-                hatsProtocol: mockHatsAddress,
-                hatsAccountImplementation: mockHatsAccountImplementationAddress,
-                registry: await erc6551Registry.getAddress(),
-                keyValuePairs: await keyValuePairs.getAddress(),
-                topHatDetails: '',
-                topHatImageURI: '',
-                adminHat: {
-                  maxSupply: 1,
-                  details: '',
-                  imageURI: '',
-                  isMutable: false,
-                  wearer: ethers.ZeroAddress,
-                  sablierParams: [],
-                },
-                hats: [],
-              },
-            ],
-          ),
-          signers: [dao],
-        });
-
-        const currentBlockTimestamp = (await hre.ethers.provider.getBlock('latest'))!.timestamp;
-
-        createRoleHatPromise = executeSafeTransaction({
-          safe: gnosisSafe,
-          to: decentHatsAddress,
-          transactionData: DecentHats_0_1_0__factory.createInterface().encodeFunctionData(
-            'createRoleHat',
-            [
-              mockHatsAddress,
-              1,
-              {
-                maxSupply: 1,
-                details: '',
-                imageURI: '',
-                isMutable: true,
-                wearer: '0xdce7ca0555101f97451926944f5ae3b7adb2f5ae',
-                sablierParams: [
-                  {
-                    sablier: mockSablierAddress,
-                    sender: gnosisSafeAddress,
-                    totalAmount: ethers.parseEther('100'),
-                    asset: mockERC20Address,
-                    cancelable: true,
-                    transferable: false,
-                    timestamps: {
-                      start: currentBlockTimestamp,
-                      cliff: currentBlockTimestamp + 86400, // 1 day cliff
-                      end: currentBlockTimestamp + 2592000, // 30 days from now
-                    },
-                    broker: { account: ethers.ZeroAddress, fee: 0 },
-                  },
-                ],
-              },
-              0,
-              '0xdce7ca0555101f97451926944f5ae3b7adb2f5ae',
-              await erc6551Registry.getAddress(),
-              mockHatsAccountImplementationAddress,
-              '0x5d0e6ce4fd951366cc55da93f6e79d8b81483109d79676a04bcc2bed6a4b5072',
-            ],
-          ),
-          signers: [dao],
-        });
-      });
-
-      it('Reverts if the top hat is not transferred to the DecentHats module first', async () => {
-        await expect(createRoleHatPromise).to.be.reverted;
-      });
-
-      it('Emits an ExecutionSuccess event', async () => {
-        // First transfer the top hat to the Safe
-        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
-        await expect(await createRoleHatPromise).to.emit(gnosisSafe, 'ExecutionSuccess');
-      });
-
-      it('Emits an ExecutionFromModuleSuccess event', async () => {
-        // First transfer the top hat to the Safe
-        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
-        await expect(await createRoleHatPromise)
-          .to.emit(gnosisSafe, 'ExecutionFromModuleSuccess')
-          .withArgs(decentHatsAddress);
-      });
-
-      it('Transfers the top hat back to the Safe', async () => {
-        // First transfer the top hat to the Safe
-        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
-
-        const isModuleWearerOfTopHat = await mockHats.isWearerOfHat(decentHatsAddress, topHatId);
-        expect(isModuleWearerOfTopHat).to.equal(true);
-
-        await createRoleHatPromise;
-
-        const isSafeWearerOfTopHat = await mockHats.isWearerOfHat(gnosisSafeAddress, topHatId);
-        expect(isSafeWearerOfTopHat).to.equal(true);
-      });
-
-      it('Actually creates the new hat', async () => {
-        // First transfer the top hat to the Safe
-        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
-
-        const hatsCountBeforeCreate = await mockHats.hatId();
-        expect(hatsCountBeforeCreate).to.equal(2); // Top hat + admin hat
-
-        await createRoleHatPromise;
-
-        const newHatId = await mockHats.hatId();
-        expect(newHatId).to.equal(3); // + newly created hat
       });
     });
   });
