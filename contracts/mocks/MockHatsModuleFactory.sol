@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 import {IHatsModuleFactory} from "../interfaces/hats/full/IHatsModuleFactory.sol";
-import {MockHatsElectionEligibility} from "./MockHatsElectionEligibility.sol";
+import {MockHatsElectionsEligibility} from "./MockHatsElectionEligibility.sol";
 
 contract MockHatsModuleFactory is IHatsModuleFactory {
     function createHatsModule(
@@ -13,7 +13,7 @@ contract MockHatsModuleFactory is IHatsModuleFactory {
         uint256
     ) external override returns (address _instance) {
         // Deploy a new instance of MockHatsElectionEligibility
-        MockHatsElectionEligibility newModule = new MockHatsElectionEligibility();
+        MockHatsElectionsEligibility newModule = new MockHatsElectionsEligibility();
         _instance = address(newModule);
     }
 

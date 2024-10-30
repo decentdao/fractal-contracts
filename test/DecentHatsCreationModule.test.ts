@@ -23,7 +23,7 @@ import {
   MockERC20,
   DecentAutonomousAdmin,
   DecentAutonomousAdmin__factory,
-  MockHatsElectionEligibility__factory,
+  MockHatsElectionsEligibility__factory,
   MockHatsModuleFactory__factory,
   ModuleProxyFactory,
   ModuleProxyFactory__factory,
@@ -32,7 +32,7 @@ import {
 import { getGnosisSafeL2Singleton, getGnosisSafeProxyFactory } from './GlobalSafeDeployments.test';
 import { executeSafeTransaction, getHatAccount, predictGnosisSafeAddress } from './helpers';
 
-describe('DecentHats', () => {
+describe('DecentHatsCreationModule', () => {
   let dao: SignerWithAddress;
 
   let mockHats: MockHats;
@@ -56,7 +56,7 @@ describe('DecentHats', () => {
   let mockERC20: MockERC20;
   let mockERC20Address: string;
 
-  let mockHatsElectionEligibilityImplementationAddress: string;
+  let mockHatsElectionsEligibilityImplementationAddress: string;
   let mockHatsModuleFactoryAddress: string;
 
   let moduleProxyFactory: ModuleProxyFactory;
@@ -70,10 +70,10 @@ describe('DecentHats', () => {
       mockHats = await new MockHats__factory(deployer).deploy();
       mockHatsAddress = await mockHats.getAddress();
 
-      const mockHatsElectionEligibilityImplementation =
-        await new MockHatsElectionEligibility__factory(deployer).deploy();
-      mockHatsElectionEligibilityImplementationAddress =
-        await mockHatsElectionEligibilityImplementation.getAddress();
+      const mockHatsElectionsEligibilityImplementation =
+        await new MockHatsElectionsEligibility__factory(deployer).deploy();
+      mockHatsElectionsEligibilityImplementationAddress =
+        await mockHatsElectionsEligibilityImplementation.getAddress();
 
       const mockHatsModuleFactory = await new MockHatsModuleFactory__factory(deployer).deploy();
       mockHatsModuleFactoryAddress = await mockHatsModuleFactory.getAddress();
@@ -172,15 +172,14 @@ describe('DecentHats', () => {
             [
               {
                 hatsProtocol: mockHatsAddress,
-                registry: await erc6551Registry.getAddress(),
+                erc6551Registry: await erc6551Registry.getAddress(),
                 hatsModuleFactory: mockHatsModuleFactoryAddress,
                 moduleProxyFactory: await moduleProxyFactory.getAddress(),
                 decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
                 hatsAccountImplementation: mockHatsAccountImplementationAddress,
                 keyValuePairs: await keyValuePairs.getAddress(),
-                hatsElectionEligibilityImplementation:
-                  mockHatsElectionEligibilityImplementationAddress,
-
+                hatsElectionsEligibilityImplementation:
+                  mockHatsElectionsEligibilityImplementationAddress,
                 topHat: {
                   details: '',
                   imageURI: '',
@@ -246,7 +245,7 @@ describe('DecentHats', () => {
                 {
                   hatsProtocol: mockHatsAddress,
                   hatsAccountImplementation: mockHatsAccountImplementationAddress,
-                  registry: await erc6551Registry.getAddress(),
+                  erc6551Registry: await erc6551Registry.getAddress(),
                   keyValuePairs: await keyValuePairs.getAddress(),
                   topHat: {
                     details: '',
@@ -262,8 +261,8 @@ describe('DecentHats', () => {
                   },
                   hats: [],
                   hatsModuleFactory: mockHatsModuleFactoryAddress,
-                  hatsElectionEligibilityImplementation:
-                    mockHatsElectionEligibilityImplementationAddress,
+                  hatsElectionsEligibilityImplementation:
+                    mockHatsElectionsEligibilityImplementationAddress,
                 },
               ],
             ),
@@ -317,7 +316,7 @@ describe('DecentHats', () => {
               {
                 hatsProtocol: mockHatsAddress,
                 hatsAccountImplementation: mockHatsAccountImplementationAddress,
-                registry: await erc6551Registry.getAddress(),
+                erc6551Registry: await erc6551Registry.getAddress(),
                 keyValuePairs: await keyValuePairs.getAddress(),
                 topHat: {
                   details: '',
@@ -351,8 +350,8 @@ describe('DecentHats', () => {
                   },
                 ],
                 hatsModuleFactory: mockHatsModuleFactoryAddress,
-                hatsElectionEligibilityImplementation:
-                  mockHatsElectionEligibilityImplementationAddress,
+                hatsElectionsEligibilityImplementation:
+                  mockHatsElectionsEligibilityImplementationAddress,
               },
             ],
           ),
@@ -393,7 +392,7 @@ describe('DecentHats', () => {
               {
                 hatsProtocol: mockHatsAddress,
                 hatsAccountImplementation: mockHatsAccountImplementationAddress,
-                registry: await erc6551Registry.getAddress(),
+                erc6551Registry: await erc6551Registry.getAddress(),
                 keyValuePairs: await keyValuePairs.getAddress(),
                 topHat: {
                   details: '',
@@ -442,8 +441,8 @@ describe('DecentHats', () => {
                   },
                 ],
                 hatsModuleFactory: mockHatsModuleFactoryAddress,
-                hatsElectionEligibilityImplementation:
-                  mockHatsElectionEligibilityImplementationAddress,
+                hatsElectionsEligibilityImplementation:
+                  mockHatsElectionsEligibilityImplementationAddress,
               },
             ],
           ),
@@ -515,7 +514,7 @@ describe('DecentHats', () => {
               {
                 hatsProtocol: mockHatsAddress,
                 hatsAccountImplementation: mockHatsAccountImplementationAddress,
-                registry: await erc6551Registry.getAddress(),
+                erc6551Registry: await erc6551Registry.getAddress(),
                 keyValuePairs: await keyValuePairs.getAddress(),
                 topHat: {
                   details: '',
@@ -569,8 +568,8 @@ describe('DecentHats', () => {
                   },
                 ],
                 hatsModuleFactory: mockHatsModuleFactoryAddress,
-                hatsElectionEligibilityImplementation:
-                  mockHatsElectionEligibilityImplementationAddress,
+                hatsElectionsEligibilityImplementation:
+                  mockHatsElectionsEligibilityImplementationAddress,
               },
             ],
           ),

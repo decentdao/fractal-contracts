@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.13;
 
-interface IHatsElectionEligibility {
+interface IHatsElectionsEligibility {
     event ElectionOpened(uint128 nextTermEnd);
     event ElectionCompleted(uint128 termEnd, address[] winners);
     event NewTermStarted(uint128 termEnd);

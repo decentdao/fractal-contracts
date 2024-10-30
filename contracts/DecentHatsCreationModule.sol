@@ -9,7 +9,7 @@ import {IERC6551Registry} from "./interfaces/IERC6551Registry.sol";
 import {IHats} from "./interfaces/hats/full/IHats.sol";
 import {LockupLinear, Broker} from "./interfaces/sablier/full/types/DataTypes.sol";
 import {IHatsModuleFactory} from "./interfaces/hats/full/IHatsModuleFactory.sol";
-import {IHatsElectionEligibility} from "./interfaces/hats/full/IHatsElectionEligibility.sol";
+import {IHatsElectionsEligibility} from "./interfaces/hats/full/modules/IHatsElectionsEligibility.sol";
 import {ModuleProxyFactory} from "@gnosis.pm/zodiac/contracts/factory/ModuleProxyFactory.sol";
 import {ISablierV2LockupLinear} from "./interfaces/sablier/ISablierV2LockupLinear.sol";
 
@@ -51,13 +51,13 @@ contract DecentHatsCreationModule {
 
     struct CreateTreeParams {
         IHats hatsProtocol;
-        IERC6551Registry registry;
+        IERC6551Registry erc6551Registry;
         IHatsModuleFactory hatsModuleFactory;
         ModuleProxyFactory moduleProxyFactory;
+        address keyValuePairs;
         address decentAutonomousAdminMasterCopy;
         address hatsAccountImplementation;
-        address keyValuePairs;
-        address hatsElectionEligibilityImplementation;
+        address hatsElectionsEligibilityImplementation;
         TopHatParams topHat;
         AdminHatParams adminHat;
         HatParams[] hats;
@@ -87,7 +87,7 @@ contract DecentHatsCreationModule {
     function createAndDeclareTree(CreateTreeParams calldata params) external {
         IHats hatsProtocol = params.hatsProtocol;
         address hatsAccountImplementation = params.hatsAccountImplementation;
-        IERC6551Registry registry = params.registry;
+        IERC6551Registry registry = params.erc6551Registry;
 
         // Create Top Hat
         (uint256 topHatId, address topHatAccount) = processTopHat(
@@ -119,7 +119,7 @@ contract DecentHatsCreationModule {
                 topHatId,
                 topHatAccount,
                 params.hatsModuleFactory,
-                params.hatsElectionEligibilityImplementation,
+                params.hatsElectionsEligibilityImplementation,
                 adminHatId,
                 hat
             );
@@ -232,7 +232,7 @@ contract DecentHatsCreationModule {
         uint256 topHatId,
         address topHatAccount,
         IHatsModuleFactory hatsModuleFactory,
-        address hatsElectionEligibilityImplementation,
+        address hatsElectionsEligibilityImplementation,
         uint256 adminHatId,
         HatParams memory hat
     ) internal {
@@ -240,7 +240,7 @@ contract DecentHatsCreationModule {
         address eligibilityAddress = createEligibilityModule(
             hatsProtocol,
             hatsModuleFactory,
-            hatsElectionEligibilityImplementation,
+            hatsElectionsEligibilityImplementation,
             topHatId,
             topHatAccount,
             adminHatId,
@@ -274,7 +274,7 @@ contract DecentHatsCreationModule {
     function createEligibilityModule(
         IHats hatsProtocol,
         IHatsModuleFactory hatsModuleFactory,
-        address hatsElectionEligibilityImplementation,
+        address hatsElectionsEligibilityImplementation,
         uint256 topHatId,
         address topHatAccount,
         uint256 adminHatId,
@@ -283,7 +283,7 @@ contract DecentHatsCreationModule {
         if (termEndDateTs != 0) {
             return
                 hatsModuleFactory.createHatsModule(
-                    hatsElectionEligibilityImplementation,
+                    hatsElectionsEligibilityImplementation,
                     hatsProtocol.getNextId(adminHatId),
                     abi.encode(topHatId, uint256(0)), // [BALLOT_BOX_ID, ADMIN_HAT_ID]
                     abi.encode(termEndDateTs),
@@ -315,7 +315,7 @@ contract DecentHatsCreationModule {
         if (hat.termEndDateTs != 0) {
             address[] memory nominatedWearers = new address[](1);
             nominatedWearers[0] = hat.wearer;
-            IHatsElectionEligibility(eligibilityAddress).elect(
+            IHatsElectionsEligibility(eligibilityAddress).elect(
                 hat.termEndDateTs,
                 nominatedWearers
             );

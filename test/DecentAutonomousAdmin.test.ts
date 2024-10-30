@@ -6,8 +6,8 @@ import {
   DecentAutonomousAdmin__factory,
   MockHats,
   MockHats__factory,
-  MockHatsElectionEligibility,
-  MockHatsElectionEligibility__factory,
+  MockHatsElectionsEligibility,
+  MockHatsElectionsEligibility__factory,
 } from '../typechain-types';
 
 describe('DecentAutonomousAdminHat', function () {
@@ -19,7 +19,7 @@ describe('DecentAutonomousAdminHat', function () {
 
   // Contract instances
   let hatsProtocol: MockHats;
-  let hatsElectionModule: MockHatsElectionEligibility;
+  let hatsElectionModule: MockHatsElectionsEligibility;
   let decentAutonomousAdminInstance: DecentAutonomousAdmin;
 
   // Variables
@@ -33,7 +33,7 @@ describe('DecentAutonomousAdminHat', function () {
     hatsProtocol = await new MockHats__factory(deployer).deploy();
 
     // Deploy MockHatsElectionEligibility (Eligibility Module)
-    hatsElectionModule = await new MockHatsElectionEligibility__factory(deployer).deploy();
+    hatsElectionModule = await new MockHatsElectionsEligibility__factory(deployer).deploy();
 
     // Create Admin Hat
     const createAdminTx = await hatsProtocol.createHat(

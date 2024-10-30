@@ -2,7 +2,7 @@
 pragma solidity 0.8.28;
 
 import {IHats} from "./interfaces/hats/full/IHats.sol";
-import {IHatsElectionEligibility} from "./interfaces/hats/full/IHatsElectionEligibility.sol";
+import {IHatsElectionsEligibility} from "./interfaces/hats/full/modules/IHatsElectionsEligibility.sol";
 import {FactoryFriendly} from "@gnosis.pm/zodiac/contracts/factory/FactoryFriendly.sol";
 import {ERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import {IDecentAutonomousAdmin} from "./interfaces/IDecentAutonomousAdmin.sol";
@@ -26,9 +26,9 @@ contract DecentAutonomousAdmin is
             false
         ) revert NotCurrentWearer();
 
-        IHatsElectionEligibility hatsElectionModule = IHatsElectionEligibility(
-            args.hatsProtocol.getHatEligibilityModule(args.hatId)
-        );
+        IHatsElectionsEligibility hatsElectionModule = IHatsElectionsEligibility(
+                args.hatsProtocol.getHatEligibilityModule(args.hatId)
+            );
 
         hatsElectionModule.startNextTerm();
 
