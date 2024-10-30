@@ -7,13 +7,13 @@ import hre from 'hardhat';
 import {
   GnosisSafeL2,
   GnosisSafeL2__factory,
-  DecentHats__factory,
+  DecentHatsCreationModule__factory,
   KeyValuePairs,
   KeyValuePairs__factory,
   ERC6551Registry__factory,
   MockHatsAccount__factory,
   ERC6551Registry,
-  DecentHats,
+  DecentHatsCreationModule,
   MockHatsAccount,
   MockHats,
   MockHats__factory,
@@ -41,8 +41,8 @@ describe('DecentHats', () => {
   let keyValuePairs: KeyValuePairs;
   let gnosisSafe: GnosisSafeL2;
 
-  let decentHats: DecentHats;
-  let decentHatsAddress: string;
+  let decentHatsCreationModule: DecentHatsCreationModule;
+  let decentHatsCreationModuleAddress: string;
 
   let gnosisSafeAddress: string;
   let erc6551Registry: ERC6551Registry;
@@ -82,8 +82,8 @@ describe('DecentHats', () => {
       erc6551Registry = await new ERC6551Registry__factory(deployer).deploy();
       mockHatsAccountImplementation = await new MockHatsAccount__factory(deployer).deploy();
       mockHatsAccountImplementationAddress = await mockHatsAccountImplementation.getAddress();
-      decentHats = await new DecentHats__factory(deployer).deploy();
-      decentHatsAddress = await decentHats.getAddress();
+      decentHatsCreationModule = await new DecentHatsCreationModule__factory(deployer).deploy();
+      decentHatsCreationModuleAddress = await decentHatsCreationModule.getAddress();
       moduleProxyFactory = await new ModuleProxyFactory__factory(deployer).deploy();
       decentAutonomousAdminMasterCopy = await new DecentAutonomousAdmin__factory(deployer).deploy();
 
@@ -144,7 +144,7 @@ describe('DecentHats', () => {
         to: gnosisSafeAddress,
         transactionData: GnosisSafeL2__factory.createInterface().encodeFunctionData(
           'enableModule',
-          [decentHatsAddress],
+          [decentHatsCreationModuleAddress],
         ),
         signers: [dao],
       });
@@ -155,7 +155,9 @@ describe('DecentHats', () => {
     });
 
     it('Emits an EnabledModule event', async () => {
-      await expect(enableModuleTx).to.emit(gnosisSafe, 'EnabledModule').withArgs(decentHatsAddress);
+      await expect(enableModuleTx)
+        .to.emit(gnosisSafe, 'EnabledModule')
+        .withArgs(decentHatsCreationModuleAddress);
     });
 
     describe('Creating a new Top Hat and Tree', () => {
@@ -164,8 +166,8 @@ describe('DecentHats', () => {
       beforeEach(async () => {
         createAndDeclareTreeTx = await executeSafeTransaction({
           safe: gnosisSafe,
-          to: decentHatsAddress,
-          transactionData: DecentHats__factory.createInterface().encodeFunctionData(
+          to: decentHatsCreationModuleAddress,
+          transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
             'createAndDeclareTree',
             [
               {
@@ -232,7 +234,7 @@ describe('DecentHats', () => {
       it('Emits an ExecutionFromModuleSuccess event', async () => {
         await expect(createAndDeclareTreeTx)
           .to.emit(gnosisSafe, 'ExecutionFromModuleSuccess')
-          .withArgs(decentHatsAddress);
+          .withArgs(decentHatsCreationModuleAddress);
       });
 
       it('Emits some hatsTreeId ValueUpdated events', async () => {
@@ -247,8 +249,8 @@ describe('DecentHats', () => {
         beforeEach(async () => {
           createAndDeclareTreeTx2 = await executeSafeTransaction({
             safe: gnosisSafe,
-            to: decentHatsAddress,
-            transactionData: DecentHats__factory.createInterface().encodeFunctionData(
+            to: decentHatsCreationModuleAddress,
+            transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
               'createAndDeclareTree',
               [
                 {
@@ -292,7 +294,7 @@ describe('DecentHats', () => {
         it('Emits an ExecutionFromModuleSuccess event', async () => {
           await expect(createAndDeclareTreeTx2)
             .to.emit(gnosisSafe, 'ExecutionFromModuleSuccess')
-            .withArgs(decentHatsAddress);
+            .withArgs(decentHatsCreationModuleAddress);
         });
 
         it('Creates Top Hats with sequential IDs', async () => {
@@ -324,8 +326,8 @@ describe('DecentHats', () => {
       beforeEach(async () => {
         createAndDeclareTreeTx = await executeSafeTransaction({
           safe: gnosisSafe,
-          to: decentHatsAddress,
-          transactionData: DecentHats__factory.createInterface().encodeFunctionData(
+          to: decentHatsCreationModuleAddress,
+          transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
             'createAndDeclareTree',
             [
               {
@@ -392,7 +394,7 @@ describe('DecentHats', () => {
       it('Emits an ExecutionFromModuleSuccess event', async () => {
         await expect(createAndDeclareTreeTx)
           .to.emit(gnosisSafe, 'ExecutionFromModuleSuccess')
-          .withArgs(decentHatsAddress);
+          .withArgs(decentHatsCreationModuleAddress);
       });
 
       it('Emits some hatsTreeId ValueUpdated events', async () => {
@@ -411,8 +413,8 @@ describe('DecentHats', () => {
 
         createAndDeclareTreeTx = await executeSafeTransaction({
           safe: gnosisSafe,
-          to: decentHatsAddress,
-          transactionData: DecentHats__factory.createInterface().encodeFunctionData(
+          to: decentHatsCreationModuleAddress,
+          transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
             'createAndDeclareTree',
             [
               {
@@ -494,7 +496,7 @@ describe('DecentHats', () => {
       it('Emits an ExecutionFromModuleSuccess event', async () => {
         await expect(createAndDeclareTreeTx)
           .to.emit(gnosisSafe, 'ExecutionFromModuleSuccess')
-          .withArgs(decentHatsAddress);
+          .withArgs(decentHatsCreationModuleAddress);
       });
 
       it('Emits some hatsTreeId ValueUpdated events', async () => {
@@ -544,8 +546,8 @@ describe('DecentHats', () => {
 
         await executeSafeTransaction({
           safe: gnosisSafe,
-          to: decentHatsAddress,
-          transactionData: DecentHats__factory.createInterface().encodeFunctionData(
+          to: decentHatsCreationModuleAddress,
+          transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
             'createAndDeclareTree',
             [
               {
@@ -678,8 +680,8 @@ describe('DecentHats', () => {
         try {
           await executeSafeTransaction({
             safe: gnosisSafe,
-            to: decentHatsAddress,
-            transactionData: DecentHats__factory.createInterface().encodeFunctionData(
+            to: decentHatsCreationModuleAddress,
+            transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
               'createAndDeclareTree',
               [
                 {
@@ -720,8 +722,8 @@ describe('DecentHats', () => {
 
         createRoleHatPromise = executeSafeTransaction({
           safe: gnosisSafe,
-          to: decentHatsAddress,
-          transactionData: DecentHats__factory.createInterface().encodeFunctionData(
+          to: decentHatsCreationModuleAddress,
+          transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
             'createRoleHat',
             [
               {
@@ -772,23 +774,26 @@ describe('DecentHats', () => {
 
       it('Emits an ExecutionSuccess event', async () => {
         // First transfer the top hat to the Safe
-        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
+        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsCreationModuleAddress);
         await expect(await createRoleHatPromise).to.emit(gnosisSafe, 'ExecutionSuccess');
       });
 
       it('Emits an ExecutionFromModuleSuccess event', async () => {
         // First transfer the top hat to the Safe
-        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
+        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsCreationModuleAddress);
         await expect(await createRoleHatPromise)
           .to.emit(gnosisSafe, 'ExecutionFromModuleSuccess')
-          .withArgs(decentHatsAddress);
+          .withArgs(decentHatsCreationModuleAddress);
       });
 
       it('Transfers the top hat back to the Safe', async () => {
         // First transfer the top hat to the Safe
-        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
+        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsCreationModuleAddress);
 
-        const isModuleWearerOfTopHat = await mockHats.isWearerOfHat(decentHatsAddress, topHatId);
+        const isModuleWearerOfTopHat = await mockHats.isWearerOfHat(
+          decentHatsCreationModuleAddress,
+          topHatId,
+        );
         expect(isModuleWearerOfTopHat).to.equal(true);
 
         await createRoleHatPromise;
@@ -799,7 +804,7 @@ describe('DecentHats', () => {
 
       it('Actually creates the new hat', async () => {
         // First transfer the top hat to the Safe
-        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
+        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsCreationModuleAddress);
 
         const hatsCountBeforeCreate = await mockHats.hatId();
         expect(hatsCountBeforeCreate).to.equal(2); // Top hat + admin hat
@@ -819,8 +824,8 @@ describe('DecentHats', () => {
         try {
           await executeSafeTransaction({
             safe: gnosisSafe,
-            to: decentHatsAddress,
-            transactionData: DecentHats__factory.createInterface().encodeFunctionData(
+            to: decentHatsCreationModuleAddress,
+            transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
               'createAndDeclareTree',
               [
                 {
@@ -862,8 +867,8 @@ describe('DecentHats', () => {
 
         createRoleHatPromise = executeSafeTransaction({
           safe: gnosisSafe,
-          to: decentHatsAddress,
-          transactionData: DecentHats__factory.createInterface().encodeFunctionData(
+          to: decentHatsCreationModuleAddress,
+          transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
             'createTermedRoleHat',
             [
               {
@@ -916,23 +921,26 @@ describe('DecentHats', () => {
 
       it('Emits an ExecutionSuccess event', async () => {
         // First transfer the top hat to the Safe
-        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
+        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsCreationModuleAddress);
         await expect(await createRoleHatPromise).to.emit(gnosisSafe, 'ExecutionSuccess');
       });
 
       it('Emits an ExecutionFromModuleSuccess event', async () => {
         // First transfer the top hat to the Safe
-        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
+        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsCreationModuleAddress);
         await expect(await createRoleHatPromise)
           .to.emit(gnosisSafe, 'ExecutionFromModuleSuccess')
-          .withArgs(decentHatsAddress);
+          .withArgs(decentHatsCreationModuleAddress);
       });
 
       it('Transfers the top hat back to the Safe', async () => {
         // First transfer the top hat to the Safe
-        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
+        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsCreationModuleAddress);
 
-        const isModuleWearerOfTopHat = await mockHats.isWearerOfHat(decentHatsAddress, topHatId);
+        const isModuleWearerOfTopHat = await mockHats.isWearerOfHat(
+          decentHatsCreationModuleAddress,
+          topHatId,
+        );
         expect(isModuleWearerOfTopHat).to.equal(true);
 
         await createRoleHatPromise;
@@ -943,7 +951,7 @@ describe('DecentHats', () => {
 
       it('Actually creates the new hat', async () => {
         // First transfer the top hat to the Safe
-        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsAddress);
+        await mockHats.transferHat(topHatId, gnosisSafeAddress, decentHatsCreationModuleAddress);
 
         const hatsCountBeforeCreate = await mockHats.hatId();
         expect(hatsCountBeforeCreate).to.equal(2); // Top hat + admin hat
