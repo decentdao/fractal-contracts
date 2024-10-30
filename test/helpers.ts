@@ -262,3 +262,13 @@ export const getHatAccount = async (
 
   return hatAccount;
 };
+
+export const topHatIdToHatId = (topHatId: bigint): bigint => {
+  // Ensure the input is valid (fits within uint32)
+  if (topHatId <= 0 || topHatId > 0xffffffff) {
+    throw new Error('Top hat ID must be a positive integer that fits within uint32');
+  }
+
+  // Shift left by 224 bits (same as in Solidity)
+  return topHatId << 224n;
+};
