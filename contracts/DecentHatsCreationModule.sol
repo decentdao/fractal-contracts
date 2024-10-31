@@ -87,6 +87,7 @@ contract DecentHatsCreationModule is DecentHatsUtils {
             params.adminHat
         );
 
+        // Create Role Hats
         for (uint256 i = 0; i < params.hats.length; ) {
             HatParams memory hat = params.hats[i];
             _processHat(
