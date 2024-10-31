@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-import {IERC6551Registry} from "./interfaces/IERC6551Registry.sol";
-import {IHats} from "./interfaces/hats/full/IHats.sol";
-import {IHatsModuleFactory} from "./interfaces/hats/full/IHatsModuleFactory.sol";
-import {DecentHatsUtils} from "./DecentHatsUtils.sol";
+import {IERC6551Registry} from "../interfaces/IERC6551Registry.sol";
+import {IHats} from "../interfaces/hats/IHats.sol";
+import {IHatsModuleFactory} from "../interfaces/hats/IHatsModuleFactory.sol";
+import {DecentHatsModuleUtils} from "./DecentHatsModuleUtils.sol";
 
-contract DecentHatsModificationModule is DecentHatsUtils {
+contract DecentHatsModificationModule is DecentHatsModuleUtils {
     struct CreateTermedOrUntermedRoleHatParams {
         IHats hatsProtocol;
         IERC6551Registry registry;
