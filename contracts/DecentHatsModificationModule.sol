@@ -34,7 +34,7 @@ contract DecentHatsModificationModule is DecentHatsUtils {
      * to avoid a race condition where not more than one active proposal to create a new role can exist at a time.
      * See: https://github.com/decentdao/decent-interface/issues/2402
      */
-    function createTestFobarrNewRoleHat(
+    function createRoleHat(
         CreateTermedOrUntermedRoleHatParams calldata params
     ) external {
         _processHat(
