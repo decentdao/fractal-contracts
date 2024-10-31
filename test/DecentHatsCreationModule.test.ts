@@ -256,12 +256,10 @@ describe('DecentHatsCreationModule', () => {
 
       describe('Multiple calls', () => {
         let createAndDeclareTreeTx2: ethers.ContractTransactionResponse;
-        let secondTopHatId: bigint;
+        let newTopHatId: bigint;
 
         beforeEach(async () => {
-          const lastTopHatId = await mockHats.lastTopHatId();
-          const thisTopHatId = lastTopHatId + 1n;
-          secondTopHatId = topHatIdToHatId(thisTopHatId);
+          newTopHatId = topHatIdToHatId((await mockHats.lastTopHatId()) + 1n);
 
           createAndDeclareTreeTx2 = await executeSafeTransaction({
             safe: gnosisSafe,
@@ -311,11 +309,10 @@ describe('DecentHatsCreationModule', () => {
           expect(await mockHats.lastTopHatId()).to.equal(2n);
         });
 
-        // TODO: This is failing and I don't know why
-        it.skip('Creates Top Hats with different IDs', async () => {
+        it('Creates Top Hats with different IDs', async () => {
           await expect(createAndDeclareTreeTx2)
             .to.emit(keyValuePairs, 'ValueUpdated')
-            .withArgs(gnosisSafeAddress, 'topHatId', secondTopHatId.toString());
+            .withArgs(gnosisSafeAddress, 'topHatId', newTopHatId.toString());
         });
       });
 

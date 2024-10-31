@@ -118,11 +118,12 @@ contract DecentHatsCreationModule is DecentHatsUtils {
         address keyValuePairs,
         TopHatParams memory topHat
     ) internal returns (uint256 topHatId, address topHatAccount) {
-        (bool success, bytes memory lastTopHatId) = address(hatsProtocol).call(
+        // Call lastTopHatId() and properly decode the response
+        (bool success, bytes memory data) = address(hatsProtocol).call(
             abi.encodeWithSignature("lastTopHatId()")
         );
         require(success, "Failed to get lastTopHatId");
-        topHatId = uint256(uint32(bytes4(lastTopHatId)) + 1) << 224;
+        topHatId = (abi.decode(data, (uint256)) + 1) << 224;
 
         IAvatar(msg.sender).execTransactionFromModule(
             // Mint top hat to the safe
