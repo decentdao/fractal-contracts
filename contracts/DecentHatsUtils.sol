@@ -37,7 +37,7 @@ abstract contract DecentHatsUtils {
 
     function _processHat(
         IHats hatsProtocol,
-        IERC6551Registry registry,
+        IERC6551Registry erc6551Registry,
         address hatsAccountImplementation,
         uint256 topHatId,
         address topHatAccount,
@@ -68,7 +68,7 @@ abstract contract DecentHatsUtils {
 
         // Get the stream recipient (based on termed or not)
         address streamRecipient = _setupStreamRecipient(
-            registry,
+            erc6551Registry,
             hatsAccountImplementation,
             address(hatsProtocol),
             hat.termEndDateTs,
@@ -158,7 +158,7 @@ abstract contract DecentHatsUtils {
 
     // Exists to avoid stack too deep errors
     function _setupStreamRecipient(
-        IERC6551Registry registry,
+        IERC6551Registry erc6551Registry,
         address hatsAccountImplementation,
         address hatsProtocol,
         uint128 termEndDateTs,
@@ -172,7 +172,7 @@ abstract contract DecentHatsUtils {
 
         // Otherwise, the Hat's smart account is the stream recipient
         return
-            registry.createAccount(
+            erc6551Registry.createAccount(
                 hatsAccountImplementation,
                 SALT,
                 block.chainid,
