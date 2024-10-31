@@ -9,6 +9,7 @@ import {
   MockHatsElectionsEligibility,
   MockHatsElectionsEligibility__factory,
 } from '../typechain-types';
+import { topHatIdToHatId } from './helpers';
 
 describe('DecentAutonomousAdminHat', function () {
   // Signer accounts
@@ -35,18 +36,21 @@ describe('DecentAutonomousAdminHat', function () {
     // Deploy MockHatsElectionEligibility (Eligibility Module)
     hatsElectionModule = await new MockHatsElectionsEligibility__factory(deployer).deploy();
 
+    const topHatId = topHatIdToHatId((await hatsProtocol.lastTopHatId()) + 1n);
+    await hatsProtocol.mintTopHat(deployer.address, 'Details', 'imageURI');
+
+    const adminHatId = await hatsProtocol.getNextId(topHatId);
+
     // Create Admin Hat
-    const createAdminTx = await hatsProtocol.createHat(
-      hre.ethers.ZeroAddress, // Admin address (self-administered), currently unused
+    await hatsProtocol.createHat(
+      topHatId, // top hat id
       'Details', // Hat details
       100, // Max supply
-      hre.ethers.ZeroAddress, // Eligibility module (none)
-      hre.ethers.ZeroAddress, // Toggle module (none)
+      '0x0000000000000000000000000000000000004a75', // Eligibility module (none)
+      '0x0000000000000000000000000000000000004a75', // Toggle module (none)
       true, // Is mutable
       'imageURI', // Image URI
     );
-    const createAdminTxReceipt = await createAdminTx.wait();
-    const adminHatId = createAdminTxReceipt?.toJSON().logs[0].args[0];
 
     // Deploy DecentAutonomousAdminHat contract with the admin hat ID
     decentAutonomousAdminInstance = await new DecentAutonomousAdmin__factory(deployer).deploy();
@@ -54,19 +58,18 @@ describe('DecentAutonomousAdminHat', function () {
     // Mint the admin hat to adminHatWearer
     await hatsProtocol.mintHat(adminHatId, adminHatAddress);
 
+    userHatId = await hatsProtocol.getNextId(adminHatId);
+
     // Create User Hat under the admin hat
-    const createUserTx = await hatsProtocol.createHat(
-      hre.ethers.ZeroAddress, // Admin address (decentAutonomousAdminInstance contract), currently unused
+    await hatsProtocol.createHat(
+      adminHatId, // Admin hat id
       'Details', // Hat details
       100, // Max supply
       await hatsElectionModule.getAddress(), // Eligibility module (election module)
-      hre.ethers.ZeroAddress, // Toggle module (none)
+      '0x0000000000000000000000000000000000004a75', // Toggle module (none)
       false, // Is mutable
       'imageURI', // Image URI
     );
-
-    const createUserTxReceipt = await createUserTx.wait();
-    userHatId = createUserTxReceipt?.toJSON().logs[0].args[0];
 
     // Mint the user hat to currentWearer
     await hatsProtocol.mintHat(userHatId, await currentWearer.getAddress());
@@ -75,7 +78,7 @@ describe('DecentAutonomousAdminHat', function () {
   describe('triggerStartNextTerm', function () {
     it('should correctly validate current wearer and transfer', async function () {
       const args = {
-        currentWearer: currentWearer.address,
+        currentWearer: await currentWearer.getAddress(),
         hatsProtocol: await hatsProtocol.getAddress(),
         hatId: userHatId,
         nominatedWearer: nominatedWearer.address,
