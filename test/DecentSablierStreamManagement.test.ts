@@ -24,7 +24,12 @@ import {
 } from '../typechain-types';
 
 import { getGnosisSafeProxyFactory, getGnosisSafeL2Singleton } from './GlobalSafeDeployments.test';
-import { executeSafeTransaction, getHatAccount, predictGnosisSafeAddress } from './helpers';
+import {
+  executeSafeTransaction,
+  getHatAccount,
+  predictGnosisSafeAddress,
+  topHatIdToHatId,
+} from './helpers';
 
 describe('DecentSablierStreamManagement', () => {
   let dao: SignerWithAddress;
@@ -59,6 +64,8 @@ describe('DecentSablierStreamManagement', () => {
   let enableModuleTx: ethers.ContractTransactionResponse;
   let createAndDeclareTreeWithRolesAndStreamsTx: ethers.ContractTransactionResponse;
   const streamFundsMax = ethers.parseEther('100');
+
+  let roleHatId: bigint;
 
   beforeEach(async () => {
     const signers = await hre.ethers.getSigners();
@@ -135,6 +142,10 @@ describe('DecentSablierStreamManagement', () => {
     mockHatsAddress = await mockHats.getAddress();
     let keyValuePairs = await new KeyValuePairs__factory(deployer).deploy();
     erc6551Registry = await new ERC6551Registry__factory(deployer).deploy();
+
+    const topHatId = topHatIdToHatId((await mockHats.lastTopHatId()) + 1n);
+    const adminHatId = await mockHats.getNextId(topHatId);
+    roleHatId = await mockHats.getNextId(adminHatId);
 
     createAndDeclareTreeWithRolesAndStreamsTx = await executeSafeTransaction({
       safe: gnosisSafe,
@@ -237,7 +248,7 @@ describe('DecentSablierStreamManagement', () => {
         expect(await mockSablier.withdrawableAmountOf(streamId)).to.eq(streamFundsMax);
 
         const recipientHatAccount = await getHatAccount(
-          2n,
+          roleHatId,
           erc6551Registry,
           mockHatsAccountImplementationAddress,
           mockHatsAddress,
@@ -282,7 +293,7 @@ describe('DecentSablierStreamManagement', () => {
         await hre.ethers.provider.send('evm_mine', []);
 
         const recipientHatAccount = await getHatAccount(
-          2n,
+          roleHatId,
           erc6551Registry,
           mockHatsAccountImplementationAddress,
           mockHatsAddress,
