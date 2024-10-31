@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-import {IHats} from "./interfaces/hats/IHats.sol";
-import {IHatsElectionsEligibility} from "./interfaces/hats/modules/IHatsElectionsEligibility.sol";
+import {IHats} from "../interfaces/hats/IHats.sol";
+import {IHatsElectionsEligibility} from "../interfaces/hats/modules/IHatsElectionsEligibility.sol";
 import {FactoryFriendly} from "@gnosis.pm/zodiac/contracts/factory/FactoryFriendly.sol";
 import {ERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
-import {IDecentAutonomousAdmin} from "./interfaces/IDecentAutonomousAdmin.sol";
+import {IDecentAutonomousAdminV1} from "../interfaces/autonomous-admin/IDecentAutonomousAdminV1.sol";
 
-contract DecentAutonomousAdmin is
-    IDecentAutonomousAdmin,
+contract DecentAutonomousAdminV1 is
+    IDecentAutonomousAdminV1,
     ERC165,
     FactoryFriendly
 {
@@ -21,10 +21,9 @@ contract DecentAutonomousAdmin is
     //                         Public Functions
     // //////////////////////////////////////////////////////////////
     function triggerStartNextTerm(TriggerStartArgs calldata args) public {
-        if (
-            args.hatsProtocol.isWearerOfHat(args.currentWearer, args.hatId) ==
-            false
-        ) revert NotCurrentWearer();
+        if (!args.hatsProtocol.isWearerOfHat(args.currentWearer, args.hatId)) {
+            revert NotCurrentWearer();
+        }
 
         IHatsElectionsEligibility hatsElectionModule = IHatsElectionsEligibility(
                 args.hatsProtocol.getHatEligibilityModule(args.hatId)
@@ -42,7 +41,7 @@ contract DecentAutonomousAdmin is
         bytes4 interfaceId
     ) public view override returns (bool) {
         return
-            interfaceId == type(IDecentAutonomousAdmin).interfaceId ||
+            interfaceId == type(IDecentAutonomousAdminV1).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 }

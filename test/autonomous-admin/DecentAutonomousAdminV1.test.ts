@@ -2,16 +2,16 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 import hre from 'hardhat';
 import {
-  DecentAutonomousAdmin,
-  DecentAutonomousAdmin__factory,
+  DecentAutonomousAdminV1,
+  DecentAutonomousAdminV1__factory,
   MockHats,
   MockHats__factory,
   MockHatsElectionsEligibility,
   MockHatsElectionsEligibility__factory,
-} from '../typechain-types';
-import { topHatIdToHatId } from './helpers';
+} from '../../typechain-types';
+import { topHatIdToHatId } from '../helpers';
 
-describe('DecentAutonomousAdminHat', function () {
+describe('DecentAutonomousAdminHatV1', function () {
   // Signer accounts
   let deployer: SignerWithAddress;
   let currentWearer: SignerWithAddress;
@@ -21,7 +21,7 @@ describe('DecentAutonomousAdminHat', function () {
   // Contract instances
   let hatsProtocol: MockHats;
   let hatsElectionModule: MockHatsElectionsEligibility;
-  let decentAutonomousAdminInstance: DecentAutonomousAdmin;
+  let decentAutonomousAdminInstance: DecentAutonomousAdminV1;
 
   // Variables
   let userHatId: bigint;
@@ -53,7 +53,7 @@ describe('DecentAutonomousAdminHat', function () {
     );
 
     // Deploy DecentAutonomousAdminHat contract with the admin hat ID
-    decentAutonomousAdminInstance = await new DecentAutonomousAdmin__factory(deployer).deploy();
+    decentAutonomousAdminInstance = await new DecentAutonomousAdminV1__factory(deployer).deploy();
     const adminHatAddress = await decentAutonomousAdminInstance.getAddress();
     // Mint the admin hat to adminHatWearer
     await hatsProtocol.mintHat(adminHatId, adminHatAddress);

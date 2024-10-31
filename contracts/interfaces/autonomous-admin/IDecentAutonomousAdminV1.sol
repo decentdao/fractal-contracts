@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-import {IHats} from "./hats/IHats.sol";
+import {IHats} from "../hats/IHats.sol";
 
-interface IDecentAutonomousAdmin {
+interface IDecentAutonomousAdminV1 {
     error NotCurrentWearer();
     struct TriggerStartArgs {
         address currentWearer;

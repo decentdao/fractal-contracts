@@ -4,8 +4,8 @@ import { expect } from 'chai';
 import { ethers } from 'ethers';
 import hre from 'hardhat';
 import {
-  DecentAutonomousAdmin,
-  DecentAutonomousAdmin__factory,
+  DecentAutonomousAdminV1,
+  DecentAutonomousAdminV1__factory,
   DecentHatsCreationModule,
   DecentHatsCreationModule__factory,
   DecentSablierStreamManagementModule,
@@ -76,7 +76,7 @@ describe('DecentSablierStreamManagement', () => {
   let roleHatId: bigint;
   let mockHatsModuleFactory: MockHatsModuleFactory;
   let moduleProxyFactory: ModuleProxyFactory;
-  let decentAutonomousAdminMasterCopy: DecentAutonomousAdmin;
+  let decentAutonomousAdminMasterCopy: DecentAutonomousAdminV1;
   let hatsElectionsEligibilityImplementation: MockHatsElectionsEligibility;
 
   beforeEach(async () => {
@@ -97,7 +97,7 @@ describe('DecentSablierStreamManagement', () => {
 
     mockHatsModuleFactory = await new MockHatsModuleFactory__factory(deployer).deploy();
     moduleProxyFactory = await new ModuleProxyFactory__factory(deployer).deploy();
-    decentAutonomousAdminMasterCopy = await new DecentAutonomousAdmin__factory(deployer).deploy();
+    decentAutonomousAdminMasterCopy = await new DecentAutonomousAdminV1__factory(deployer).deploy();
     hatsElectionsEligibilityImplementation = await new MockHatsElectionsEligibility__factory(
       deployer,
     ).deploy();

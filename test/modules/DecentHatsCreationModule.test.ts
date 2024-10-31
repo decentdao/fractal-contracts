@@ -21,8 +21,8 @@ import {
   MockSablierV2LockupLinear,
   MockERC20__factory,
   MockERC20,
-  DecentAutonomousAdmin,
-  DecentAutonomousAdmin__factory,
+  DecentAutonomousAdminV1,
+  DecentAutonomousAdminV1__factory,
   MockHatsElectionsEligibility__factory,
   MockHatsModuleFactory__factory,
   ModuleProxyFactory,
@@ -65,7 +65,7 @@ describe('DecentHatsCreationModule', () => {
   let mockHatsModuleFactoryAddress: string;
 
   let moduleProxyFactory: ModuleProxyFactory;
-  let decentAutonomousAdminMasterCopy: DecentAutonomousAdmin;
+  let decentAutonomousAdminMasterCopy: DecentAutonomousAdminV1;
   beforeEach(async () => {
     try {
       const signers = await hre.ethers.getSigners();
@@ -90,7 +90,9 @@ describe('DecentHatsCreationModule', () => {
       decentHatsCreationModule = await new DecentHatsCreationModule__factory(deployer).deploy();
       decentHatsCreationModuleAddress = await decentHatsCreationModule.getAddress();
       moduleProxyFactory = await new ModuleProxyFactory__factory(deployer).deploy();
-      decentAutonomousAdminMasterCopy = await new DecentAutonomousAdmin__factory(deployer).deploy();
+      decentAutonomousAdminMasterCopy = await new DecentAutonomousAdminV1__factory(
+        deployer,
+      ).deploy();
 
       const gnosisSafeProxyFactory = getGnosisSafeProxyFactory();
       const gnosisSafeL2Singleton = getGnosisSafeL2Singleton();

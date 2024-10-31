@@ -22,9 +22,9 @@ import {
   MockERC20__factory,
   MockERC20,
   ModuleProxyFactory,
-  DecentAutonomousAdmin,
   ModuleProxyFactory__factory,
-  DecentAutonomousAdmin__factory,
+  DecentAutonomousAdminV1,
+  DecentAutonomousAdminV1__factory,
   MockHatsModuleFactory__factory,
   MockHatsElectionsEligibility__factory,
   DecentHatsCreationModule,
@@ -69,7 +69,7 @@ describe('DecentHatsModificationModule', () => {
   let mockHatsModuleFactoryAddress: string;
 
   let moduleProxyFactory: ModuleProxyFactory;
-  let decentAutonomousAdminMasterCopy: DecentAutonomousAdmin;
+  let decentAutonomousAdminMasterCopy: DecentAutonomousAdminV1;
 
   beforeEach(async () => {
     const signers = await hre.ethers.getSigners();
@@ -89,7 +89,7 @@ describe('DecentHatsModificationModule', () => {
     ).deploy();
     decentHatsModificationModuleAddress = await decentHatsModificationModule.getAddress();
     moduleProxyFactory = await new ModuleProxyFactory__factory(deployer).deploy();
-    decentAutonomousAdminMasterCopy = await new DecentAutonomousAdmin__factory(deployer).deploy();
+    decentAutonomousAdminMasterCopy = await new DecentAutonomousAdminV1__factory(deployer).deploy();
 
     const mockHatsModuleFactory = await new MockHatsModuleFactory__factory(deployer).deploy();
     mockHatsModuleFactoryAddress = await mockHatsModuleFactory.getAddress();
