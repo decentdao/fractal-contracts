@@ -35,49 +35,64 @@ abstract contract DecentHatsModuleUtils {
         bool isMutable;
     }
 
-    function _processHat(
-        IHats hatsProtocol,
-        IERC6551Registry erc6551Registry,
-        address hatsAccountImplementation,
-        uint256 topHatId,
-        address topHatAccount,
-        IHatsModuleFactory hatsModuleFactory,
-        address hatsElectionsEligibilityImplementation,
-        uint256 adminHatId,
-        HatParams memory hat
+    struct CreateRoleHatsParams {
+        IHats hatsProtocol;
+        IERC6551Registry erc6551Registry;
+        address hatsAccountImplementation;
+        uint256 topHatId;
+        address topHatAccount;
+        IHatsModuleFactory hatsModuleFactory;
+        address hatsElectionsEligibilityImplementation;
+        uint256 adminHatId;
+        HatParams[] hats;
+    }
+
+    function _processRoleHats(
+        CreateRoleHatsParams memory roleHatsParams
     ) internal {
-        // Create eligibility module if needed
-        address eligibilityAddress = _createEligibilityModule(
-            hatsProtocol,
-            hatsModuleFactory,
-            hatsElectionsEligibilityImplementation,
-            topHatId,
-            topHatAccount,
-            adminHatId,
-            hat.termEndDateTs
-        );
+        for (uint256 i = 0; i < roleHatsParams.hats.length; ) {
+            HatParams memory hatParams = roleHatsParams.hats[i];
 
-        // Create and Mint the Role Hat
-        uint256 hatId = _createAndMintHat(
-            hatsProtocol,
-            adminHatId,
-            hat,
-            eligibilityAddress,
-            topHatAccount
-        );
+            // Create eligibility module if needed
+            address eligibilityAddress = _createEligibilityModule(
+                roleHatsParams.hatsProtocol,
+                roleHatsParams.hatsModuleFactory,
+                roleHatsParams.hatsElectionsEligibilityImplementation,
+                roleHatsParams.topHatId,
+                roleHatsParams.topHatAccount,
+                roleHatsParams.adminHatId,
+                hatParams.termEndDateTs
+            );
 
-        // Get the stream recipient (based on termed or not)
-        address streamRecipient = _setupStreamRecipient(
-            erc6551Registry,
-            hatsAccountImplementation,
-            address(hatsProtocol),
-            hat.termEndDateTs,
-            hat.wearer,
-            hatId
-        );
+            // Create and Mint the Role Hat
+            uint256 hatId = _createAndMintHat(
+                roleHatsParams.hatsProtocol,
+                roleHatsParams.adminHatId,
+                hatParams,
+                eligibilityAddress,
+                roleHatsParams.topHatAccount
+            );
 
-        // Create streams
-        _processSablierStreams(hat.sablierStreamsParams, streamRecipient);
+            // Get the stream recipient (based on termed or not)
+            address streamRecipient = _setupStreamRecipient(
+                roleHatsParams.erc6551Registry,
+                roleHatsParams.hatsAccountImplementation,
+                address(roleHatsParams.hatsProtocol),
+                hatParams.termEndDateTs,
+                hatParams.wearer,
+                hatId
+            );
+
+            // Create streams
+            _processSablierStreams(
+                hatParams.sablierStreamsParams,
+                streamRecipient
+            );
+
+            unchecked {
+                ++i;
+            }
+        }
     }
 
     function _createEligibilityModule(

@@ -193,7 +193,8 @@ describe('DecentHatsCreationModule', () => {
                 erc6551Registry: await erc6551Registry.getAddress(),
                 hatsModuleFactory: mockHatsModuleFactoryAddress,
                 moduleProxyFactory: await moduleProxyFactory.getAddress(),
-                decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
+                decentAutonomousAdminImplementation:
+                  await decentAutonomousAdminMasterCopy.getAddress(),
                 hatsAccountImplementation: mockHatsAccountImplementationAddress,
                 keyValuePairs: await keyValuePairs.getAddress(),
                 hatsElectionsEligibilityImplementation:
@@ -276,7 +277,7 @@ describe('DecentHatsCreationModule', () => {
                     details: '',
                     imageURI: '',
                   },
-                  decentAutonomousAdminMasterCopy:
+                  decentAutonomousAdminImplementation:
                     await decentAutonomousAdminMasterCopy.getAddress(),
                   moduleProxyFactory: await moduleProxyFactory.getAddress(),
                   adminHat: {
@@ -356,7 +357,8 @@ describe('DecentHatsCreationModule', () => {
                   details: '',
                   imageURI: '',
                 },
-                decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
+                decentAutonomousAdminImplementation:
+                  await decentAutonomousAdminMasterCopy.getAddress(),
                 moduleProxyFactory: await moduleProxyFactory.getAddress(),
                 adminHat: {
                   details: '',
@@ -434,7 +436,8 @@ describe('DecentHatsCreationModule', () => {
                   details: '',
                   imageURI: '',
                 },
-                decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
+                decentAutonomousAdminImplementation:
+                  await decentAutonomousAdminMasterCopy.getAddress(),
                 moduleProxyFactory: await moduleProxyFactory.getAddress(),
                 adminHat: {
                   details: '',
@@ -556,7 +559,8 @@ describe('DecentHatsCreationModule', () => {
                   details: '',
                   imageURI: '',
                 },
-                decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
+                decentAutonomousAdminImplementation:
+                  await decentAutonomousAdminMasterCopy.getAddress(),
                 moduleProxyFactory: await moduleProxyFactory.getAddress(),
                 adminHat: {
                   details: '',

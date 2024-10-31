@@ -32,7 +32,7 @@ contract DecentHatsCreationModule is DecentHatsModuleUtils {
         IHatsModuleFactory hatsModuleFactory;
         ModuleProxyFactory moduleProxyFactory;
         address keyValuePairs;
-        address decentAutonomousAdminMasterCopy;
+        address decentAutonomousAdminImplementation;
         address hatsAccountImplementation;
         address hatsElectionsEligibilityImplementation;
         TopHatParams topHat;
@@ -62,50 +62,41 @@ contract DecentHatsCreationModule is DecentHatsModuleUtils {
      * We also make use of `KeyValuePairs` to associate the topHatId with the Safe.
      */
     function createAndDeclareTree(CreateTreeParams calldata params) external {
-        IHats hatsProtocol = params.hatsProtocol;
-        address hatsAccountImplementation = params.hatsAccountImplementation;
-        IERC6551Registry erc6551Registry = params.erc6551Registry;
-
         // Create Top Hat
         (uint256 topHatId, address topHatAccount) = _processTopHat(
-            hatsProtocol,
-            erc6551Registry,
-            hatsAccountImplementation,
+            params.hatsProtocol,
+            params.erc6551Registry,
+            params.hatsAccountImplementation,
             params.keyValuePairs,
             params.topHat
         );
 
         // Create Admin Hat
         uint256 adminHatId = _processAdminHat(
-            hatsProtocol,
-            erc6551Registry,
-            hatsAccountImplementation,
+            params.hatsProtocol,
+            params.erc6551Registry,
+            params.hatsAccountImplementation,
             topHatId,
             topHatAccount,
             params.moduleProxyFactory,
-            params.decentAutonomousAdminMasterCopy,
+            params.decentAutonomousAdminImplementation,
             params.adminHat
         );
 
         // Create Role Hats
-        for (uint256 i = 0; i < params.hats.length; ) {
-            HatParams memory hat = params.hats[i];
-            _processHat(
-                hatsProtocol,
-                erc6551Registry,
-                hatsAccountImplementation,
-                topHatId,
-                topHatAccount,
-                params.hatsModuleFactory,
-                params.hatsElectionsEligibilityImplementation,
-                adminHatId,
-                hat
-            );
-
-            unchecked {
-                ++i;
-            }
-        }
+        CreateRoleHatsParams memory roleHatParams = CreateRoleHatsParams({
+            hatsProtocol: params.hatsProtocol,
+            erc6551Registry: params.erc6551Registry,
+            hatsAccountImplementation: params.hatsAccountImplementation,
+            topHatId: topHatId,
+            topHatAccount: topHatAccount,
+            hatsModuleFactory: params.hatsModuleFactory,
+            hatsElectionsEligibilityImplementation: params
+                .hatsElectionsEligibilityImplementation,
+            adminHatId: adminHatId,
+            hats: params.hats
+        });
+        _processRoleHats(roleHatParams);
     }
 
     /* /////////////////////////////////////////////////////////////////////////////
@@ -172,7 +163,7 @@ contract DecentHatsCreationModule is DecentHatsModuleUtils {
         uint256 topHatId,
         address topHatAccount,
         ModuleProxyFactory moduleProxyFactory,
-        address decentAutonomousAdminMasterCopy,
+        address decentAutonomousAdminImplementation,
         AdminHatParams memory adminHat
     ) internal returns (uint256 adminHatId) {
         // Create Admin Hat
@@ -204,7 +195,7 @@ contract DecentHatsCreationModule is DecentHatsModuleUtils {
 
         // Deploy Decent Autonomous Admin Module, which will wear the Admin Hat
         address autonomousAdminModule = moduleProxyFactory.deployModule(
-            decentAutonomousAdminMasterCopy,
+            decentAutonomousAdminImplementation,
             abi.encodeWithSignature("setUp(bytes)", bytes("")),
             uint256(
                 keccak256(

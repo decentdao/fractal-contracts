@@ -179,7 +179,7 @@ describe('DecentSablierStreamManagement', () => {
             hatsAccountImplementation: mockHatsAccountImplementationAddress,
             hatsModuleFactory: await mockHatsModuleFactory.getAddress(),
             moduleProxyFactory: await moduleProxyFactory.getAddress(),
-            decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
+            decentAutonomousAdminImplementation: await decentAutonomousAdminMasterCopy.getAddress(),
             hatsElectionsEligibilityImplementation:
               await hatsElectionsEligibilityImplementation.getAddress(),
             erc6551Registry: await erc6551Registry.getAddress(),
