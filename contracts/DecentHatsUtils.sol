@@ -10,7 +10,7 @@ import {LockupLinear, Broker} from "./interfaces/sablier/full/types/DataTypes.so
 import {IHatsModuleFactory} from "./interfaces/hats/full/IHatsModuleFactory.sol";
 import {ISablierV2LockupLinear} from "./interfaces/sablier/ISablierV2LockupLinear.sol";
 
-contract DecentHatsUtils {
+abstract contract DecentHatsUtils {
     bytes32 public constant SALT =
         0x5d0e6ce4fd951366cc55da93f6e79d8b81483109d79676a04bcc2bed6a4b5072;
 
