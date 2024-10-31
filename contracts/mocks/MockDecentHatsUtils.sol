@@ -2,9 +2,9 @@
 pragma solidity 0.8.28;
 
 import {DecentHatsUtils} from "../DecentHatsUtils.sol";
-import {IHats} from "../interfaces/hats/full/IHats.sol";
+import {IHats} from "../interfaces/hats/IHats.sol";
 import {IERC6551Registry} from "../interfaces/IERC6551Registry.sol";
-import {IHatsModuleFactory} from "../interfaces/hats/full/IHatsModuleFactory.sol";
+import {IHatsModuleFactory} from "../interfaces/hats/IHatsModuleFactory.sol";
 
 contract MockDecentHatsUtils is DecentHatsUtils {
     // Expose the internal _processHat function for testing

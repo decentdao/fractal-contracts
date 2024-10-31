@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {IHatsModuleFactory} from "../interfaces/hats/full/IHatsModuleFactory.sol";
+import {IHatsModuleFactory} from "../interfaces/hats/IHatsModuleFactory.sol";
 import {MockHatsElectionsEligibility} from "./MockHatsElectionEligibility.sol";
 
 contract MockHatsModuleFactory is IHatsModuleFactory {

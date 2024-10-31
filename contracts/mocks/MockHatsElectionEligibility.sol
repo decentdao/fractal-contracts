@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
-import {IHatsElectionsEligibility} from "../interfaces/hats/full/modules/IHatsElectionsEligibility.sol";
+import {IHatsElectionsEligibility} from "../interfaces/hats/modules/IHatsElectionsEligibility.sol";
 
 contract MockHatsElectionsEligibility is IHatsElectionsEligibility {
     function currentTermEnd() external view returns (uint128) {}

@@ -4,8 +4,10 @@ import { expect } from 'chai';
 import { ethers } from 'ethers';
 import hre from 'hardhat';
 import {
-  DecentHats_0_1_0,
-  DecentHats_0_1_0__factory,
+  DecentAutonomousAdmin,
+  DecentAutonomousAdmin__factory,
+  DecentHatsCreationModule,
+  DecentHatsCreationModule__factory,
   DecentSablierStreamManagement,
   DecentSablierStreamManagement__factory,
   ERC6551Registry,
@@ -19,8 +21,14 @@ import {
   MockHats__factory,
   MockHatsAccount,
   MockHatsAccount__factory,
+  MockHatsElectionsEligibility,
+  MockHatsElectionsEligibility__factory,
+  MockHatsModuleFactory,
+  MockHatsModuleFactory__factory,
   MockSablierV2LockupLinear,
   MockSablierV2LockupLinear__factory,
+  ModuleProxyFactory,
+  ModuleProxyFactory__factory,
 } from '../typechain-types';
 
 import { getGnosisSafeProxyFactory, getGnosisSafeL2Singleton } from './GlobalSafeDeployments.test';
@@ -38,7 +46,7 @@ describe('DecentSablierStreamManagement', () => {
   let mockHats: MockHats;
   let mockHatsAddress: string;
 
-  let decentHats: DecentHats_0_1_0;
+  let decentHats: DecentHatsCreationModule;
   let decentHatsAddress: string;
 
   let decentSablierManagement: DecentSablierStreamManagement;
@@ -66,6 +74,10 @@ describe('DecentSablierStreamManagement', () => {
   const streamFundsMax = ethers.parseEther('100');
 
   let roleHatId: bigint;
+  let mockHatsModuleFactory: MockHatsModuleFactory;
+  let moduleProxyFactory: ModuleProxyFactory;
+  let decentAutonomousAdminMasterCopy: DecentAutonomousAdmin;
+  let hatsElectionsEligibilityImplementation: MockHatsElectionsEligibility;
 
   beforeEach(async () => {
     const signers = await hre.ethers.getSigners();
@@ -78,8 +90,15 @@ describe('DecentSablierStreamManagement', () => {
     mockHatsAccountImplementation = await new MockHatsAccount__factory(deployer).deploy();
     mockHatsAccountImplementationAddress = await mockHatsAccountImplementation.getAddress();
 
-    decentHats = await new DecentHats_0_1_0__factory(deployer).deploy();
+    decentHats = await new DecentHatsCreationModule__factory(deployer).deploy();
     decentHatsAddress = await decentHats.getAddress();
+
+    mockHatsModuleFactory = await new MockHatsModuleFactory__factory(deployer).deploy();
+    moduleProxyFactory = await new ModuleProxyFactory__factory(deployer).deploy();
+    decentAutonomousAdminMasterCopy = await new DecentAutonomousAdmin__factory(deployer).deploy();
+    hatsElectionsEligibilityImplementation = await new MockHatsElectionsEligibility__factory(
+      deployer,
+    ).deploy();
 
     const gnosisSafeProxyFactory = getGnosisSafeProxyFactory();
     const gnosisSafeL2Singleton = getGnosisSafeL2Singleton();
@@ -150,23 +169,27 @@ describe('DecentSablierStreamManagement', () => {
     createAndDeclareTreeWithRolesAndStreamsTx = await executeSafeTransaction({
       safe: gnosisSafe,
       to: decentHatsAddress,
-      transactionData: DecentHats_0_1_0__factory.createInterface().encodeFunctionData(
+      transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
         'createAndDeclareTree',
         [
           {
             hatsProtocol: mockHatsAddress,
             hatsAccountImplementation: mockHatsAccountImplementationAddress,
-            registry: await erc6551Registry.getAddress(),
+            hatsModuleFactory: await mockHatsModuleFactory.getAddress(),
+            moduleProxyFactory: await moduleProxyFactory.getAddress(),
+            decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
+            hatsElectionsEligibilityImplementation:
+              await hatsElectionsEligibilityImplementation.getAddress(),
+            erc6551Registry: await erc6551Registry.getAddress(),
             keyValuePairs: await keyValuePairs.getAddress(),
-            topHatDetails: '',
-            topHatImageURI: '',
+            topHat: {
+              details: '',
+              imageURI: '',
+            },
             adminHat: {
-              maxSupply: 1,
               details: '',
               imageURI: '',
               isMutable: false,
-              wearer: ethers.ZeroAddress,
-              sablierParams: [],
             },
             hats: [
               {
@@ -175,7 +198,8 @@ describe('DecentSablierStreamManagement', () => {
                 imageURI: '',
                 isMutable: false,
                 wearer: dao.address,
-                sablierParams: [
+                termEndDateTs: 0,
+                sablierStreamsParams: [
                   {
                     sablier: mockSablierAddress,
                     sender: gnosisSafeAddress,
