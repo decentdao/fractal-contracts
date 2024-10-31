@@ -10,7 +10,7 @@ import {LockupLinear, Broker} from "./interfaces/sablier/full/types/DataTypes.so
 import {IHatsModuleFactory} from "./interfaces/hats/full/IHatsModuleFactory.sol";
 import {ISablierV2LockupLinear} from "./interfaces/sablier/ISablierV2LockupLinear.sol";
 
-contract DecentHatsUtils {
+abstract contract DecentHatsUtils {
     bytes32 public constant SALT =
         0x5d0e6ce4fd951366cc55da93f6e79d8b81483109d79676a04bcc2bed6a4b5072;
 
@@ -37,7 +37,7 @@ contract DecentHatsUtils {
 
     function _processHat(
         IHats hatsProtocol,
-        IERC6551Registry registry,
+        IERC6551Registry erc6551Registry,
         address hatsAccountImplementation,
         uint256 topHatId,
         address topHatAccount,
@@ -68,7 +68,7 @@ contract DecentHatsUtils {
 
         // Get the stream recipient (based on termed or not)
         address streamRecipient = _setupStreamRecipient(
-            registry,
+            erc6551Registry,
             hatsAccountImplementation,
             address(hatsProtocol),
             hat.termEndDateTs,
@@ -158,7 +158,7 @@ contract DecentHatsUtils {
 
     // Exists to avoid stack too deep errors
     function _setupStreamRecipient(
-        IERC6551Registry registry,
+        IERC6551Registry erc6551Registry,
         address hatsAccountImplementation,
         address hatsProtocol,
         uint128 termEndDateTs,
@@ -172,7 +172,7 @@ contract DecentHatsUtils {
 
         // Otherwise, the Hat's smart account is the stream recipient
         return
-            registry.createAccount(
+            erc6551Registry.createAccount(
                 hatsAccountImplementation,
                 SALT,
                 block.chainid,

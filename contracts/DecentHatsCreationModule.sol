@@ -64,12 +64,12 @@ contract DecentHatsCreationModule is DecentHatsUtils {
     function createAndDeclareTree(CreateTreeParams calldata params) external {
         IHats hatsProtocol = params.hatsProtocol;
         address hatsAccountImplementation = params.hatsAccountImplementation;
-        IERC6551Registry registry = params.erc6551Registry;
+        IERC6551Registry erc6551Registry = params.erc6551Registry;
 
         // Create Top Hat
         (uint256 topHatId, address topHatAccount) = _processTopHat(
             hatsProtocol,
-            registry,
+            erc6551Registry,
             hatsAccountImplementation,
             params.keyValuePairs,
             params.topHat
@@ -78,7 +78,7 @@ contract DecentHatsCreationModule is DecentHatsUtils {
         // Create Admin Hat
         uint256 adminHatId = _processAdminHat(
             hatsProtocol,
-            registry,
+            erc6551Registry,
             hatsAccountImplementation,
             topHatId,
             topHatAccount,
@@ -91,7 +91,7 @@ contract DecentHatsCreationModule is DecentHatsUtils {
             HatParams memory hat = params.hats[i];
             _processHat(
                 hatsProtocol,
-                registry,
+                erc6551Registry,
                 hatsAccountImplementation,
                 topHatId,
                 topHatAccount,
@@ -113,7 +113,7 @@ contract DecentHatsCreationModule is DecentHatsUtils {
 
     function _processTopHat(
         IHats hatsProtocol,
-        IERC6551Registry registry,
+        IERC6551Registry erc6551Registry,
         address hatsAccountImplementation,
         address keyValuePairs,
         TopHatParams memory topHat
@@ -139,7 +139,7 @@ contract DecentHatsCreationModule is DecentHatsUtils {
         );
 
         // Create top hat account
-        topHatAccount = registry.createAccount(
+        topHatAccount = erc6551Registry.createAccount(
             hatsAccountImplementation,
             SALT,
             block.chainid,
@@ -166,7 +166,7 @@ contract DecentHatsCreationModule is DecentHatsUtils {
 
     function _processAdminHat(
         IHats hatsProtocol,
-        IERC6551Registry registry,
+        IERC6551Registry erc6551Registry,
         address hatsAccountImplementation,
         uint256 topHatId,
         address topHatAccount,
@@ -193,7 +193,7 @@ contract DecentHatsCreationModule is DecentHatsUtils {
         );
 
         // Create Admin Hat's ERC6551 Account
-        registry.createAccount(
+        erc6551Registry.createAccount(
             hatsAccountImplementation,
             SALT,
             block.chainid,
