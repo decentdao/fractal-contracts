@@ -84,19 +84,20 @@ contract DecentHatsCreationModule is DecentHatsModuleUtils {
         );
 
         // Create Role Hats
-        CreateRoleHatsParams memory roleHatParams = CreateRoleHatsParams({
-            hatsProtocol: params.hatsProtocol,
-            erc6551Registry: params.erc6551Registry,
-            hatsAccountImplementation: params.hatsAccountImplementation,
-            topHatId: topHatId,
-            topHatAccount: topHatAccount,
-            hatsModuleFactory: params.hatsModuleFactory,
-            hatsElectionsEligibilityImplementation: params
-                .hatsElectionsEligibilityImplementation,
-            adminHatId: adminHatId,
-            hats: params.hats
-        });
-        _processRoleHats(roleHatParams);
+        _processRoleHats(
+            CreateRoleHatsParams({
+                hatsProtocol: params.hatsProtocol,
+                erc6551Registry: params.erc6551Registry,
+                hatsAccountImplementation: params.hatsAccountImplementation,
+                topHatId: topHatId,
+                topHatAccount: topHatAccount,
+                hatsModuleFactory: params.hatsModuleFactory,
+                hatsElectionsEligibilityImplementation: params
+                    .hatsElectionsEligibilityImplementation,
+                adminHatId: adminHatId,
+                hats: params.hats
+            })
+        );
     }
 
     /* /////////////////////////////////////////////////////////////////////////////
