@@ -10,13 +10,14 @@ import {
   MockHatsElectionsEligibility__factory,
 } from '../../typechain-types';
 import { topHatIdToHatId } from '../helpers';
+import { currentBlockTimestamp, setTime } from '../time';
 
 describe('DecentAutonomousAdminHatV1', function () {
   // Signer accounts
   let deployer: SignerWithAddress;
-  let currentWearer: SignerWithAddress;
+  let firstWearer: SignerWithAddress;
   let randomUser: SignerWithAddress;
-  let nominatedWearer: SignerWithAddress;
+  let secondWearer: SignerWithAddress;
 
   // Contract instances
   let hatsProtocol: MockHats;
@@ -24,24 +25,24 @@ describe('DecentAutonomousAdminHatV1', function () {
   let decentAutonomousAdminInstance: DecentAutonomousAdminV1;
 
   // Variables
-  let userHatId: bigint;
+  let roleHatId: bigint;
+
+  let firstTermEnd: number;
+  let nextTermEnd: number;
 
   beforeEach(async function () {
     // Get signers
-    [deployer, currentWearer, nominatedWearer, randomUser] = await hre.ethers.getSigners();
+    [deployer, firstWearer, secondWearer, randomUser] = await hre.ethers.getSigners();
 
     // Deploy MockHatsAutoAdmin (Mock Hats Protocol)
     hatsProtocol = await new MockHats__factory(deployer).deploy();
 
-    // Deploy MockHatsElectionEligibility (Eligibility Module)
-    hatsElectionModule = await new MockHatsElectionsEligibility__factory(deployer).deploy();
-
+    // Create Top Hat, mint to deployer
     const topHatId = topHatIdToHatId((await hatsProtocol.lastTopHatId()) + 1n);
     await hatsProtocol.mintTopHat(deployer.address, 'Details', 'imageURI');
 
-    const adminHatId = await hatsProtocol.getNextId(topHatId);
-
     // Create Admin Hat
+    const adminHatId = await hatsProtocol.getNextId(topHatId);
     await hatsProtocol.createHat(
       topHatId, // top hat id
       'Details', // Hat details
@@ -52,59 +53,84 @@ describe('DecentAutonomousAdminHatV1', function () {
       'imageURI', // Image URI
     );
 
-    // Deploy DecentAutonomousAdminHat contract with the admin hat ID
+    // Deploy DecentAutonomousAdminHat contract
     decentAutonomousAdminInstance = await new DecentAutonomousAdminV1__factory(deployer).deploy();
-    const adminHatAddress = await decentAutonomousAdminInstance.getAddress();
-    // Mint the admin hat to adminHatWearer
-    await hatsProtocol.mintHat(adminHatId, adminHatAddress);
+    const autonomousAdminAddress = await decentAutonomousAdminInstance.getAddress();
 
-    userHatId = await hatsProtocol.getNextId(adminHatId);
+    // Mint the admin hat to autonomous admin contract
+    await hatsProtocol.mintHat(adminHatId, autonomousAdminAddress);
+
+    // Deploy MockHatsElectionEligibility (Eligibility Module)
+    hatsElectionModule = await new MockHatsElectionsEligibility__factory(deployer).deploy();
+
+    // setup the first term
+
+    firstTermEnd = (await currentBlockTimestamp()) + 100;
+    await hatsElectionModule.setup(firstTermEnd, [await firstWearer.getAddress()]);
 
     // Create User Hat under the admin hat
+    roleHatId = await hatsProtocol.getNextId(adminHatId);
     await hatsProtocol.createHat(
       adminHatId, // Admin hat id
       'Details', // Hat details
-      100, // Max supply
+      1, // Max supply
       await hatsElectionModule.getAddress(), // Eligibility module (election module)
       '0x0000000000000000000000000000000000004a75', // Toggle module (none)
       false, // Is mutable
       'imageURI', // Image URI
     );
 
-    // Mint the user hat to currentWearer
-    await hatsProtocol.mintHat(userHatId, await currentWearer.getAddress());
+    // Mint the role hat to currentWearer
+    await hatsProtocol.mintHat(roleHatId, await firstWearer.getAddress());
+
+    // set up the next election
+    nextTermEnd = firstTermEnd + 100;
+    await hatsElectionModule.setNextTerm(nextTermEnd);
+    await hatsElectionModule.elect(nextTermEnd, [await secondWearer.getAddress()]);
   });
 
   describe('triggerStartNextTerm', function () {
-    it('should correctly validate current wearer and transfer', async function () {
-      const args = {
-        currentWearer: await currentWearer.getAddress(),
-        hatsProtocol: await hatsProtocol.getAddress(),
-        hatId: userHatId,
-        nominatedWearer: nominatedWearer.address,
-      };
-
-      // Call triggerStartNextTerm on the decentAutonomousAdminInstance contract
-      await decentAutonomousAdminInstance.triggerStartNextTerm(args);
-
-      // Verify the hat is now worn by the nominated wearer
-      expect((await hatsProtocol.isWearerOfHat(nominatedWearer.address, userHatId)) === true);
-
-      expect((await hatsProtocol.isWearerOfHat(currentWearer.address, userHatId)) === false);
+    describe('before the first term is over', function () {
+      it('should have correct wearers', async () => {
+        expect(await hatsProtocol.isWearerOfHat(firstWearer.address, roleHatId)).to.equal(true);
+        expect(await hatsProtocol.isWearerOfHat(secondWearer.address, roleHatId)).to.equal(false);
+      });
     });
-    it('should correctly invalidate random address as current wearer', async function () {
-      const args = {
-        currentWearer: randomUser.address,
-        hatsProtocol: await hatsProtocol.getAddress(),
-        hatId: userHatId,
-        nominatedWearer: nominatedWearer.address,
-        sablierStreamInfo: [], // No Sablier stream info for this test
-      };
 
-      // revert if not the current wearer
-      await expect(
-        decentAutonomousAdminInstance.connect(randomUser).triggerStartNextTerm(args),
-      ).to.be.revertedWithCustomError(decentAutonomousAdminInstance, 'NotCurrentWearer');
+    describe('after the first term is over', function () {
+      beforeEach(async () => {
+        // Wait until the first term is over
+        await setTime(firstTermEnd + 1);
+      });
+
+      describe('with a valid current wearer', function () {
+        beforeEach(async () => {
+          await decentAutonomousAdminInstance.triggerStartNextTerm({
+            currentWearer: await firstWearer.getAddress(),
+            nominatedWearer: secondWearer.address,
+            hatsProtocol: await hatsProtocol.getAddress(),
+            hatId: roleHatId,
+          });
+        });
+
+        it('should have correct wearers after triggering next term', async () => {
+          expect(await hatsProtocol.isWearerOfHat(firstWearer.address, roleHatId)).to.equal(false);
+          expect(await hatsProtocol.isWearerOfHat(secondWearer.address, roleHatId)).to.equal(true);
+        });
+      });
+
+      describe('with invalid current wearer', function () {
+        it('should revert if the current wearer is not the wearer of the hat', async () => {
+          await expect(
+            decentAutonomousAdminInstance.triggerStartNextTerm({
+              currentWearer: await randomUser.getAddress(),
+              nominatedWearer: secondWearer.address,
+              hatsProtocol: await hatsProtocol.getAddress(),
+              hatId: roleHatId,
+            }),
+          ).to.be.revertedWithCustomError(hatsProtocol, 'AllHatsWorn');
+        });
+      });
     });
   });
 });

@@ -21,10 +21,6 @@ contract DecentAutonomousAdminV1 is
     //                         Public Functions
     // //////////////////////////////////////////////////////////////
     function triggerStartNextTerm(TriggerStartArgs calldata args) public {
-        if (!args.hatsProtocol.isWearerOfHat(args.currentWearer, args.hatId)) {
-            revert NotCurrentWearer();
-        }
-
         IHatsElectionsEligibility hatsElectionModule = IHatsElectionsEligibility(
                 args.hatsProtocol.getHatEligibilityModule(args.hatId)
             );
