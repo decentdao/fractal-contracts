@@ -8,8 +8,8 @@ import {
   DecentAutonomousAdmin__factory,
   DecentHatsCreationModule,
   DecentHatsCreationModule__factory,
-  DecentSablierStreamManagement,
-  DecentSablierStreamManagement__factory,
+  DecentSablierStreamManagementModule,
+  DecentSablierStreamManagementModule__factory,
   ERC6551Registry,
   ERC6551Registry__factory,
   GnosisSafeL2,
@@ -29,15 +29,15 @@ import {
   MockSablierV2LockupLinear__factory,
   ModuleProxyFactory,
   ModuleProxyFactory__factory,
-} from '../typechain-types';
+} from '../../typechain-types';
 
-import { getGnosisSafeProxyFactory, getGnosisSafeL2Singleton } from './GlobalSafeDeployments.test';
+import { getGnosisSafeProxyFactory, getGnosisSafeL2Singleton } from '../GlobalSafeDeployments.test';
 import {
   executeSafeTransaction,
   getHatAccount,
   predictGnosisSafeAddress,
   topHatIdToHatId,
-} from './helpers';
+} from '../helpers';
 
 describe('DecentSablierStreamManagement', () => {
   let dao: SignerWithAddress;
@@ -49,7 +49,7 @@ describe('DecentSablierStreamManagement', () => {
   let decentHats: DecentHatsCreationModule;
   let decentHatsAddress: string;
 
-  let decentSablierManagement: DecentSablierStreamManagement;
+  let decentSablierManagement: DecentSablierStreamManagementModule;
   let decentSablierManagementAddress: string;
 
   let mockHatsAccountImplementation: MockHatsAccount;
@@ -84,7 +84,9 @@ describe('DecentSablierStreamManagement', () => {
     const [deployer] = signers;
     [, dao] = signers;
 
-    decentSablierManagement = await new DecentSablierStreamManagement__factory(deployer).deploy();
+    decentSablierManagement = await new DecentSablierStreamManagementModule__factory(
+      deployer,
+    ).deploy();
     decentSablierManagementAddress = await decentSablierManagement.getAddress();
 
     mockHatsAccountImplementation = await new MockHatsAccount__factory(deployer).deploy();
@@ -283,7 +285,7 @@ describe('DecentSablierStreamManagement', () => {
           safe: gnosisSafe,
           to: decentSablierManagementAddress,
           transactionData:
-            DecentSablierStreamManagement__factory.createInterface().encodeFunctionData(
+            DecentSablierStreamManagementModule__factory.createInterface().encodeFunctionData(
               'withdrawMaxFromStream',
               [mockSablierAddress, await recipientHatAccount.getAddress(), streamId, dao.address],
             ),
@@ -341,7 +343,7 @@ describe('DecentSablierStreamManagement', () => {
           safe: gnosisSafe,
           to: decentSablierManagementAddress,
           transactionData:
-            DecentSablierStreamManagement__factory.createInterface().encodeFunctionData(
+            DecentSablierStreamManagementModule__factory.createInterface().encodeFunctionData(
               'withdrawMaxFromStream',
               [mockSablierAddress, await recipientHatAccount.getAddress(), streamId, dao.address],
             ),
@@ -378,7 +380,7 @@ describe('DecentSablierStreamManagement', () => {
           safe: gnosisSafe,
           to: decentSablierManagementAddress,
           transactionData:
-            DecentSablierStreamManagement__factory.createInterface().encodeFunctionData(
+            DecentSablierStreamManagementModule__factory.createInterface().encodeFunctionData(
               'cancelStream',
               [mockSablierAddress, streamId],
             ),
@@ -413,7 +415,7 @@ describe('DecentSablierStreamManagement', () => {
           safe: gnosisSafe,
           to: decentSablierManagementAddress,
           transactionData:
-            DecentSablierStreamManagement__factory.createInterface().encodeFunctionData(
+            DecentSablierStreamManagementModule__factory.createInterface().encodeFunctionData(
               'cancelStream',
               [mockSablierAddress, streamId],
             ),
@@ -465,7 +467,7 @@ describe('DecentSablierStreamManagement', () => {
           safe: gnosisSafe,
           to: decentSablierManagementAddress,
           transactionData:
-            DecentSablierStreamManagement__factory.createInterface().encodeFunctionData(
+            DecentSablierStreamManagementModule__factory.createInterface().encodeFunctionData(
               'cancelStream',
               [mockSablierAddress, streamId],
             ),

@@ -27,15 +27,15 @@ import {
   MockHatsModuleFactory__factory,
   ModuleProxyFactory,
   ModuleProxyFactory__factory,
-} from '../typechain-types';
+} from '../../typechain-types';
 
-import { getGnosisSafeL2Singleton, getGnosisSafeProxyFactory } from './GlobalSafeDeployments.test';
+import { getGnosisSafeL2Singleton, getGnosisSafeProxyFactory } from '../GlobalSafeDeployments.test';
 import {
   executeSafeTransaction,
   getHatAccount,
   predictGnosisSafeAddress,
   topHatIdToHatId,
-} from './helpers';
+} from '../helpers';
 
 describe('DecentHatsCreationModule', () => {
   let dao: SignerWithAddress;

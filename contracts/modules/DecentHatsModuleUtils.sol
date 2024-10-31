@@ -4,13 +4,13 @@ pragma solidity 0.8.28;
 import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 import {IAvatar} from "@gnosis.pm/zodiac/contracts/interfaces/IAvatar.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IERC6551Registry} from "./interfaces/IERC6551Registry.sol";
-import {IHats} from "./interfaces/hats/IHats.sol";
-import {LockupLinear, Broker} from "./interfaces/sablier/types/DataTypes.sol";
-import {IHatsModuleFactory} from "./interfaces/hats/IHatsModuleFactory.sol";
-import {ISablierV2LockupLinear} from "./interfaces/sablier/ISablierV2LockupLinear.sol";
+import {IERC6551Registry} from "../interfaces/IERC6551Registry.sol";
+import {IHats} from "../interfaces/hats/IHats.sol";
+import {LockupLinear, Broker} from "../interfaces/sablier/types/DataTypes.sol";
+import {IHatsModuleFactory} from "../interfaces/hats/IHatsModuleFactory.sol";
+import {ISablierV2LockupLinear} from "../interfaces/sablier/ISablierV2LockupLinear.sol";
 
-abstract contract DecentHatsUtils {
+abstract contract DecentHatsModuleUtils {
     bytes32 public constant SALT =
         0x5d0e6ce4fd951366cc55da93f6e79d8b81483109d79676a04bcc2bed6a4b5072;
 

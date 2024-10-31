@@ -3,8 +3,8 @@ import { expect } from 'chai';
 import hre from 'hardhat';
 
 import {
-  MockDecentHatsUtils,
-  MockDecentHatsUtils__factory,
+  MockDecentHatsModuleUtils,
+  MockDecentHatsModuleUtils__factory,
   MockHats,
   MockHats__factory,
   ERC6551Registry,
@@ -19,24 +19,24 @@ import {
   MockERC20__factory,
   GnosisSafeL2,
   GnosisSafeL2__factory,
-} from '../typechain-types';
+} from '../../typechain-types';
 
-import { getGnosisSafeL2Singleton, getGnosisSafeProxyFactory } from './GlobalSafeDeployments.test';
+import { getGnosisSafeL2Singleton, getGnosisSafeProxyFactory } from '../GlobalSafeDeployments.test';
 
 import {
   getHatAccount,
   topHatIdToHatId,
   predictGnosisSafeAddress,
   executeSafeTransaction,
-} from './helpers';
+} from '../helpers';
 
-describe('DecentHatsUtils', () => {
+describe('DecentHatsModuleUtils', () => {
   let deployer: SignerWithAddress;
   let safeSigner: SignerWithAddress;
   let wearer: SignerWithAddress;
 
   let mockHats: MockHats;
-  let mockDecentHatsUtils: MockDecentHatsUtils;
+  let mockDecentHatsModuleUtils: MockDecentHatsModuleUtils;
   let erc6551Registry: ERC6551Registry;
   let mockHatsAccount: MockHatsAccount;
   let mockHatsModuleFactory: MockHatsModuleFactory;
@@ -56,7 +56,7 @@ describe('DecentHatsUtils', () => {
 
     // Deploy mock contracts
     mockHats = await new MockHats__factory(deployer).deploy();
-    mockDecentHatsUtils = await new MockDecentHatsUtils__factory(deployer).deploy();
+    mockDecentHatsModuleUtils = await new MockDecentHatsModuleUtils__factory(deployer).deploy();
     erc6551Registry = await new ERC6551Registry__factory(deployer).deploy();
     mockHatsAccount = await new MockHatsAccount__factory(deployer).deploy();
     mockHatsModuleFactory = await new MockHatsModuleFactory__factory(deployer).deploy();
@@ -154,7 +154,7 @@ describe('DecentHatsUtils', () => {
       safe: gnosisSafe,
       to: gnosisSafeAddress,
       transactionData: GnosisSafeL2__factory.createInterface().encodeFunctionData('enableModule', [
-        await mockDecentHatsUtils.getAddress(),
+        await mockDecentHatsModuleUtils.getAddress(),
       ]),
       signers: [safeSigner],
     });
@@ -175,8 +175,8 @@ describe('DecentHatsUtils', () => {
       const roleHatId = await mockHats.getNextId(adminHatId);
       await executeSafeTransaction({
         safe: gnosisSafe,
-        to: await mockDecentHatsUtils.getAddress(),
-        transactionData: MockDecentHatsUtils__factory.createInterface().encodeFunctionData(
+        to: await mockDecentHatsModuleUtils.getAddress(),
+        transactionData: MockDecentHatsModuleUtils__factory.createInterface().encodeFunctionData(
           'processHat',
           [
             await mockHats.getAddress(),
@@ -217,8 +217,8 @@ describe('DecentHatsUtils', () => {
       const roleHatId = await mockHats.getNextId(adminHatId);
       await executeSafeTransaction({
         safe: gnosisSafe,
-        to: await mockDecentHatsUtils.getAddress(),
-        transactionData: MockDecentHatsUtils__factory.createInterface().encodeFunctionData(
+        to: await mockDecentHatsModuleUtils.getAddress(),
+        transactionData: MockDecentHatsModuleUtils__factory.createInterface().encodeFunctionData(
           'processHat',
           [
             await mockHats.getAddress(),
@@ -250,7 +250,7 @@ describe('DecentHatsUtils', () => {
         sablierStreamsParams: [
           {
             sablier: await mockSablier.getAddress(),
-            sender: await mockDecentHatsUtils.getAddress(),
+            sender: await mockDecentHatsModuleUtils.getAddress(),
             asset: await mockERC20.getAddress(),
             timestamps: {
               start: currentBlockTimestamp,
@@ -270,8 +270,8 @@ describe('DecentHatsUtils', () => {
 
       await executeSafeTransaction({
         safe: gnosisSafe,
-        to: await mockDecentHatsUtils.getAddress(),
-        transactionData: MockDecentHatsUtils__factory.createInterface().encodeFunctionData(
+        to: await mockDecentHatsModuleUtils.getAddress(),
+        transactionData: MockDecentHatsModuleUtils__factory.createInterface().encodeFunctionData(
           'processHat',
           [
             await mockHats.getAddress(),
@@ -298,7 +298,7 @@ describe('DecentHatsUtils', () => {
       expect(stream1.endTime).to.equal(currentBlockTimestamp + 2592000);
 
       const event = streamCreatedEvents[0];
-      expect(event.args.sender).to.equal(await mockDecentHatsUtils.getAddress());
+      expect(event.args.sender).to.equal(await mockDecentHatsModuleUtils.getAddress());
       expect(event.args.totalAmount).to.equal(hre.ethers.parseEther('100'));
     });
   });

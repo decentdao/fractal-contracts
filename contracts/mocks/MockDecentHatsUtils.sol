@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-import {DecentHatsUtils} from "../DecentHatsUtils.sol";
+import {DecentHatsModuleUtils} from "../modules/DecentHatsModuleUtils.sol";
 import {IHats} from "../interfaces/hats/IHats.sol";
 import {IERC6551Registry} from "../interfaces/IERC6551Registry.sol";
 import {IHatsModuleFactory} from "../interfaces/hats/IHatsModuleFactory.sol";
 
-contract MockDecentHatsUtils is DecentHatsUtils {
+contract MockDecentHatsModuleUtils is DecentHatsModuleUtils {
     // Expose the internal _processHat function for testing
     function processHat(
         IHats hatsProtocol,
