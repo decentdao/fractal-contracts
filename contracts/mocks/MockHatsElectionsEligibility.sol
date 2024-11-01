@@ -25,37 +25,21 @@ contract MockHatsElectionsEligibility is IHatsElectionsEligibility {
         _;
     }
 
-    // Can only be called once by the constructor
-    function setup(
-        uint128 _firstTermEnd,
-        address[] calldata _winners
-    ) external onlyOnce {
-        require(
-            _firstTermEnd > block.timestamp,
-            "First term must be in the future"
-        );
-        currentTermEnd = _firstTermEnd;
-        for (uint256 i; i < _winners.length; ) {
-            electionResults[_firstTermEnd][_winners[i]] = true;
-
-            unchecked {
-                ++i;
-            }
-        }
-    }
-
     function _setUp(bytes calldata _initData) external onlyOnce {
         // decode init data
-        uint128 firstTermEnd = abi.decode(_initData, (uint128));
+        uint128 _firstTermEnd = abi.decode(_initData, (uint128));
+        require(
+            _firstTermEnd > block.timestamp,
+            "First term must end in the future"
+        );
 
-        // set currentTermEnd
-        currentTermEnd = firstTermEnd;
+        currentTermEnd = _firstTermEnd;
 
         // open the first election
-        electionStatus[firstTermEnd] = true;
+        electionStatus[_firstTermEnd] = true;
 
         // log the first term
-        emit ElectionOpened(firstTermEnd);
+        emit ElectionOpened(_firstTermEnd);
     }
 
     function elect(uint128 _termEnd, address[] calldata _winners) external {

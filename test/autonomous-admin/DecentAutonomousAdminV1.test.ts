@@ -1,5 +1,7 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
+/* eslint-disable-next-line import/no-extraneous-dependencies */
+import { ethers } from 'ethers';
 import hre from 'hardhat';
 import {
   DecentAutonomousAdminV1,
@@ -64,9 +66,11 @@ describe('DecentAutonomousAdminHatV1', function () {
     hatsElectionModule = await new MockHatsElectionsEligibility__factory(deployer).deploy();
 
     // setup the first term
-
     firstTermEnd = (await currentBlockTimestamp()) + 100;
-    await hatsElectionModule.setup(firstTermEnd, [await firstWearer.getAddress()]);
+    await hatsElectionModule._setUp(
+      ethers.AbiCoder.defaultAbiCoder().encode(['uint128'], [firstTermEnd]),
+    );
+    await hatsElectionModule.elect(firstTermEnd, [await firstWearer.getAddress()]);
 
     // Create User Hat under the admin hat
     roleHatId = await hatsProtocol.getNextId(adminHatId);
