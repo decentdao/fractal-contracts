@@ -138,7 +138,7 @@ contract DecentHatsCreationModule is DecentHatsModuleUtils {
         // Create Top Hat's ERC6551 Account
         topHatAccount = erc6551Registry.createAccount(
             hatsAccountImplementation,
-            PEPPER,
+            SALT,
             block.chainid,
             address(hatsProtocol),
             topHatId
@@ -192,7 +192,7 @@ contract DecentHatsCreationModule is DecentHatsModuleUtils {
         // Create Admin Hat's ERC6551 Account
         erc6551Registry.createAccount(
             hatsAccountImplementation,
-            PEPPER,
+            SALT,
             block.chainid,
             address(hatsProtocol),
             adminHatId
@@ -205,9 +205,9 @@ contract DecentHatsCreationModule is DecentHatsModuleUtils {
             uint256(
                 keccak256(
                     abi.encodePacked(
-                        // for the salt, we'll concatenate our static PEPPER
+                        // for the salt, we'll concatenate our static salt
                         // with the Admin Hat ID
-                        PEPPER,
+                        SALT,
                         adminHatId
                     )
                 )
