@@ -1,0 +1,322 @@
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { expect } from 'chai';
+import hre from 'hardhat';
+
+import {
+  MockDecentHatsModuleUtils,
+  MockDecentHatsModuleUtils__factory,
+  MockHats,
+  MockHats__factory,
+  ERC6551Registry,
+  ERC6551Registry__factory,
+  MockHatsAccount,
+  MockHatsAccount__factory,
+  MockHatsModuleFactory,
+  MockHatsModuleFactory__factory,
+  MockSablierV2LockupLinear,
+  MockSablierV2LockupLinear__factory,
+  MockERC20,
+  MockERC20__factory,
+  GnosisSafeL2,
+  GnosisSafeL2__factory,
+} from '../../typechain-types';
+
+import { getGnosisSafeL2Singleton, getGnosisSafeProxyFactory } from '../GlobalSafeDeployments.test';
+
+import {
+  getHatAccount,
+  topHatIdToHatId,
+  predictGnosisSafeAddress,
+  executeSafeTransaction,
+} from '../helpers';
+
+describe('DecentHatsModuleUtils', () => {
+  let deployer: SignerWithAddress;
+  let safeSigner: SignerWithAddress;
+  let wearer: SignerWithAddress;
+
+  let mockHats: MockHats;
+  let mockDecentHatsModuleUtils: MockDecentHatsModuleUtils;
+  let erc6551Registry: ERC6551Registry;
+  let mockHatsAccount: MockHatsAccount;
+  let mockHatsModuleFactory: MockHatsModuleFactory;
+  let mockSablier: MockSablierV2LockupLinear;
+  let mockERC20: MockERC20;
+  let gnosisSafe: GnosisSafeL2;
+  let gnosisSafeAddress: string;
+
+  let topHatId: bigint;
+  let topHatAccount: string;
+  let adminHatId: bigint;
+  let mockHatsElectionsEligibilityImplementationAddress: string;
+
+  beforeEach(async () => {
+    const signers = await hre.ethers.getSigners();
+    [deployer, safeSigner, wearer] = signers;
+
+    // Deploy mock contracts
+    mockHats = await new MockHats__factory(deployer).deploy();
+    mockDecentHatsModuleUtils = await new MockDecentHatsModuleUtils__factory(deployer).deploy();
+    erc6551Registry = await new ERC6551Registry__factory(deployer).deploy();
+    mockHatsAccount = await new MockHatsAccount__factory(deployer).deploy();
+    mockHatsModuleFactory = await new MockHatsModuleFactory__factory(deployer).deploy();
+    mockSablier = await new MockSablierV2LockupLinear__factory(deployer).deploy();
+    mockERC20 = await new MockERC20__factory(deployer).deploy('MockERC20', 'MCK');
+
+    // Deploy Safe
+    const gnosisSafeProxyFactory = getGnosisSafeProxyFactory();
+    const gnosisSafeL2Singleton = getGnosisSafeL2Singleton();
+    const gnosisSafeL2SingletonAddress = await gnosisSafeL2Singleton.getAddress();
+
+    const createGnosisSetupCalldata = GnosisSafeL2__factory.createInterface().encodeFunctionData(
+      'setup',
+      [
+        [safeSigner.address],
+        1,
+        hre.ethers.ZeroAddress,
+        hre.ethers.ZeroHash,
+        hre.ethers.ZeroAddress,
+        hre.ethers.ZeroAddress,
+        0,
+        hre.ethers.ZeroAddress,
+      ],
+    );
+    const saltNum = BigInt(`0x${Buffer.from(hre.ethers.randomBytes(32)).toString('hex')}`);
+
+    const predictedGnosisSafeAddress = await predictGnosisSafeAddress(
+      createGnosisSetupCalldata,
+      saltNum,
+      gnosisSafeL2SingletonAddress,
+      gnosisSafeProxyFactory,
+    );
+    gnosisSafeAddress = predictedGnosisSafeAddress;
+
+    await gnosisSafeProxyFactory.createProxyWithNonce(
+      gnosisSafeL2SingletonAddress,
+      createGnosisSetupCalldata,
+      saltNum,
+    );
+
+    gnosisSafe = GnosisSafeL2__factory.connect(predictedGnosisSafeAddress, deployer);
+
+    // Create top hat and admin hat
+    await executeSafeTransaction({
+      safe: gnosisSafe,
+      to: await mockHats.getAddress(),
+      transactionData: MockHats__factory.createInterface().encodeFunctionData('mintTopHat', [
+        gnosisSafeAddress,
+        '',
+        '',
+      ]),
+      signers: [safeSigner],
+    });
+
+    topHatId = topHatIdToHatId(await mockHats.lastTopHatId());
+    adminHatId = await mockHats.getNextId(topHatId);
+
+    topHatAccount = await (
+      await getHatAccount(
+        topHatId,
+        erc6551Registry,
+        await mockHatsAccount.getAddress(),
+        await mockHats.getAddress(),
+      )
+    ).getAddress();
+
+    // Create admin hat
+    await executeSafeTransaction({
+      safe: gnosisSafe,
+      to: await mockHats.getAddress(),
+      transactionData: MockHats__factory.createInterface().encodeFunctionData('createHat', [
+        topHatId,
+        '',
+        1,
+        await mockHats.getAddress(),
+        await mockHats.getAddress(),
+        false,
+        '',
+      ]),
+      signers: [safeSigner],
+    });
+
+    // Deploy mock eligibility implementation
+    const MockHatsElectionsEligibility = await hre.ethers.getContractFactory(
+      'MockHatsElectionsEligibility',
+    );
+    const mockHatsElectionsEligibility = await MockHatsElectionsEligibility.deploy();
+    mockHatsElectionsEligibilityImplementationAddress =
+      await mockHatsElectionsEligibility.getAddress();
+
+    // Mint tokens to mockDecentHatsUtils for Sablier streams
+    await mockERC20.mint(await gnosisSafe.getAddress(), hre.ethers.parseEther('1000000'));
+
+    await executeSafeTransaction({
+      safe: gnosisSafe,
+      to: gnosisSafeAddress,
+      transactionData: GnosisSafeL2__factory.createInterface().encodeFunctionData('enableModule', [
+        await mockDecentHatsModuleUtils.getAddress(),
+      ]),
+      signers: [safeSigner],
+    });
+  });
+
+  describe('processHat', () => {
+    it('Creates an untermed hat with no streams', async () => {
+      const hatParams = {
+        wearer: wearer.address,
+        details: '',
+        imageURI: '',
+        sablierStreamsParams: [],
+        termEndDateTs: 0n,
+        maxSupply: 1,
+        isMutable: false,
+      };
+
+      const roleHatId = await mockHats.getNextId(adminHatId);
+      await executeSafeTransaction({
+        safe: gnosisSafe,
+        to: await mockDecentHatsModuleUtils.getAddress(),
+        transactionData: MockDecentHatsModuleUtils__factory.createInterface().encodeFunctionData(
+          'processRoleHats',
+          [
+            {
+              hatsProtocol: await mockHats.getAddress(),
+              erc6551Registry: await erc6551Registry.getAddress(),
+              hatsAccountImplementation: await mockHatsAccount.getAddress(),
+              topHatId,
+              topHatAccount,
+              hatsModuleFactory: await mockHatsModuleFactory.getAddress(),
+              hatsElectionsEligibilityImplementation:
+                mockHatsElectionsEligibilityImplementationAddress,
+              adminHatId,
+              hats: [hatParams],
+            },
+          ],
+        ),
+        signers: [safeSigner],
+      });
+      const hatAccount = await getHatAccount(
+        roleHatId,
+        erc6551Registry,
+        await mockHatsAccount.getAddress(),
+        await mockHats.getAddress(),
+      );
+      expect(await hatAccount.tokenId()).to.equal(roleHatId);
+      expect(await hatAccount.tokenImplementation()).to.equal(await mockHats.getAddress());
+    });
+
+    it('Creates a termed hat with no streams', async () => {
+      const termEndDateTs = BigInt(Math.floor(Date.now() / 1000) + 100000);
+      const hatParams = {
+        wearer: wearer.address,
+        details: '',
+        imageURI: '',
+        sablierStreamsParams: [],
+        termEndDateTs,
+        maxSupply: 1,
+        isMutable: false,
+      };
+
+      const roleHatId = await mockHats.getNextId(adminHatId);
+      await executeSafeTransaction({
+        safe: gnosisSafe,
+        to: await mockDecentHatsModuleUtils.getAddress(),
+        transactionData: MockDecentHatsModuleUtils__factory.createInterface().encodeFunctionData(
+          'processRoleHats',
+          [
+            {
+              hatsProtocol: await mockHats.getAddress(),
+              erc6551Registry: await erc6551Registry.getAddress(),
+              hatsAccountImplementation: await mockHatsAccount.getAddress(),
+              topHatId,
+              topHatAccount,
+              hatsModuleFactory: await mockHatsModuleFactory.getAddress(),
+              hatsElectionsEligibilityImplementation:
+                mockHatsElectionsEligibilityImplementationAddress,
+              adminHatId,
+              hats: [hatParams],
+            },
+          ],
+        ),
+        signers: [safeSigner],
+      });
+
+      expect(await mockHats.isWearerOfHat.staticCall(wearer.address, roleHatId)).to.equal(true);
+      expect(await mockHats.getHatEligibilityModule(roleHatId)).to.not.equal(
+        hre.ethers.ZeroAddress,
+      );
+    });
+
+    it('Creates an untermed hat with a stream', async () => {
+      const currentBlockTimestamp = (await hre.ethers.provider.getBlock('latest'))!.timestamp;
+      const hatParams = {
+        wearer: wearer.address,
+        details: '',
+        imageURI: '',
+        sablierStreamsParams: [
+          {
+            sablier: await mockSablier.getAddress(),
+            sender: await mockDecentHatsModuleUtils.getAddress(),
+            asset: await mockERC20.getAddress(),
+            timestamps: {
+              start: currentBlockTimestamp,
+              cliff: 0,
+              end: currentBlockTimestamp + 2592000, // 30 days
+            },
+            broker: { account: hre.ethers.ZeroAddress, fee: 0 },
+            totalAmount: hre.ethers.parseEther('100'),
+            cancelable: true,
+            transferable: false,
+          },
+        ],
+        termEndDateTs: 0n,
+        maxSupply: 1,
+        isMutable: false,
+      };
+
+      await executeSafeTransaction({
+        safe: gnosisSafe,
+        to: await mockDecentHatsModuleUtils.getAddress(),
+        transactionData: MockDecentHatsModuleUtils__factory.createInterface().encodeFunctionData(
+          'processRoleHats',
+          [
+            {
+              hatsProtocol: await mockHats.getAddress(),
+              erc6551Registry: await erc6551Registry.getAddress(),
+              hatsAccountImplementation: await mockHatsAccount.getAddress(),
+              topHatId,
+              topHatAccount,
+              hatsModuleFactory: await mockHatsModuleFactory.getAddress(),
+              hatsElectionsEligibilityImplementation:
+                mockHatsElectionsEligibilityImplementationAddress,
+              adminHatId,
+              hats: [hatParams],
+            },
+          ],
+        ),
+        signers: [safeSigner],
+      });
+
+      const streamCreatedEvents = await mockSablier.queryFilter(
+        mockSablier.filters.StreamCreated(),
+      );
+      expect(streamCreatedEvents.length).to.equal(1);
+
+      const stream1 = await mockSablier.getStream(streamCreatedEvents[0].args.streamId);
+      expect(stream1.startTime).to.equal(currentBlockTimestamp);
+      expect(stream1.endTime).to.equal(currentBlockTimestamp + 2592000);
+
+      const event = streamCreatedEvents[0];
+      expect(event.args.sender).to.equal(await mockDecentHatsModuleUtils.getAddress());
+      expect(event.args.totalAmount).to.equal(hre.ethers.parseEther('100'));
+    });
+  });
+
+  describe('SALT', () => {
+    it('should be a static hardcoded value that never changes for any reason', async () => {
+      expect(await mockDecentHatsModuleUtils.SALT()).to.equal(
+        '0x5d0e6ce4fd951366cc55da93f6e79d8b81483109d79676a04bcc2bed6a4b5072',
+      );
+    });
+  });
+});
