@@ -9,11 +9,12 @@ contract MockHatsModuleFactory is IHatsModuleFactory {
         address,
         uint256,
         bytes calldata,
-        bytes calldata,
+        bytes calldata _initData,
         uint256
     ) external override returns (address _instance) {
         // Deploy a new instance of MockHatsElectionEligibility
         MockHatsElectionsEligibility newModule = new MockHatsElectionsEligibility();
+        newModule._setUp(_initData);
         _instance = address(newModule);
     }
 

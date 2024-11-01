@@ -44,6 +44,20 @@ contract MockHatsElectionsEligibility is IHatsElectionsEligibility {
         }
     }
 
+    function _setUp(bytes calldata _initData) external onlyOnce {
+        // decode init data
+        uint128 firstTermEnd = abi.decode(_initData, (uint128));
+
+        // set currentTermEnd
+        currentTermEnd = firstTermEnd;
+
+        // open the first election
+        electionStatus[firstTermEnd] = true;
+
+        // log the first term
+        emit ElectionOpened(firstTermEnd);
+    }
+
     function elect(uint128 _termEnd, address[] calldata _winners) external {
         // results can only be submitted for open elections
         if (!electionStatus[_termEnd]) revert ElectionClosed(_termEnd);
