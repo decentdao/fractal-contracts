@@ -46,8 +46,8 @@ describe('DecentSablierStreamManagement', () => {
   let mockHats: MockHats;
   let mockHatsAddress: string;
 
-  let decentHats: DecentHatsCreationModule;
-  let decentHatsAddress: string;
+  let decentHatsCreationModule: DecentHatsCreationModule;
+  let decentHatsCreationModuleAddress: string;
 
   let decentSablierManagement: DecentSablierStreamManagementModule;
   let decentSablierManagementAddress: string;
@@ -92,8 +92,8 @@ describe('DecentSablierStreamManagement', () => {
     mockHatsAccountImplementation = await new MockHatsAccount__factory(deployer).deploy();
     mockHatsAccountImplementationAddress = await mockHatsAccountImplementation.getAddress();
 
-    decentHats = await new DecentHatsCreationModule__factory(deployer).deploy();
-    decentHatsAddress = await decentHats.getAddress();
+    decentHatsCreationModule = await new DecentHatsCreationModule__factory(deployer).deploy();
+    decentHatsCreationModuleAddress = await decentHatsCreationModule.getAddress();
 
     mockHatsModuleFactory = await new MockHatsModuleFactory__factory(deployer).deploy();
     moduleProxyFactory = await new ModuleProxyFactory__factory(deployer).deploy();
@@ -152,7 +152,7 @@ describe('DecentSablierStreamManagement', () => {
       safe: gnosisSafe,
       to: gnosisSafeAddress,
       transactionData: GnosisSafeL2__factory.createInterface().encodeFunctionData('enableModule', [
-        decentHatsAddress,
+        decentHatsCreationModuleAddress,
       ]),
       signers: [dao],
     });
@@ -170,7 +170,7 @@ describe('DecentSablierStreamManagement', () => {
 
     createAndDeclareTreeWithRolesAndStreamsTx = await executeSafeTransaction({
       safe: gnosisSafe,
-      to: decentHatsAddress,
+      to: decentHatsCreationModuleAddress,
       transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
         'createAndDeclareTree',
         [
