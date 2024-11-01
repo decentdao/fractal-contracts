@@ -11,7 +11,7 @@ import {IHatsModuleFactory} from "../interfaces/hats/IHatsModuleFactory.sol";
 import {ISablierV2LockupLinear} from "../interfaces/sablier/ISablierV2LockupLinear.sol";
 
 abstract contract DecentHatsModuleUtils {
-    bytes32 public constant SALT =
+    bytes32 public constant PEPPER =
         0x5d0e6ce4fd951366cc55da93f6e79d8b81483109d79676a04bcc2bed6a4b5072;
 
     struct SablierStreamParams {
@@ -112,7 +112,7 @@ abstract contract DecentHatsModuleUtils {
                     hatsProtocol.getNextId(adminHatId),
                     abi.encode(topHatId, uint256(0)), // [BALLOT_BOX_ID, ADMIN_HAT_ID]
                     abi.encode(termEndDateTs),
-                    uint256(SALT)
+                    uint256(PEPPER)
                 );
         }
 
@@ -196,7 +196,7 @@ abstract contract DecentHatsModuleUtils {
         return
             erc6551Registry.createAccount(
                 hatsAccountImplementation,
-                SALT,
+                PEPPER,
                 block.chainid,
                 hatsProtocol,
                 hatId
