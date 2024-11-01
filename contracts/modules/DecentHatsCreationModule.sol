@@ -60,42 +60,46 @@ contract DecentHatsCreationModule is DecentHatsModuleUtils {
      * no hat tree, we defer the creation of the hat tree and its setup to this contract. This way, in a single tx block,
      * the resulting topHatId of the newly created hat can be used to create an admin hat and any other hats needed.
      * We also make use of `KeyValuePairs` to associate the topHatId with the Safe.
+     *
+     * @param treeParams The parameters for creating the Hat Tree with Roles
      */
-    function createAndDeclareTree(CreateTreeParams calldata params) external {
+    function createAndDeclareTree(
+        CreateTreeParams calldata treeParams
+    ) external {
         // Create Top Hat
         (uint256 topHatId, address topHatAccount) = _processTopHat(
-            params.hatsProtocol,
-            params.erc6551Registry,
-            params.hatsAccountImplementation,
-            params.keyValuePairs,
-            params.topHat
+            treeParams.hatsProtocol,
+            treeParams.erc6551Registry,
+            treeParams.hatsAccountImplementation,
+            treeParams.keyValuePairs,
+            treeParams.topHat
         );
 
         // Create Admin Hat
         uint256 adminHatId = _processAdminHat(
-            params.hatsProtocol,
-            params.erc6551Registry,
-            params.hatsAccountImplementation,
+            treeParams.hatsProtocol,
+            treeParams.erc6551Registry,
+            treeParams.hatsAccountImplementation,
             topHatId,
             topHatAccount,
-            params.moduleProxyFactory,
-            params.decentAutonomousAdminImplementation,
-            params.adminHat
+            treeParams.moduleProxyFactory,
+            treeParams.decentAutonomousAdminImplementation,
+            treeParams.adminHat
         );
 
         // Create Role Hats
         _processRoleHats(
             CreateRoleHatsParams({
-                hatsProtocol: params.hatsProtocol,
-                erc6551Registry: params.erc6551Registry,
-                hatsAccountImplementation: params.hatsAccountImplementation,
+                hatsProtocol: treeParams.hatsProtocol,
+                erc6551Registry: treeParams.erc6551Registry,
+                hatsAccountImplementation: treeParams.hatsAccountImplementation,
                 topHatId: topHatId,
                 topHatAccount: topHatAccount,
-                hatsModuleFactory: params.hatsModuleFactory,
-                hatsElectionsEligibilityImplementation: params
+                hatsModuleFactory: treeParams.hatsModuleFactory,
+                hatsElectionsEligibilityImplementation: treeParams
                     .hatsElectionsEligibilityImplementation,
                 adminHatId: adminHatId,
-                hats: params.hats
+                hats: treeParams.hats
             })
         );
     }
@@ -109,7 +113,7 @@ contract DecentHatsCreationModule is DecentHatsModuleUtils {
         IERC6551Registry erc6551Registry,
         address hatsAccountImplementation,
         address keyValuePairs,
-        TopHatParams memory topHat
+        TopHatParams calldata topHat
     ) internal returns (uint256 topHatId, address topHatAccount) {
         // Call lastTopHatId() and properly decode the response
         (bool success, bytes memory data) = address(hatsProtocol).call(
@@ -118,8 +122,8 @@ contract DecentHatsCreationModule is DecentHatsModuleUtils {
         require(success, "Failed to get lastTopHatId");
         topHatId = (abi.decode(data, (uint256)) + 1) << 224;
 
+        // Mint Top Hat to the Safe
         IAvatar(msg.sender).execTransactionFromModule(
-            // Mint top hat to the safe
             address(hatsProtocol),
             0,
             abi.encodeWithSignature(
@@ -131,7 +135,7 @@ contract DecentHatsCreationModule is DecentHatsModuleUtils {
             Enum.Operation.Call
         );
 
-        // Create top hat account
+        // Create Top Hat's ERC6551 Account
         topHatAccount = erc6551Registry.createAccount(
             hatsAccountImplementation,
             SALT,
@@ -165,7 +169,7 @@ contract DecentHatsCreationModule is DecentHatsModuleUtils {
         address topHatAccount,
         ModuleProxyFactory moduleProxyFactory,
         address decentAutonomousAdminImplementation,
-        AdminHatParams memory adminHat
+        AdminHatParams calldata adminHat
     ) internal returns (uint256 adminHatId) {
         // Create Admin Hat
         adminHatId = hatsProtocol.getNextId(topHatId);
@@ -195,13 +199,14 @@ contract DecentHatsCreationModule is DecentHatsModuleUtils {
         );
 
         // Deploy Decent Autonomous Admin Module, which will wear the Admin Hat
-        address autonomousAdminModule = moduleProxyFactory.deployModule(
+        address autonomousAdmin = moduleProxyFactory.deployModule(
             decentAutonomousAdminImplementation,
             abi.encodeWithSignature("setUp(bytes)", bytes("")),
             uint256(
                 keccak256(
                     abi.encodePacked(
-                        // for the salt, we'll concatenate our static salt with the id of the Admin Hat
+                        // for the salt, we'll concatenate our static salt
+                        // with the Admin Hat ID
                         SALT,
                         adminHatId
                     )
@@ -216,7 +221,7 @@ contract DecentHatsCreationModule is DecentHatsModuleUtils {
             abi.encodeWithSignature(
                 "mintHat(uint256,address)",
                 adminHatId,
-                autonomousAdminModule
+                autonomousAdmin
             ),
             Enum.Operation.Call
         );
