@@ -311,4 +311,12 @@ describe('DecentHatsModuleUtils', () => {
       expect(event.args.totalAmount).to.equal(hre.ethers.parseEther('100'));
     });
   });
+
+  describe('SALT', () => {
+    it('should be a static hardcoded value that never changes for any reason', async () => {
+      expect(await mockDecentHatsModuleUtils.SALT()).to.equal(
+        '0x5d0e6ce4fd951366cc55da93f6e79d8b81483109d79676a04bcc2bed6a4b5072',
+      );
+    });
+  });
 });
