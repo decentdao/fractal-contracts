@@ -104,6 +104,7 @@ abstract contract DecentHatsModuleUtils {
         uint256 adminHatId,
         uint128 termEndDateTs
     ) private returns (address) {
+        // If the Hat is termed, create the eligibility module
         if (termEndDateTs != 0) {
             return
                 hatsModuleFactory.createHatsModule(
@@ -114,6 +115,8 @@ abstract contract DecentHatsModuleUtils {
                     uint256(SALT)
                 );
         }
+
+        // Otherwise, return the Top Hat account
         return topHatAccount;
     }
 
@@ -124,7 +127,10 @@ abstract contract DecentHatsModuleUtils {
         address eligibilityAddress,
         address topHatAccount
     ) private returns (uint256) {
+        // Grab the next Hat ID (before creating it)
         uint256 hatId = hatsProtocol.getNextId(adminHatId);
+
+        // Create the new Hat
         IAvatar(msg.sender).execTransactionFromModule(
             address(hatsProtocol),
             0,
@@ -141,7 +147,7 @@ abstract contract DecentHatsModuleUtils {
             Enum.Operation.Call
         );
 
-        // If the hat is termed, nominate the wearer as the eligible member
+        // If the Hat is termed, nominate the wearer as the eligible member
         if (hat.termEndDateTs != 0) {
             address[] memory nominatedWearers = new address[](1);
             nominatedWearers[0] = hat.wearer;
@@ -158,6 +164,7 @@ abstract contract DecentHatsModuleUtils {
             );
         }
 
+        // Mint the Hat
         IAvatar(msg.sender).execTransactionFromModule(
             address(hatsProtocol),
             0,
