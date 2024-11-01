@@ -4,10 +4,12 @@ import { expect } from 'chai';
 import { ethers } from 'ethers';
 import hre from 'hardhat';
 import {
-  DecentHats_0_1_0,
-  DecentHats_0_1_0__factory,
-  DecentSablierStreamManagement,
-  DecentSablierStreamManagement__factory,
+  DecentAutonomousAdminV1,
+  DecentAutonomousAdminV1__factory,
+  DecentHatsCreationModule,
+  DecentHatsCreationModule__factory,
+  DecentSablierStreamManagementModule,
+  DecentSablierStreamManagementModule__factory,
   ERC6551Registry,
   ERC6551Registry__factory,
   GnosisSafeL2,
@@ -19,17 +21,23 @@ import {
   MockHats__factory,
   MockHatsAccount,
   MockHatsAccount__factory,
+  MockHatsElectionsEligibility,
+  MockHatsElectionsEligibility__factory,
+  MockHatsModuleFactory,
+  MockHatsModuleFactory__factory,
   MockSablierV2LockupLinear,
   MockSablierV2LockupLinear__factory,
-} from '../typechain-types';
+  ModuleProxyFactory,
+  ModuleProxyFactory__factory,
+} from '../../typechain-types';
 
-import { getGnosisSafeProxyFactory, getGnosisSafeL2Singleton } from './GlobalSafeDeployments.test';
+import { getGnosisSafeProxyFactory, getGnosisSafeL2Singleton } from '../GlobalSafeDeployments.test';
 import {
   executeSafeTransaction,
   getHatAccount,
   predictGnosisSafeAddress,
   topHatIdToHatId,
-} from './helpers';
+} from '../helpers';
 
 describe('DecentSablierStreamManagement', () => {
   let dao: SignerWithAddress;
@@ -38,10 +46,10 @@ describe('DecentSablierStreamManagement', () => {
   let mockHats: MockHats;
   let mockHatsAddress: string;
 
-  let decentHats: DecentHats_0_1_0;
-  let decentHatsAddress: string;
+  let decentHatsCreationModule: DecentHatsCreationModule;
+  let decentHatsCreationModuleAddress: string;
 
-  let decentSablierManagement: DecentSablierStreamManagement;
+  let decentSablierManagement: DecentSablierStreamManagementModule;
   let decentSablierManagementAddress: string;
 
   let mockHatsAccountImplementation: MockHatsAccount;
@@ -66,20 +74,33 @@ describe('DecentSablierStreamManagement', () => {
   const streamFundsMax = ethers.parseEther('100');
 
   let roleHatId: bigint;
+  let mockHatsModuleFactory: MockHatsModuleFactory;
+  let moduleProxyFactory: ModuleProxyFactory;
+  let decentAutonomousAdminMasterCopy: DecentAutonomousAdminV1;
+  let hatsElectionsEligibilityImplementation: MockHatsElectionsEligibility;
 
   beforeEach(async () => {
     const signers = await hre.ethers.getSigners();
     const [deployer] = signers;
     [, dao] = signers;
 
-    decentSablierManagement = await new DecentSablierStreamManagement__factory(deployer).deploy();
+    decentSablierManagement = await new DecentSablierStreamManagementModule__factory(
+      deployer,
+    ).deploy();
     decentSablierManagementAddress = await decentSablierManagement.getAddress();
 
     mockHatsAccountImplementation = await new MockHatsAccount__factory(deployer).deploy();
     mockHatsAccountImplementationAddress = await mockHatsAccountImplementation.getAddress();
 
-    decentHats = await new DecentHats_0_1_0__factory(deployer).deploy();
-    decentHatsAddress = await decentHats.getAddress();
+    decentHatsCreationModule = await new DecentHatsCreationModule__factory(deployer).deploy();
+    decentHatsCreationModuleAddress = await decentHatsCreationModule.getAddress();
+
+    mockHatsModuleFactory = await new MockHatsModuleFactory__factory(deployer).deploy();
+    moduleProxyFactory = await new ModuleProxyFactory__factory(deployer).deploy();
+    decentAutonomousAdminMasterCopy = await new DecentAutonomousAdminV1__factory(deployer).deploy();
+    hatsElectionsEligibilityImplementation = await new MockHatsElectionsEligibility__factory(
+      deployer,
+    ).deploy();
 
     const gnosisSafeProxyFactory = getGnosisSafeProxyFactory();
     const gnosisSafeL2Singleton = getGnosisSafeL2Singleton();
@@ -131,7 +152,7 @@ describe('DecentSablierStreamManagement', () => {
       safe: gnosisSafe,
       to: gnosisSafeAddress,
       transactionData: GnosisSafeL2__factory.createInterface().encodeFunctionData('enableModule', [
-        decentHatsAddress,
+        decentHatsCreationModuleAddress,
       ]),
       signers: [dao],
     });
@@ -149,24 +170,28 @@ describe('DecentSablierStreamManagement', () => {
 
     createAndDeclareTreeWithRolesAndStreamsTx = await executeSafeTransaction({
       safe: gnosisSafe,
-      to: decentHatsAddress,
-      transactionData: DecentHats_0_1_0__factory.createInterface().encodeFunctionData(
+      to: decentHatsCreationModuleAddress,
+      transactionData: DecentHatsCreationModule__factory.createInterface().encodeFunctionData(
         'createAndDeclareTree',
         [
           {
             hatsProtocol: mockHatsAddress,
             hatsAccountImplementation: mockHatsAccountImplementationAddress,
-            registry: await erc6551Registry.getAddress(),
+            hatsModuleFactory: await mockHatsModuleFactory.getAddress(),
+            moduleProxyFactory: await moduleProxyFactory.getAddress(),
+            decentAutonomousAdminImplementation: await decentAutonomousAdminMasterCopy.getAddress(),
+            hatsElectionsEligibilityImplementation:
+              await hatsElectionsEligibilityImplementation.getAddress(),
+            erc6551Registry: await erc6551Registry.getAddress(),
             keyValuePairs: await keyValuePairs.getAddress(),
-            topHatDetails: '',
-            topHatImageURI: '',
+            topHat: {
+              details: '',
+              imageURI: '',
+            },
             adminHat: {
-              maxSupply: 1,
               details: '',
               imageURI: '',
               isMutable: false,
-              wearer: ethers.ZeroAddress,
-              sablierParams: [],
             },
             hats: [
               {
@@ -175,7 +200,8 @@ describe('DecentSablierStreamManagement', () => {
                 imageURI: '',
                 isMutable: false,
                 wearer: dao.address,
-                sablierParams: [
+                termEndDateTs: 0,
+                sablierStreamsParams: [
                   {
                     sablier: mockSablierAddress,
                     sender: gnosisSafeAddress,
@@ -259,7 +285,7 @@ describe('DecentSablierStreamManagement', () => {
           safe: gnosisSafe,
           to: decentSablierManagementAddress,
           transactionData:
-            DecentSablierStreamManagement__factory.createInterface().encodeFunctionData(
+            DecentSablierStreamManagementModule__factory.createInterface().encodeFunctionData(
               'withdrawMaxFromStream',
               [mockSablierAddress, await recipientHatAccount.getAddress(), streamId, dao.address],
             ),
@@ -317,7 +343,7 @@ describe('DecentSablierStreamManagement', () => {
           safe: gnosisSafe,
           to: decentSablierManagementAddress,
           transactionData:
-            DecentSablierStreamManagement__factory.createInterface().encodeFunctionData(
+            DecentSablierStreamManagementModule__factory.createInterface().encodeFunctionData(
               'withdrawMaxFromStream',
               [mockSablierAddress, await recipientHatAccount.getAddress(), streamId, dao.address],
             ),
@@ -354,7 +380,7 @@ describe('DecentSablierStreamManagement', () => {
           safe: gnosisSafe,
           to: decentSablierManagementAddress,
           transactionData:
-            DecentSablierStreamManagement__factory.createInterface().encodeFunctionData(
+            DecentSablierStreamManagementModule__factory.createInterface().encodeFunctionData(
               'cancelStream',
               [mockSablierAddress, streamId],
             ),
@@ -389,7 +415,7 @@ describe('DecentSablierStreamManagement', () => {
           safe: gnosisSafe,
           to: decentSablierManagementAddress,
           transactionData:
-            DecentSablierStreamManagement__factory.createInterface().encodeFunctionData(
+            DecentSablierStreamManagementModule__factory.createInterface().encodeFunctionData(
               'cancelStream',
               [mockSablierAddress, streamId],
             ),
@@ -441,7 +467,7 @@ describe('DecentSablierStreamManagement', () => {
           safe: gnosisSafe,
           to: decentSablierManagementAddress,
           transactionData:
-            DecentSablierStreamManagement__factory.createInterface().encodeFunctionData(
+            DecentSablierStreamManagementModule__factory.createInterface().encodeFunctionData(
               'cancelStream',
               [mockSablierAddress, streamId],
             ),

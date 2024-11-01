@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import {IHats} from "../interfaces/hats/full/IHats.sol";
-import {IHatsIdUtilities} from "../interfaces/hats/full/IHatsIdUtilities.sol";
+import {IHats} from "../interfaces/hats/IHats.sol";
+import {IHatsIdUtilities} from "../interfaces/hats/IHatsIdUtilities.sol";
 
 /// @notice Minimalist and gas efficient standard ERC1155 implementation.
 /// @author Solmate (https://github.com/transmissions11/solmate/blob/main/src/tokens/ERC1155.sol)

@@ -1,19 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {IHatsModuleFactory} from "../interfaces/hats/full/IHatsModuleFactory.sol";
-import {MockHatsElectionsEligibility} from "./MockHatsElectionEligibility.sol";
+import {IHatsModuleFactory} from "../interfaces/hats/IHatsModuleFactory.sol";
+import {MockHatsElectionsEligibility} from "./MockHatsElectionsEligibility.sol";
 
 contract MockHatsModuleFactory is IHatsModuleFactory {
     function createHatsModule(
         address,
         uint256,
         bytes calldata,
-        bytes calldata,
+        bytes calldata _initData,
         uint256
     ) external override returns (address _instance) {
-        // Deploy a new instance of MockHatsElectionEligibility
+        // Deploy a new instance of MockHatsElectionsEligibility
         MockHatsElectionsEligibility newModule = new MockHatsElectionsEligibility();
+        newModule._setUp(_initData);
         _instance = address(newModule);
     }
 

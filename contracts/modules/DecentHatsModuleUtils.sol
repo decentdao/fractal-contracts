@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.28;
+pragma solidity >=0.8.28;
 
 import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 import {IAvatar} from "@gnosis.pm/zodiac/contracts/interfaces/IAvatar.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IERC6551Registry} from "./interfaces/IERC6551Registry.sol";
-import {IHats} from "./interfaces/hats/full/IHats.sol";
-import {LockupLinear, Broker} from "./interfaces/sablier/full/types/DataTypes.sol";
-import {IHatsModuleFactory} from "./interfaces/hats/full/IHatsModuleFactory.sol";
-import {ISablierV2LockupLinear} from "./interfaces/sablier/ISablierV2LockupLinear.sol";
+import {IERC6551Registry} from "../interfaces/IERC6551Registry.sol";
+import {IHats} from "../interfaces/hats/IHats.sol";
+import {LockupLinear, Broker} from "../interfaces/sablier/types/DataTypes.sol";
+import {IHatsModuleFactory} from "../interfaces/hats/IHatsModuleFactory.sol";
+import {ISablierV2LockupLinear} from "../interfaces/sablier/ISablierV2LockupLinear.sol";
 
-abstract contract DecentHatsUtils {
+abstract contract DecentHatsModuleUtils {
     bytes32 public constant SALT =
         0x5d0e6ce4fd951366cc55da93f6e79d8b81483109d79676a04bcc2bed6a4b5072;
 
@@ -35,49 +35,64 @@ abstract contract DecentHatsUtils {
         bool isMutable;
     }
 
-    function _processHat(
-        IHats hatsProtocol,
-        IERC6551Registry erc6551Registry,
-        address hatsAccountImplementation,
-        uint256 topHatId,
-        address topHatAccount,
-        IHatsModuleFactory hatsModuleFactory,
-        address hatsElectionsEligibilityImplementation,
-        uint256 adminHatId,
-        HatParams memory hat
+    struct CreateRoleHatsParams {
+        IHats hatsProtocol;
+        IERC6551Registry erc6551Registry;
+        address hatsAccountImplementation;
+        uint256 topHatId;
+        address topHatAccount;
+        IHatsModuleFactory hatsModuleFactory;
+        address hatsElectionsEligibilityImplementation;
+        uint256 adminHatId;
+        HatParams[] hats;
+    }
+
+    function _processRoleHats(
+        CreateRoleHatsParams memory roleHatsParams
     ) internal {
-        // Create eligibility module if needed
-        address eligibilityAddress = _createEligibilityModule(
-            hatsProtocol,
-            hatsModuleFactory,
-            hatsElectionsEligibilityImplementation,
-            topHatId,
-            topHatAccount,
-            adminHatId,
-            hat.termEndDateTs
-        );
+        for (uint256 i = 0; i < roleHatsParams.hats.length; ) {
+            HatParams memory hatParams = roleHatsParams.hats[i];
 
-        // Create and Mint the Role Hat
-        uint256 hatId = _createAndMintHat(
-            hatsProtocol,
-            adminHatId,
-            hat,
-            eligibilityAddress,
-            topHatAccount
-        );
+            // Create eligibility module if needed
+            address eligibilityAddress = _createEligibilityModule(
+                roleHatsParams.hatsProtocol,
+                roleHatsParams.hatsModuleFactory,
+                roleHatsParams.hatsElectionsEligibilityImplementation,
+                roleHatsParams.topHatId,
+                roleHatsParams.topHatAccount,
+                roleHatsParams.adminHatId,
+                hatParams.termEndDateTs
+            );
 
-        // Get the stream recipient (based on termed or not)
-        address streamRecipient = _setupStreamRecipient(
-            erc6551Registry,
-            hatsAccountImplementation,
-            address(hatsProtocol),
-            hat.termEndDateTs,
-            hat.wearer,
-            hatId
-        );
+            // Create and Mint the Role Hat
+            uint256 hatId = _createAndMintHat(
+                roleHatsParams.hatsProtocol,
+                roleHatsParams.adminHatId,
+                hatParams,
+                eligibilityAddress,
+                roleHatsParams.topHatAccount
+            );
 
-        // Create streams
-        _processSablierStreams(hat.sablierStreamsParams, streamRecipient);
+            // Get the stream recipient (based on termed or not)
+            address streamRecipient = _setupStreamRecipient(
+                roleHatsParams.erc6551Registry,
+                roleHatsParams.hatsAccountImplementation,
+                address(roleHatsParams.hatsProtocol),
+                hatParams.termEndDateTs,
+                hatParams.wearer,
+                hatId
+            );
+
+            // Create streams
+            _processSablierStreams(
+                hatParams.sablierStreamsParams,
+                streamRecipient
+            );
+
+            unchecked {
+                ++i;
+            }
+        }
     }
 
     function _createEligibilityModule(
@@ -89,6 +104,7 @@ abstract contract DecentHatsUtils {
         uint256 adminHatId,
         uint128 termEndDateTs
     ) private returns (address) {
+        // If the Hat is termed, create the eligibility module
         if (termEndDateTs != 0) {
             return
                 hatsModuleFactory.createHatsModule(
@@ -99,6 +115,8 @@ abstract contract DecentHatsUtils {
                     uint256(SALT)
                 );
         }
+
+        // Otherwise, return the Top Hat account
         return topHatAccount;
     }
 
@@ -109,7 +127,10 @@ abstract contract DecentHatsUtils {
         address eligibilityAddress,
         address topHatAccount
     ) private returns (uint256) {
+        // Grab the next Hat ID (before creating it)
         uint256 hatId = hatsProtocol.getNextId(adminHatId);
+
+        // Create the new Hat
         IAvatar(msg.sender).execTransactionFromModule(
             address(hatsProtocol),
             0,
@@ -126,7 +147,7 @@ abstract contract DecentHatsUtils {
             Enum.Operation.Call
         );
 
-        // If the hat is termed, nominate the wearer as the eligible member
+        // If the Hat is termed, nominate the wearer as the eligible member
         if (hat.termEndDateTs != 0) {
             address[] memory nominatedWearers = new address[](1);
             nominatedWearers[0] = hat.wearer;
@@ -143,6 +164,7 @@ abstract contract DecentHatsUtils {
             );
         }
 
+        // Mint the Hat
         IAvatar(msg.sender).execTransactionFromModule(
             address(hatsProtocol),
             0,

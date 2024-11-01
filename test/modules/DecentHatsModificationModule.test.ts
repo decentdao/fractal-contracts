@@ -22,21 +22,21 @@ import {
   MockERC20__factory,
   MockERC20,
   ModuleProxyFactory,
-  DecentAutonomousAdmin,
   ModuleProxyFactory__factory,
-  DecentAutonomousAdmin__factory,
+  DecentAutonomousAdminV1,
+  DecentAutonomousAdminV1__factory,
   MockHatsModuleFactory__factory,
   MockHatsElectionsEligibility__factory,
   DecentHatsCreationModule,
-} from '../typechain-types';
+} from '../../typechain-types';
 
-import { getGnosisSafeL2Singleton, getGnosisSafeProxyFactory } from './GlobalSafeDeployments.test';
+import { getGnosisSafeL2Singleton, getGnosisSafeProxyFactory } from '../GlobalSafeDeployments.test';
 import {
   executeSafeTransaction,
   getHatAccount,
   predictGnosisSafeAddress,
   topHatIdToHatId,
-} from './helpers';
+} from '../helpers';
 
 describe('DecentHatsModificationModule', () => {
   let safe: SignerWithAddress;
@@ -69,7 +69,7 @@ describe('DecentHatsModificationModule', () => {
   let mockHatsModuleFactoryAddress: string;
 
   let moduleProxyFactory: ModuleProxyFactory;
-  let decentAutonomousAdminMasterCopy: DecentAutonomousAdmin;
+  let decentAutonomousAdminMasterCopy: DecentAutonomousAdminV1;
 
   beforeEach(async () => {
     const signers = await hre.ethers.getSigners();
@@ -89,7 +89,7 @@ describe('DecentHatsModificationModule', () => {
     ).deploy();
     decentHatsModificationModuleAddress = await decentHatsModificationModule.getAddress();
     moduleProxyFactory = await new ModuleProxyFactory__factory(deployer).deploy();
-    decentAutonomousAdminMasterCopy = await new DecentAutonomousAdmin__factory(deployer).deploy();
+    decentAutonomousAdminMasterCopy = await new DecentAutonomousAdminV1__factory(deployer).deploy();
 
     const mockHatsModuleFactory = await new MockHatsModuleFactory__factory(deployer).deploy();
     mockHatsModuleFactoryAddress = await mockHatsModuleFactory.getAddress();
@@ -170,7 +170,8 @@ describe('DecentHatsModificationModule', () => {
               erc6551Registry: await erc6551Registry.getAddress(),
               hatsModuleFactory: mockHatsModuleFactoryAddress,
               moduleProxyFactory: await moduleProxyFactory.getAddress(),
-              decentAutonomousAdminMasterCopy: await decentAutonomousAdminMasterCopy.getAddress(),
+              decentAutonomousAdminImplementation:
+                await decentAutonomousAdminMasterCopy.getAddress(),
               hatsAccountImplementation: mockHatsAccountImplementationAddress,
               keyValuePairs: await keyValuePairs.getAddress(),
               hatsElectionsEligibilityImplementation:
@@ -243,39 +244,41 @@ describe('DecentHatsModificationModule', () => {
           to: decentHatsModificationModuleAddress,
           transactionData:
             DecentHatsModificationModule__factory.createInterface().encodeFunctionData(
-              'createRoleHat',
+              'createRoleHats',
               [
                 {
                   hatsProtocol: mockHatsAddress,
-                  registry: await erc6551Registry.getAddress(),
+                  erc6551Registry: await erc6551Registry.getAddress(),
                   topHatAccount: await topHatAccount.getAddress(),
                   hatsAccountImplementation: mockHatsAccountImplementationAddress,
                   adminHatId,
                   topHatId,
-                  hat: {
-                    wearer: await topHatAccount.getAddress(), // any non-zero address,
-                    details: '',
-                    imageURI: '',
-                    sablierStreamsParams: [
-                      {
-                        sablier: mockSablierAddress,
-                        sender: gnosisSafeAddress,
-                        totalAmount: ethers.parseEther('100'),
-                        asset: mockERC20Address,
-                        cancelable: true,
-                        transferable: false,
-                        timestamps: {
-                          start: currentBlockTimestamp,
-                          cliff: currentBlockTimestamp + 86400, // 1 day cliff
-                          end: currentBlockTimestamp + 2592000, // 30 days from now
+                  hats: [
+                    {
+                      wearer: await topHatAccount.getAddress(), // any non-zero address,
+                      details: '',
+                      imageURI: '',
+                      sablierStreamsParams: [
+                        {
+                          sablier: mockSablierAddress,
+                          sender: gnosisSafeAddress,
+                          totalAmount: ethers.parseEther('100'),
+                          asset: mockERC20Address,
+                          cancelable: true,
+                          transferable: false,
+                          timestamps: {
+                            start: currentBlockTimestamp,
+                            cliff: currentBlockTimestamp + 86400, // 1 day cliff
+                            end: currentBlockTimestamp + 2592000, // 30 days from now
+                          },
+                          broker: { account: ethers.ZeroAddress, fee: 0 },
                         },
-                        broker: { account: ethers.ZeroAddress, fee: 0 },
-                      },
-                    ],
-                    termEndDateTs: 0,
-                    maxSupply: 1,
-                    isMutable: true,
-                  },
+                      ],
+                      termEndDateTs: 0,
+                      maxSupply: 1,
+                      isMutable: true,
+                    },
+                  ],
                   hatsElectionsEligibilityImplementation:
                     mockHatsElectionsEligibilityImplementationAddress,
                   hatsModuleFactory: mockHatsModuleFactoryAddress,
@@ -342,39 +345,41 @@ describe('DecentHatsModificationModule', () => {
           to: decentHatsModificationModuleAddress,
           transactionData:
             DecentHatsModificationModule__factory.createInterface().encodeFunctionData(
-              'createRoleHat',
+              'createRoleHats',
               [
                 {
                   hatsProtocol: mockHatsAddress,
-                  registry: await erc6551Registry.getAddress(),
+                  erc6551Registry: await erc6551Registry.getAddress(),
                   topHatAccount: await topHatAccount.getAddress(),
                   hatsAccountImplementation: mockHatsAccountImplementationAddress,
                   adminHatId,
                   topHatId,
-                  hat: {
-                    wearer: await topHatAccount.getAddress(), // any non-zero address,
-                    details: '',
-                    imageURI: '',
-                    sablierStreamsParams: [
-                      {
-                        sablier: mockSablierAddress,
-                        sender: gnosisSafeAddress,
-                        totalAmount: ethers.parseEther('100'),
-                        asset: mockERC20Address,
-                        cancelable: true,
-                        transferable: false,
-                        timestamps: {
-                          start: currentBlockTimestamp,
-                          cliff: currentBlockTimestamp + 86400, // 1 day cliff
-                          end: currentBlockTimestamp + 2592000, // 30 days from now
+                  hats: [
+                    {
+                      wearer: await topHatAccount.getAddress(), // any non-zero address,
+                      details: '',
+                      imageURI: '',
+                      sablierStreamsParams: [
+                        {
+                          sablier: mockSablierAddress,
+                          sender: gnosisSafeAddress,
+                          totalAmount: ethers.parseEther('100'),
+                          asset: mockERC20Address,
+                          cancelable: true,
+                          transferable: false,
+                          timestamps: {
+                            start: currentBlockTimestamp,
+                            cliff: currentBlockTimestamp + 86400, // 1 day cliff
+                            end: currentBlockTimestamp + 2592000, // 30 days from now
+                          },
+                          broker: { account: ethers.ZeroAddress, fee: 0 },
                         },
-                        broker: { account: ethers.ZeroAddress, fee: 0 },
-                      },
-                    ],
-                    termEndDateTs: currentBlockTimestamp + 2592000, // 30 days from now
-                    maxSupply: 1,
-                    isMutable: true,
-                  },
+                      ],
+                      termEndDateTs: currentBlockTimestamp + 2592000, // 30 days from now
+                      maxSupply: 1,
+                      isMutable: true,
+                    },
+                  ],
                   hatsElectionsEligibilityImplementation:
                     mockHatsElectionsEligibilityImplementationAddress,
                   hatsModuleFactory: mockHatsModuleFactoryAddress,
