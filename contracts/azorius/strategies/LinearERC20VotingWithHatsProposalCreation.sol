@@ -7,7 +7,7 @@ import {IHats} from "../../interfaces/hats/IHats.sol";
 
 /**
  * An [Azorius](./Azorius.md) [BaseStrategy](./BaseStrategy.md) implementation that
- * enables linear (i.e. 1 to 1) ERC21 based token voting, with proposal creation
+ * enables linear (i.e. 1 to 1) ERC20 based token voting, with proposal creation
  * restricted to users wearing whitelisted Hats.
  */
 contract LinearERC20VotingWithHatsProposalCreation is
