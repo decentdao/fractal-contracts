@@ -20,10 +20,6 @@ contract DecentAutonomousAdminV1 is
     // //////////////////////////////////////////////////////////////
     //                         Public Functions
     // //////////////////////////////////////////////////////////////
-    function version() external pure override returns (uint32) {
-        return 1;
-    }
-
     function triggerStartNextTerm(TriggerStartArgs calldata args) public {
         IHatsElectionsEligibility hatsElectionModule = IHatsElectionsEligibility(
                 args.hatsProtocol.getHatEligibilityModule(args.hatId)
