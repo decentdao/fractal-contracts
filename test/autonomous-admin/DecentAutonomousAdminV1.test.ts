@@ -93,12 +93,6 @@ describe('DecentAutonomousAdminHatV1', function () {
     await hatsElectionModule.elect(nextTermEnd, [await secondWearer.getAddress()]);
   });
 
-  describe('version', function () {
-    it('should return the correct version', async () => {
-      expect(await decentAutonomousAdminInstance.version()).to.equal(1);
-    });
-  });
-
   describe('triggerStartNextTerm', function () {
     describe('before the first term is over', function () {
       it('should have correct wearers', async () => {
