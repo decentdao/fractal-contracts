@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity =0.8.19;
 
-import {IERC721VotingStrategy} from "./interfaces/IERC721VotingStrategy.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {BaseVotingBasisPercent} from "./BaseVotingBasisPercent.sol";
-import {IAzorius} from "./interfaces/IAzorius.sol";
-import {BaseStrategy} from "./BaseStrategy.sol";
+import {IERC721VotingStrategy} from "../interfaces/IERC721VotingStrategy.sol";
+import {BaseVotingBasisPercent} from "../BaseVotingBasisPercent.sol";
+import {IAzorius} from "../interfaces/IAzorius.sol";
+import {BaseStrategy} from "../BaseStrategy.sol";
 
 /**
  * An Azorius strategy that allows multiple ERC721 tokens to be registered as governance tokens,

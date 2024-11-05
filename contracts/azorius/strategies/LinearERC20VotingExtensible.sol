@@ -2,9 +2,9 @@
 pragma solidity =0.8.19;
 
 import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
-import {BaseStrategy, IBaseStrategy} from "./BaseStrategy.sol";
-import {BaseQuorumPercent} from "./BaseQuorumPercent.sol";
-import {BaseVotingBasisPercent} from "./BaseVotingBasisPercent.sol";
+import {BaseStrategy, IBaseStrategy} from "../BaseStrategy.sol";
+import {BaseQuorumPercent} from "../BaseQuorumPercent.sol";
+import {BaseVotingBasisPercent} from "../BaseVotingBasisPercent.sol";
 
 /**
  * An [Azorius](./Azorius.md) [BaseStrategy](./BaseStrategy.md) implementation that
