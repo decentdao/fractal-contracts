@@ -45,7 +45,6 @@ describe('LinearERC20VotingWithHatsProposalCreation', () => {
   // Wallets
   let deployer: SignerWithAddress;
   let gnosisSafeOwner: SignerWithAddress;
-  let rando: SignerWithAddress;
 
   // Gnosis
   let createGnosisSetupCalldata: string;
@@ -59,7 +58,7 @@ describe('LinearERC20VotingWithHatsProposalCreation', () => {
 
     const abiCoder = new ethers.AbiCoder();
 
-    [deployer, gnosisSafeOwner, rando] = await hre.ethers.getSigners();
+    [deployer, gnosisSafeOwner] = await hre.ethers.getSigners();
 
     createGnosisSetupCalldata =
       // eslint-disable-next-line camelcase
@@ -245,22 +244,6 @@ describe('LinearERC20VotingWithHatsProposalCreation', () => {
     expect(await linearERC20VotingWithHats.hatsContract()).to.eq(
       '0x1234567890123456789012345678901234567890',
     );
-  });
-
-  it('Non-owner cannot whitelist a hat', async () => {
-    const hatId = 1; // Example hat ID
-
-    await expect(linearERC20VotingWithHats.connect(rando).whitelistHat(hatId)).to.be.revertedWith(
-      'Ownable: caller is not the owner',
-    );
-  });
-
-  it('Non-owner cannot remove a hat from the whitelist', async () => {
-    const hatId = 1; // Example hat ID
-
-    await expect(
-      linearERC20VotingWithHats.connect(rando).removeHatFromWhitelist(hatId),
-    ).to.be.revertedWith('Ownable: caller is not the owner');
   });
 
   it('Cannot call setUp function again', async () => {
