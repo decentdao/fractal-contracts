@@ -255,6 +255,14 @@ describe('LinearERC20VotingWithHatsProposalCreation', () => {
     );
   });
 
+  it('Non-owner cannot remove a hat from the whitelist', async () => {
+    const hatId = 1; // Example hat ID
+
+    await expect(
+      linearERC20VotingWithHats.connect(rando).removeHatFromWhitelist(hatId),
+    ).to.be.revertedWith('Ownable: caller is not the owner');
+  });
+
   it('Cannot call setUp function again', async () => {
     const setupParams = ethers.AbiCoder.defaultAbiCoder().encode(
       ['address', 'address', 'address', 'uint32', 'uint256', 'uint256', 'address', 'uint256[]'],
