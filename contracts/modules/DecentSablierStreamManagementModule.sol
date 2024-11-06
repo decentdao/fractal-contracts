@@ -14,8 +14,7 @@ contract DecentSablierStreamManagementModule {
         address to
     ) public {
         // Check if there are funds to withdraw
-        uint128 withdrawableAmount = sablier.withdrawableAmountOf(streamId);
-        if (withdrawableAmount == 0) {
+        if (sablier.withdrawableAmountOf(streamId) == 0) {
             return;
         }
 
