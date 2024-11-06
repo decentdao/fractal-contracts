@@ -81,7 +81,9 @@ describe('HatsProposalCreationWhitelist', () => {
     expect(await mockHatsProposalCreationWhitelist.hatsContract()).to.eq(
       await hatsProtocol.getAddress(),
     );
-    expect(await mockHatsProposalCreationWhitelist.isHatWhitelisted(proposerHatId)).to.equal(true);
+    expect(
+      (await mockHatsProposalCreationWhitelist.getWhitelistedHatIds()).includes(proposerHatId),
+    ).to.equal(true);
   });
 
   it('Cannot call setUp function again', async () => {
@@ -144,31 +146,35 @@ describe('HatsProposalCreationWhitelist', () => {
   });
 
   it('Returns correct number of whitelisted hats', async () => {
-    expect(await mockHatsProposalCreationWhitelist.getWhitelistedHatsCount()).to.equal(1);
+    expect((await mockHatsProposalCreationWhitelist.getWhitelistedHatIds()).length).to.equal(1);
 
     await mockHatsProposalCreationWhitelist.connect(owner).whitelistHat(nonProposerHatId);
 
-    expect(await mockHatsProposalCreationWhitelist.getWhitelistedHatsCount()).to.equal(2);
+    expect((await mockHatsProposalCreationWhitelist.getWhitelistedHatIds()).length).to.equal(2);
 
     await mockHatsProposalCreationWhitelist.connect(owner).removeHatFromWhitelist(proposerHatId);
 
-    expect(await mockHatsProposalCreationWhitelist.getWhitelistedHatsCount()).to.equal(1);
+    expect((await mockHatsProposalCreationWhitelist.getWhitelistedHatIds()).length).to.equal(1);
   });
 
   it('Correctly checks if a hat is whitelisted', async () => {
-    expect(await mockHatsProposalCreationWhitelist.isHatWhitelisted(proposerHatId)).to.equal(true);
-    expect(await mockHatsProposalCreationWhitelist.isHatWhitelisted(nonProposerHatId)).to.equal(
-      false,
-    );
+    expect(
+      (await mockHatsProposalCreationWhitelist.getWhitelistedHatIds()).includes(proposerHatId),
+    ).to.equal(true);
+    expect(
+      (await mockHatsProposalCreationWhitelist.getWhitelistedHatIds()).includes(nonProposerHatId),
+    ).to.equal(false);
 
     await mockHatsProposalCreationWhitelist.connect(owner).whitelistHat(nonProposerHatId);
 
-    expect(await mockHatsProposalCreationWhitelist.isHatWhitelisted(nonProposerHatId)).to.equal(
-      true,
-    );
+    expect(
+      (await mockHatsProposalCreationWhitelist.getWhitelistedHatIds()).includes(nonProposerHatId),
+    ).to.equal(true);
 
     await mockHatsProposalCreationWhitelist.connect(owner).removeHatFromWhitelist(proposerHatId);
 
-    expect(await mockHatsProposalCreationWhitelist.isHatWhitelisted(proposerHatId)).to.equal(false);
+    expect(
+      (await mockHatsProposalCreationWhitelist.getWhitelistedHatIds()).includes(proposerHatId),
+    ).to.equal(false);
   });
 });

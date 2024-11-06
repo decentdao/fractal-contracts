@@ -11,7 +11,7 @@ abstract contract HatsProposalCreationWhitelist is OwnableUpgradeable {
     IHats public hatsContract;
 
     /** Array to store whitelisted Hat IDs. */
-    uint256[] public whitelistedHatIds;
+    uint256[] private whitelistedHatIds;
 
     error InvalidHatsContract();
     error NoHatsWhitelisted();
@@ -96,24 +96,10 @@ abstract contract HatsProposalCreationWhitelist is OwnableUpgradeable {
     }
 
     /**
-     * Returns the number of whitelisted hats.
-     * @return The number of whitelisted hats
+     * @dev Returns the IDs of all whitelisted Hats.
+     * @return uint256[] memory An array of whitelisted Hat IDs.
      */
-    function getWhitelistedHatsCount() public view returns (uint256) {
-        return whitelistedHatIds.length;
-    }
-
-    /**
-     * Checks if a hat is whitelisted.
-     * @param _hatId The ID of the Hat to check
-     * @return True if the hat is whitelisted, false otherwise
-     */
-    function isHatWhitelisted(uint256 _hatId) public view returns (bool) {
-        for (uint256 i = 0; i < whitelistedHatIds.length; i++) {
-            if (whitelistedHatIds[i] == _hatId) {
-                return true;
-            }
-        }
-        return false;
+    function getWhitelistedHatIds() public view returns (uint256[] memory) {
+        return whitelistedHatIds;
     }
 }
