@@ -27,9 +27,10 @@ contract DecentAutonomousAdminV1 is
 
         hatsElectionModule.startNextTerm();
 
-        // This will burn the hat since wearer is no longer eligible
+        // This will burn the hat if wearer is no longer eligible
         args.hatsProtocol.checkHatWearerStatus(args.hatId, args.currentWearer);
-        // This will mint the hat to the nominated wearer
+
+        // This will mint the hat to the nominated wearer, if necessary
         if (args.nominatedWearer != args.currentWearer) {
             args.hatsProtocol.mintHat(args.hatId, args.nominatedWearer);
         }

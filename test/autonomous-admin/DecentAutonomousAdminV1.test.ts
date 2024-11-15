@@ -48,7 +48,7 @@ describe('DecentAutonomousAdminHatV1', function () {
     await hatsProtocol.createHat(
       topHatId, // top hat id
       'Details', // Hat details
-      100, // Max supply
+      1, // Max supply
       '0x0000000000000000000000000000000000004a75', // Eligibility module (none)
       '0x0000000000000000000000000000000000004a75', // Toggle module (none)
       true, // Is mutable
@@ -86,54 +86,86 @@ describe('DecentAutonomousAdminHatV1', function () {
 
     // Mint the role hat to currentWearer
     await hatsProtocol.mintHat(roleHatId, await firstWearer.getAddress());
-
-    // set up the next election
-    nextTermEnd = firstTermEnd + 100;
-    await hatsElectionModule.setNextTerm(nextTermEnd);
-    await hatsElectionModule.elect(nextTermEnd, [await secondWearer.getAddress()]);
   });
 
   describe('triggerStartNextTerm', function () {
-    describe('before the first term is over', function () {
-      it('should have correct wearers', async () => {
-        expect(await hatsProtocol.isWearerOfHat(firstWearer.address, roleHatId)).to.equal(true);
-        expect(await hatsProtocol.isWearerOfHat(secondWearer.address, roleHatId)).to.equal(false);
-      });
-    });
-
-    describe('after the first term is over', function () {
+    describe('when the new wearer is different from the old wearer', function () {
       beforeEach(async () => {
-        // Wait until the first term is over
-        await setTime(firstTermEnd + 1);
+        // set up the next election
+        nextTermEnd = firstTermEnd + 100;
+        await hatsElectionModule.setNextTerm(nextTermEnd);
+        await hatsElectionModule.elect(nextTermEnd, [await secondWearer.getAddress()]);
       });
 
-      describe('with a valid current wearer', function () {
+      describe('before the first term is over', function () {
+        it('should have correct wearers', async () => {
+          expect(await hatsProtocol.isWearerOfHat(firstWearer.address, roleHatId)).to.equal(true);
+          expect(await hatsProtocol.isWearerOfHat(secondWearer.address, roleHatId)).to.equal(false);
+        });
+      });
+
+      describe('after the first term is over', function () {
         beforeEach(async () => {
-          await decentAutonomousAdminInstance.triggerStartNextTerm({
-            currentWearer: await firstWearer.getAddress(),
-            nominatedWearer: secondWearer.address,
-            hatsProtocol: await hatsProtocol.getAddress(),
-            hatId: roleHatId,
-          });
+          // Wait until the first term is over
+          await setTime(firstTermEnd + 1);
         });
 
-        it('should have correct wearers after triggering next term', async () => {
-          expect(await hatsProtocol.isWearerOfHat(firstWearer.address, roleHatId)).to.equal(false);
-          expect(await hatsProtocol.isWearerOfHat(secondWearer.address, roleHatId)).to.equal(true);
-        });
-      });
-
-      describe('with invalid current wearer', function () {
-        it('should revert if the current wearer is not the wearer of the hat', async () => {
-          await expect(
-            decentAutonomousAdminInstance.triggerStartNextTerm({
-              currentWearer: await randomUser.getAddress(),
+        describe('with a valid current wearer', function () {
+          beforeEach(async () => {
+            await decentAutonomousAdminInstance.triggerStartNextTerm({
+              currentWearer: await firstWearer.getAddress(),
               nominatedWearer: secondWearer.address,
               hatsProtocol: await hatsProtocol.getAddress(),
               hatId: roleHatId,
-            }),
-          ).to.be.revertedWithCustomError(hatsProtocol, 'AllHatsWorn');
+            });
+          });
+
+          it('should have correct wearers after triggering next term', async () => {
+            expect(await hatsProtocol.isWearerOfHat(firstWearer.address, roleHatId)).to.equal(
+              false,
+            );
+            expect(await hatsProtocol.isWearerOfHat(secondWearer.address, roleHatId)).to.equal(
+              true,
+            );
+          });
         });
+
+        describe('with invalid current wearer', function () {
+          it('should revert if the current wearer is not the wearer of the hat', async () => {
+            await expect(
+              decentAutonomousAdminInstance.triggerStartNextTerm({
+                currentWearer: await randomUser.getAddress(),
+                nominatedWearer: secondWearer.address,
+                hatsProtocol: await hatsProtocol.getAddress(),
+                hatId: roleHatId,
+              }),
+            ).to.be.revertedWithCustomError(hatsProtocol, 'AllHatsWorn');
+          });
+        });
+      });
+    });
+
+    describe('when the new wearer is the same as the old wearer', function () {
+      beforeEach(async () => {
+        // set up the next election
+        nextTermEnd = firstTermEnd + 100;
+        await hatsElectionModule.setNextTerm(nextTermEnd);
+        await hatsElectionModule.elect(nextTermEnd, [await firstWearer.getAddress()]);
+
+        // Wait until the first term is over
+        await setTime(firstTermEnd + 1);
+
+        // trigger the next term
+        await decentAutonomousAdminInstance.triggerStartNextTerm({
+          currentWearer: await firstWearer.getAddress(),
+          nominatedWearer: firstWearer.address,
+          hatsProtocol: await hatsProtocol.getAddress(),
+          hatId: roleHatId,
+        });
+      });
+
+      it('should result in original wearer still wearing hat', async () => {
+        expect(await hatsProtocol.isWearerOfHat(firstWearer.address, roleHatId)).to.equal(true);
       });
     });
   });
