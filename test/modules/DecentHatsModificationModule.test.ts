@@ -282,6 +282,7 @@ describe('DecentHatsModificationModule', () => {
                   hatsElectionsEligibilityImplementation:
                     mockHatsElectionsEligibilityImplementationAddress,
                   hatsModuleFactory: mockHatsModuleFactoryAddress,
+                  keyValuePairs: await keyValuePairs.getAddress(),
                 },
               ],
             ),
@@ -383,6 +384,7 @@ describe('DecentHatsModificationModule', () => {
                   hatsElectionsEligibilityImplementation:
                     mockHatsElectionsEligibilityImplementationAddress,
                   hatsModuleFactory: mockHatsModuleFactoryAddress,
+                  keyValuePairs: await keyValuePairs.getAddress(),
                 },
               ],
             ),
