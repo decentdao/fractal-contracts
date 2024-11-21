@@ -19,6 +19,8 @@ import {
   MockERC20__factory,
   GnosisSafeL2,
   GnosisSafeL2__factory,
+  KeyValuePairs,
+  KeyValuePairs__factory,
 } from '../../typechain-types';
 
 import { getGnosisSafeL2Singleton, getGnosisSafeProxyFactory } from '../GlobalSafeDeployments.test';
@@ -44,6 +46,8 @@ describe('DecentHatsModuleUtils', () => {
   let mockERC20: MockERC20;
   let gnosisSafe: GnosisSafeL2;
   let gnosisSafeAddress: string;
+  let keyValuePairs: KeyValuePairs;
+  let keyValuePairsAddress: string;
 
   let topHatId: bigint;
   let topHatAccount: string;
@@ -62,7 +66,9 @@ describe('DecentHatsModuleUtils', () => {
     mockHatsModuleFactory = await new MockHatsModuleFactory__factory(deployer).deploy();
     mockSablier = await new MockSablierV2LockupLinear__factory(deployer).deploy();
     mockERC20 = await new MockERC20__factory(deployer).deploy('MockERC20', 'MCK');
-
+    // deploy keyValuePairs contract
+    keyValuePairs = await new KeyValuePairs__factory(deployer).deploy();
+    keyValuePairsAddress = await keyValuePairs.getAddress();
     // Deploy Safe
     const gnosisSafeProxyFactory = getGnosisSafeProxyFactory();
     const gnosisSafeL2Singleton = getGnosisSafeL2Singleton();
@@ -190,6 +196,7 @@ describe('DecentHatsModuleUtils', () => {
                 mockHatsElectionsEligibilityImplementationAddress,
               adminHatId,
               hats: [hatParams],
+              keyValuePairs: keyValuePairsAddress,
             },
           ],
         ),
@@ -235,6 +242,7 @@ describe('DecentHatsModuleUtils', () => {
                 mockHatsElectionsEligibilityImplementationAddress,
               adminHatId,
               hats: [hatParams],
+              keyValuePairs: keyValuePairsAddress,
             },
           ],
         ),
@@ -291,6 +299,7 @@ describe('DecentHatsModuleUtils', () => {
                 mockHatsElectionsEligibilityImplementationAddress,
               adminHatId,
               hats: [hatParams],
+              keyValuePairs: keyValuePairsAddress,
             },
           ],
         ),
