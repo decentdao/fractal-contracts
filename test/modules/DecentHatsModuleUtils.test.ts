@@ -322,9 +322,10 @@ describe('DecentHatsModuleUtils', () => {
 
       expect(event.args.sender).to.equal(await mockDecentHatsModuleUtils.getAddress());
       expect(event.args.totalAmount).to.equal(hre.ethers.parseEther('100'));
+      const expectedResult = `{"${hatId}": "${streamCreatedEvents[0].args.streamId}"}`;
       await expect(processRoleHatTx)
         .to.emit(keyValuePairs, 'ValueUpdated')
-        .withArgs(gnosisSafeAddress, hatId, streamCreatedEvents[0].args.streamId);
+        .withArgs(gnosisSafeAddress, 'hatId', expectedResult);
     });
 
     it('Creates a termed hat with a stream', async () => {
@@ -401,9 +402,10 @@ describe('DecentHatsModuleUtils', () => {
 
       expect(event.args.sender).to.equal(await mockDecentHatsModuleUtils.getAddress());
       expect(event.args.totalAmount).to.equal(hre.ethers.parseEther('100'));
+      const expectedResult = `{"${hatId}": "${streamCreatedEvents[0].args.streamId}"}`;
       await expect(processRoleHatTx)
         .to.emit(keyValuePairs, 'ValueUpdated')
-        .withArgs(gnosisSafeAddress, hatId, streamCreatedEvents[0].args.streamId);
+        .withArgs(gnosisSafeAddress, 'hatId', expectedResult);
     });
   });
 
