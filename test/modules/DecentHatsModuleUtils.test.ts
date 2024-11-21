@@ -326,6 +326,85 @@ describe('DecentHatsModuleUtils', () => {
         .to.emit(keyValuePairs, 'ValueUpdated')
         .withArgs(gnosisSafeAddress, hatId, streamCreatedEvents[0].args.streamId);
     });
+
+    it('Creates a termed hat with a stream', async () => {
+      const currentBlockTimestamp = (await hre.ethers.provider.getBlock('latest'))!.timestamp;
+      const termEndDateTs = BigInt(Math.floor(Date.now() / 1000) + 100000);
+      const hatParams = {
+        wearer: wearer.address,
+        details: '',
+        imageURI: '',
+        sablierStreamsParams: [
+          {
+            sablier: await mockSablier.getAddress(),
+            sender: await mockDecentHatsModuleUtils.getAddress(),
+            asset: await mockERC20.getAddress(),
+            timestamps: {
+              start: currentBlockTimestamp,
+              cliff: 0,
+              end: currentBlockTimestamp + 2592000, // 30 days
+            },
+            broker: { account: hre.ethers.ZeroAddress, fee: 0 },
+            totalAmount: hre.ethers.parseEther('100'),
+            cancelable: true,
+            transferable: false,
+          },
+        ],
+        termEndDateTs,
+        maxSupply: 1,
+        isMutable: false,
+      };
+
+      const roleHatId = await mockHats.getNextId(adminHatId);
+      const processRoleHatTx = await executeSafeTransaction({
+        safe: gnosisSafe,
+        to: await mockDecentHatsModuleUtils.getAddress(),
+        transactionData: MockDecentHatsModuleUtils__factory.createInterface().encodeFunctionData(
+          'processRoleHats',
+          [
+            {
+              hatsProtocol: await mockHats.getAddress(),
+              erc6551Registry: await erc6551Registry.getAddress(),
+              hatsAccountImplementation: await mockHatsAccount.getAddress(),
+              topHatId,
+              topHatAccount,
+              hatsModuleFactory: await mockHatsModuleFactory.getAddress(),
+              hatsElectionsEligibilityImplementation:
+                mockHatsElectionsEligibilityImplementationAddress,
+              adminHatId,
+              hats: [hatParams],
+              keyValuePairs: keyValuePairsAddress,
+            },
+          ],
+        ),
+        signers: [safeSigner],
+      });
+
+      expect(await mockHats.isWearerOfHat.staticCall(wearer.address, roleHatId)).to.equal(true);
+      expect(await mockHats.getHatEligibilityModule(roleHatId)).to.not.equal(
+        hre.ethers.ZeroAddress,
+      );
+
+      const streamCreatedEvents = await mockSablier.queryFilter(
+        mockSablier.filters.StreamCreated(),
+      );
+      expect(streamCreatedEvents.length).to.equal(1);
+
+      const stream1 = await mockSablier.getStream(streamCreatedEvents[0].args.streamId);
+      expect(stream1.startTime).to.equal(currentBlockTimestamp);
+      expect(stream1.endTime).to.equal(currentBlockTimestamp + 2592000);
+
+      // get the last hat created event
+      const hatCreatedEvents = await mockHats.queryFilter(mockHats.filters.HatCreated());
+      const hatId = hatCreatedEvents[hatCreatedEvents.length - 1].args.id;
+      const event = streamCreatedEvents[0];
+
+      expect(event.args.sender).to.equal(await mockDecentHatsModuleUtils.getAddress());
+      expect(event.args.totalAmount).to.equal(hre.ethers.parseEther('100'));
+      await expect(processRoleHatTx)
+        .to.emit(keyValuePairs, 'ValueUpdated')
+        .withArgs(gnosisSafeAddress, hatId, streamCreatedEvents[0].args.streamId);
+    });
   });
 
   describe('SALT', () => {
