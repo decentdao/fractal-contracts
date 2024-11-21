@@ -254,8 +254,16 @@ abstract contract DecentHatsModuleUtils {
             // Update KeyValuePairs with the stream ID and Hat ID
             string[] memory keys = new string[](1);
             string[] memory values = new string[](1);
-            keys[0] = Strings.toString(hatId);
-            values[0] = Strings.toString(streamId);
+            keys[0] = "hatId";
+            values[0] = string(
+                abi.encodePacked(
+                    '{"',
+                    Strings.toString(hatId),
+                    '": "',
+                    Strings.toString(streamId),
+                    '"}'
+                )
+            );
 
             IAvatar(msg.sender).execTransactionFromModule(
                 keyValuePairs,
