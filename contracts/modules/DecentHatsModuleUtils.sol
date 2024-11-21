@@ -254,14 +254,12 @@ abstract contract DecentHatsModuleUtils {
             // Update KeyValuePairs with the stream ID and Hat ID
             string[] memory keys = new string[](1);
             string[] memory values = new string[](1);
-            keys[0] = "hatId";
+            keys[0] = "hatIdToStreamId";
             values[0] = string(
                 abi.encodePacked(
-                    '{"',
                     Strings.toString(hatId),
-                    '": "',
-                    Strings.toString(streamId),
-                    '"}'
+                    ":",
+                    Strings.toString(streamId)
                 )
             );
 
