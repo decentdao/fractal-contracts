@@ -282,7 +282,7 @@ describe('DecentHatsModuleUtils', () => {
         isMutable: false,
       };
 
-      await executeSafeTransaction({
+      const processRoleHatTx = await executeSafeTransaction({
         safe: gnosisSafe,
         to: await mockDecentHatsModuleUtils.getAddress(),
         transactionData: MockDecentHatsModuleUtils__factory.createInterface().encodeFunctionData(
@@ -315,9 +315,16 @@ describe('DecentHatsModuleUtils', () => {
       expect(stream1.startTime).to.equal(currentBlockTimestamp);
       expect(stream1.endTime).to.equal(currentBlockTimestamp + 2592000);
 
+      // get the last hat created event
+      const hatCreatedEvents = await mockHats.queryFilter(mockHats.filters.HatCreated());
+      const hatId = hatCreatedEvents[hatCreatedEvents.length - 1].args.id;
       const event = streamCreatedEvents[0];
+
       expect(event.args.sender).to.equal(await mockDecentHatsModuleUtils.getAddress());
       expect(event.args.totalAmount).to.equal(hre.ethers.parseEther('100'));
+      await expect(processRoleHatTx)
+        .to.emit(keyValuePairs, 'ValueUpdated')
+        .withArgs(gnosisSafeAddress, hatId, streamCreatedEvents[0].args.streamId);
     });
   });
 
