@@ -99,7 +99,8 @@ contract DecentHatsCreationModule is DecentHatsModuleUtils {
                 hatsElectionsEligibilityImplementation: treeParams
                     .hatsElectionsEligibilityImplementation,
                 adminHatId: adminHatId,
-                hats: treeParams.hats
+                hats: treeParams.hats,
+                keyValuePairs: treeParams.keyValuePairs
             })
         );
     }

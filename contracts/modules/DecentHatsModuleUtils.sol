@@ -9,6 +9,7 @@ import {IHats} from "../interfaces/hats/IHats.sol";
 import {LockupLinear, Broker} from "../interfaces/sablier/types/DataTypes.sol";
 import {IHatsModuleFactory} from "../interfaces/hats/IHatsModuleFactory.sol";
 import {ISablierV2LockupLinear} from "../interfaces/sablier/ISablierV2LockupLinear.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 abstract contract DecentHatsModuleUtils {
     bytes32 public constant SALT =
@@ -41,6 +42,7 @@ abstract contract DecentHatsModuleUtils {
         address hatsAccountImplementation;
         uint256 topHatId;
         address topHatAccount;
+        address keyValuePairs;
         IHatsModuleFactory hatsModuleFactory;
         address hatsElectionsEligibilityImplementation;
         uint256 adminHatId;
@@ -86,7 +88,9 @@ abstract contract DecentHatsModuleUtils {
             // Create streams
             _processSablierStreams(
                 hatParams.sablierStreamsParams,
-                streamRecipient
+                streamRecipient,
+                roleHatsParams.keyValuePairs,
+                hatId
             );
 
             unchecked {
@@ -205,7 +209,9 @@ abstract contract DecentHatsModuleUtils {
 
     function _processSablierStreams(
         SablierStreamParams[] memory streamParams,
-        address streamRecipient
+        address streamRecipient,
+        address keyValuePairs,
+        uint256 hatId
     ) private {
         for (uint256 i = 0; i < streamParams.length; ) {
             SablierStreamParams memory sablierStreamParams = streamParams[i];
@@ -221,6 +227,9 @@ abstract contract DecentHatsModuleUtils {
                 ),
                 Enum.Operation.Call
             );
+            uint256 streamId = ISablierV2LockupLinear(
+                sablierStreamParams.sablier
+            ).nextStreamId();
 
             // Proxy the Sablier call through IAvatar
             IAvatar(msg.sender).execTransactionFromModule(
@@ -238,6 +247,29 @@ abstract contract DecentHatsModuleUtils {
                         timestamps: sablierStreamParams.timestamps,
                         broker: sablierStreamParams.broker
                     })
+                ),
+                Enum.Operation.Call
+            );
+
+            // Update KeyValuePairs with the stream ID and Hat ID
+            string[] memory keys = new string[](1);
+            string[] memory values = new string[](1);
+            keys[0] = "hatIdToStreamId";
+            values[0] = string(
+                abi.encodePacked(
+                    Strings.toString(hatId),
+                    ":",
+                    Strings.toString(streamId)
+                )
+            );
+
+            IAvatar(msg.sender).execTransactionFromModule(
+                keyValuePairs,
+                0,
+                abi.encodeWithSignature(
+                    "updateValues(string[],string[])",
+                    keys,
+                    values
                 ),
                 Enum.Operation.Call
             );
