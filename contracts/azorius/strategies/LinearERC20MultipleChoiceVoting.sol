@@ -305,4 +305,13 @@ abstract contract LinearERC20MultipleChoiceVoting is BaseStrategy, BaseQuorumPer
         }
         emit Voted(_voter, _proposalId, _choices, _weight);
     }
+
+    /** @inheritdoc BaseQuorumPercent*/
+    function quorumVotes(
+        uint32 _proposalId
+    ) public view virtual override returns (uint256) {
+        return
+            (quorumNumerator * getProposalVotingSupply(_proposalId)) /
+            QUORUM_DENOMINATOR;
+    }
 }
