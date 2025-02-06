@@ -6,6 +6,7 @@ import {IERC721VotingStrategy} from "../interfaces/IERC721VotingStrategy.sol";
 import {BaseVotingBasisPercent} from "../BaseVotingBasisPercent.sol";
 import {IAzorius} from "../interfaces/IAzorius.sol";
 import {BaseStrategy} from "../BaseStrategy.sol";
+import {IVersion} from "../interfaces/IVersion.sol";
 
 /**
  * An Azorius strategy that allows multiple ERC721 tokens to be registered as governance tokens,
@@ -27,7 +28,8 @@ import {BaseStrategy} from "../BaseStrategy.sol";
 abstract contract LinearERC721VotingExtensible is
     BaseStrategy,
     BaseVotingBasisPercent,
-    IERC721VotingStrategy
+    IERC721VotingStrategy,
+    IVersion
 {
     /**
      * The voting options for a Proposal.
@@ -467,5 +469,11 @@ abstract contract LinearERC721VotingExtensible is
         }
 
         emit Voted(_voter, _proposalId, _voteType, _tokenAddresses, _tokenIds);
+    }
+
+    /** @inheritdoc IVersion*/
+    function getVersion() external pure virtual returns (uint8) {
+        // This should be incremented whenever the contract is modified
+        return 0;
     }
 }

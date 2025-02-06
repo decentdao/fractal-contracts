@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import {LinearERC721VotingExtensible} from "./LinearERC721VotingExtensible.sol";
 import {HatsProposalCreationWhitelist} from "./HatsProposalCreationWhitelist.sol";
 import {IHats} from "../../interfaces/hats/IHats.sol";
+import {IVersion} from "../interfaces/IVersion.sol";
 
 /**
  * An [Azorius](./Azorius.md) [BaseStrategy](./BaseStrategy.md) implementation that
@@ -81,5 +82,12 @@ contract LinearERC721VotingWithHatsProposalCreation is
         returns (bool)
     {
         return HatsProposalCreationWhitelist.isProposer(_address);
+    }
+
+    /** @inheritdoc IVersion*/
+    function getVersion() external pure override returns (uint8) {
+        // Although this function is implemented by parent class, we want them to have independent versionings
+        // This should be incremented whenever the contract is modified
+        return 0;
     }
 }
