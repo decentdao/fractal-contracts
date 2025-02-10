@@ -5,7 +5,6 @@ import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
 import {BaseStrategy, IBaseStrategy} from "../BaseStrategy.sol";
 import {BaseQuorumPercent} from "../BaseQuorumPercent.sol";
 import {BaseVotingBasisPercent} from "../BaseVotingBasisPercent.sol";
-import {IVersion} from "../interfaces/IVersion.sol";
 
 /**
  * An [Azorius](./Azorius.md) [BaseStrategy](./BaseStrategy.md) implementation that
@@ -21,8 +20,7 @@ import {IVersion} from "../interfaces/IVersion.sol";
 abstract contract LinearERC20VotingExtensible is
     BaseStrategy,
     BaseQuorumPercent,
-    BaseVotingBasisPercent,
-    IVersion
+    BaseVotingBasisPercent
 {
     /**
      * The voting options for a Proposal.
@@ -331,11 +329,5 @@ abstract contract LinearERC20VotingExtensible is
         return
             (quorumNumerator * getProposalVotingSupply(_proposalId)) /
             QUORUM_DENOMINATOR;
-    }
-
-    /** @inheritdoc IVersion*/
-    function getVersion() external pure virtual returns (uint8) {
-        // This should be incremented whenever the contract is modified
-        return 0;
     }
 }
