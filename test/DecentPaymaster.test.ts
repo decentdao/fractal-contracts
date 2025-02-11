@@ -1,7 +1,13 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
-import { DecentPaymaster, MockEntryPoint, ModuleProxyFactory } from '../typechain-types';
+import {
+  DecentPaymaster,
+  MockEntryPoint,
+  ModuleProxyFactory,
+  IPaymaster__factory,
+  IDecentPaymaster__factory,
+} from '../typechain-types';
 import { getModuleProxyFactory } from './GlobalSafeDeployments.test';
 import { calculateProxyAddress } from './helpers';
 
@@ -131,7 +137,7 @@ describe.only('DecentPaymaster', function () {
         strategy.address,
         MOCK_FUNCTION_SELECTOR,
       );
-      expect(isApproved).to.equal(true);
+      void expect(isApproved).to.be.true;
     });
 
     it('Should allow owner to revoke function approval', async function () {
@@ -145,7 +151,7 @@ describe.only('DecentPaymaster', function () {
         strategy.address,
         MOCK_FUNCTION_SELECTOR,
       );
-      expect(isApproved).to.equal(false);
+      void expect(isApproved).to.be.false;
     });
 
     it('Should revert when non-owner tries to set approval', async function () {
@@ -180,7 +186,7 @@ describe.only('DecentPaymaster', function () {
 
       for (const selector of selectors) {
         const isApproved = await decentPaymaster.isFunctionApproved(strategy.address, selector);
-        expect(isApproved).to.equal(true);
+        void expect(isApproved).to.be.true;
       }
     });
 
@@ -376,6 +382,60 @@ describe.only('DecentPaymaster', function () {
       const totalDeposit = deposit1 + deposit2 + deposit3;
       const balance = await entryPoint.balanceOf(await decentPaymaster.getAddress());
       expect(balance).to.equal(totalDeposit);
+    });
+  });
+
+  describe('ERC165', function () {
+    let iPaymasterInterfaceId: string;
+    let iDecentPaymasterInterfaceId: string;
+
+    beforeEach(async function () {
+      // Calculate IPaymaster interface ID
+      const IPaymasterInterface = IPaymaster__factory.createInterface();
+      const validatePaymasterUserOpSelector =
+        IPaymasterInterface.getFunction('validatePaymasterUserOp').selector;
+      const postOpSelector = IPaymasterInterface.getFunction('postOp').selector;
+      iPaymasterInterfaceId = ethers.hexlify(
+        ethers.toBeArray(BigInt(validatePaymasterUserOpSelector) ^ BigInt(postOpSelector)),
+      );
+
+      // Calculate IDecentPaymaster interface ID
+      const IDecentPaymasterInterface = IDecentPaymaster__factory.createInterface();
+      const setStrategyFunctionApprovalSelector = IDecentPaymasterInterface.getFunction(
+        'setStrategyFunctionApproval',
+      ).selector;
+      const isFunctionApprovedSelector =
+        IDecentPaymasterInterface.getFunction('isFunctionApproved').selector;
+      const setUpSelector = IDecentPaymasterInterface.getFunction('setUp').selector;
+      iDecentPaymasterInterfaceId = ethers.hexlify(
+        ethers.toBeArray(
+          BigInt(setStrategyFunctionApprovalSelector) ^
+            BigInt(isFunctionApprovedSelector) ^
+            BigInt(setUpSelector),
+        ),
+      );
+    });
+
+    it('Should support IERC165 interface', async function () {
+      const IERC165InterfaceId = '0x01ffc9a7';
+      const supported = await decentPaymaster.supportsInterface(IERC165InterfaceId);
+      void expect(supported).to.be.true;
+    });
+
+    it('Should support IPaymaster interface', async function () {
+      const supported = await decentPaymaster.supportsInterface(iPaymasterInterfaceId);
+      void expect(supported).to.be.true;
+    });
+
+    it('Should support IDecentPaymaster interface', async function () {
+      const supported = await decentPaymaster.supportsInterface(iDecentPaymasterInterfaceId);
+      void expect(supported).to.be.true;
+    });
+
+    it('Should not support random interface', async function () {
+      const randomInterfaceId = '0x12345678';
+      const supported = await decentPaymaster.supportsInterface(randomInterfaceId);
+      void expect(supported).to.be.false;
     });
   });
 });
