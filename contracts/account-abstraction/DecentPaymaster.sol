@@ -100,9 +100,7 @@ contract DecentPaymaster is IDecentPaymaster, BasePaymaster, ERC165 {
         return (abi.encode(), 0);
     }
 
-    /**
-     * @dev See {IERC165-supportsInterface}.
-     */
+    /// @inheritdoc ERC165
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual override(ERC165) returns (bool) {
