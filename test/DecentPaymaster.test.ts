@@ -23,7 +23,7 @@ interface PackedUserOperation {
   signature: string;
 }
 
-describe.only('DecentPaymaster', function () {
+describe('DecentPaymaster', function () {
   let decentPaymaster: DecentPaymaster;
   let decentPaymasterMastercopy: DecentPaymaster;
   let entryPoint: MockEntryPoint;
