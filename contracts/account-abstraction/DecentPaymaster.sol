@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-import {BasePaymaster, IEntryPoint} from "@account-abstraction/contracts/core/BasePaymaster.sol";
+import {BasePaymaster, IEntryPoint} from "./BasePaymaster.sol";
 import {PackedUserOperation} from "@account-abstraction/contracts/interfaces/IPaymaster.sol";
-import {UserOperationLib} from "@account-abstraction/contracts/core/UserOperationLib.sol";
 
 contract DecentPaymaster is BasePaymaster {
     // Mapping: strategy address => function selector => is approved
@@ -13,9 +12,25 @@ contract DecentPaymaster is BasePaymaster {
 
     error UnauthorizedStrategy();
     error InvalidCallDataLength();
+    error ZeroAddressStrategy();
+    error InvalidArrayLength();
 
-    constructor(IEntryPoint _entryPoint) BasePaymaster(_entryPoint) {
-        // Initialize with EntryPoint address
+    constructor() {
+        _disableInitializers();
+    }
+
+    /**
+     * Initial setup of the DecentPaymaster instance.
+     * @param initializeParams encoded initialization parameters: `address _owner`,
+     * `address _entryPoint`
+     */
+    function setUp(bytes memory initializeParams) public initializer {
+        (address _owner, address _entryPoint) = abi.decode(
+            initializeParams,
+            (address, address)
+        );
+        __BasePaymaster_init(IEntryPoint(_entryPoint));
+        transferOwnership(_owner);
     }
 
     /**
@@ -29,7 +44,8 @@ contract DecentPaymaster is BasePaymaster {
         bytes4[] calldata selectors,
         bool[] calldata approved
     ) external onlyOwner {
-        require(selectors.length == approved.length, "Invalid input length");
+        if (strategy == address(0)) revert ZeroAddressStrategy();
+        if (selectors.length != approved.length) revert InvalidArrayLength();
         for (uint256 i = 0; i < selectors.length; i++) {
             approvedFunctions[strategy][selectors[i]] = approved[i];
             emit FunctionApproved(strategy, selectors[i], approved[i]);
