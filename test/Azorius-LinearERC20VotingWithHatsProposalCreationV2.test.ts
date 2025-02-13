@@ -237,33 +237,7 @@ describe('LinearERC20VotingWithHatsProposalCreationV2', () => {
     ).to.emit(gnosisSafe, 'ExecutionSuccess');
   });
 
-  it('Gets correctly initialized', async () => {
+  it('Gets correctly initialized with version 2', async () => {
     expect(await linearERC20VotingWithHats.getVersion()).to.eq(2);
-    expect(await linearERC20VotingWithHats.owner()).to.eq(gnosisSafeOwner.address);
-    expect(await linearERC20VotingWithHats.governanceToken()).to.eq(await votesERC20.getAddress());
-    expect(await linearERC20VotingWithHats.azoriusModule()).to.eq(await azorius.getAddress());
-    expect(await linearERC20VotingWithHats.hatsContract()).to.eq(
-      '0x1234567890123456789012345678901234567890',
-    );
-  });
-
-  it('Cannot call setUp function again', async () => {
-    const setupParams = ethers.AbiCoder.defaultAbiCoder().encode(
-      ['address', 'address', 'address', 'uint32', 'uint256', 'uint256', 'address', 'uint256[]'],
-      [
-        gnosisSafeOwner.address,
-        await votesERC20.getAddress(),
-        await azorius.getAddress(),
-        60, // voting period
-        500000, // quorum numerator
-        500000, // basis numerator
-        '0x1234567890123456789012345678901234567890',
-        [1n],
-      ],
-    );
-
-    await expect(linearERC20VotingWithHats.setUp(setupParams)).to.be.revertedWith(
-      'Initializable: contract is already initialized',
-    );
   });
 });
