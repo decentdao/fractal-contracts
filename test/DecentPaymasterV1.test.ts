@@ -2,11 +2,13 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import {
-  DecentPaymaster,
+  DecentPaymasterV1,
   MockEntryPoint,
   ModuleProxyFactory,
+  MockEntryPoint__factory,
   IPaymaster__factory,
-  IDecentPaymaster__factory,
+  IDecentPaymasterV1__factory,
+  DecentPaymasterV1__factory,
 } from '../typechain-types';
 import { getModuleProxyFactory } from './GlobalSafeDeployments.test';
 import { calculateProxyAddress } from './helpers';
@@ -23,9 +25,9 @@ interface PackedUserOperation {
   signature: string;
 }
 
-describe('DecentPaymaster', function () {
-  let decentPaymaster: DecentPaymaster;
-  let decentPaymasterMastercopy: DecentPaymaster;
+describe('DecentPaymasterV1', function () {
+  let decentPaymaster: DecentPaymasterV1;
+  let decentPaymasterMastercopy: DecentPaymasterV1;
   let entryPoint: MockEntryPoint;
   let moduleProxyFactory: ModuleProxyFactory;
   let owner: SignerWithAddress;
@@ -43,11 +45,11 @@ describe('DecentPaymaster', function () {
     moduleProxyFactory = getModuleProxyFactory();
 
     // Deploy mock EntryPoint
-    const EntryPointFactory = await ethers.getContractFactory('MockEntryPoint');
+    const EntryPointFactory = new MockEntryPoint__factory(owner);
     entryPoint = await EntryPointFactory.deploy();
 
     // Deploy DecentPaymaster mastercopy
-    const DecentPaymasterFactory = await ethers.getContractFactory('DecentPaymaster');
+    const DecentPaymasterFactory = new DecentPaymasterV1__factory(owner);
     decentPaymasterMastercopy = await DecentPaymasterFactory.deploy();
 
     // Encode initialization parameters
@@ -78,7 +80,7 @@ describe('DecentPaymaster', function () {
     );
 
     decentPaymaster = await hre.ethers.getContractAt(
-      'DecentPaymaster',
+      'DecentPaymasterV1',
       predictedDecentPaymasterAddress,
     );
 
@@ -119,6 +121,11 @@ describe('DecentPaymaster', function () {
       await expect(decentPaymaster.setUp(initializeParams)).to.be.revertedWith(
         'Initializable: contract is already initialized',
       );
+    });
+
+    it('Should have a version', async function () {
+      const version = await decentPaymaster.getVersion();
+      void expect(version).to.equal(1);
     });
   });
 
@@ -400,7 +407,7 @@ describe('DecentPaymaster', function () {
       );
 
       // Calculate IDecentPaymaster interface ID
-      const IDecentPaymasterInterface = IDecentPaymaster__factory.createInterface();
+      const IDecentPaymasterInterface = IDecentPaymasterV1__factory.createInterface();
       const setStrategyFunctionApprovalSelector = IDecentPaymasterInterface.getFunction(
         'setStrategyFunctionApproval',
       ).selector;

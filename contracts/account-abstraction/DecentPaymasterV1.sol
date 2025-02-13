@@ -2,11 +2,17 @@
 pragma solidity 0.8.28;
 
 import {BasePaymaster, IEntryPoint} from "./BasePaymaster.sol";
-import {IDecentPaymaster} from "./interfaces/IDecentPaymaster.sol";
+import {IDecentPaymasterV1} from "./interfaces/IDecentPaymasterV1.sol";
+import {IVersion} from "../interfaces/IVersion.sol";
 import {PackedUserOperation, IPaymaster} from "@account-abstraction/contracts/interfaces/IPaymaster.sol";
 import {ERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
-contract DecentPaymaster is IDecentPaymaster, BasePaymaster, ERC165 {
+contract DecentPaymasterV1 is
+    IDecentPaymasterV1,
+    IVersion,
+    BasePaymaster,
+    ERC165
+{
     // Mapping: strategy address => function selector => is approved
     mapping(address => mapping(bytes4 => bool)) public approvedFunctions;
 
@@ -106,7 +112,12 @@ contract DecentPaymaster is IDecentPaymaster, BasePaymaster, ERC165 {
     ) public view virtual override(ERC165) returns (bool) {
         return
             interfaceId == type(IPaymaster).interfaceId ||
-            interfaceId == type(IDecentPaymaster).interfaceId ||
+            interfaceId == type(IDecentPaymasterV1).interfaceId ||
             super.supportsInterface(interfaceId);
+    }
+
+    /// @inheritdoc IVersion
+    function getVersion() public pure override returns (uint16) {
+        return 1;
     }
 }
