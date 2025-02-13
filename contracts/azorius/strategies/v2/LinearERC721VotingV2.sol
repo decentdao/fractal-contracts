@@ -2,7 +2,7 @@
 pragma solidity =0.8.19;
 
 import {LinearERC721VotingExtensible} from "../LinearERC721VotingExtensible.sol";
-import {IVersion} from "../../interfaces/IVersion.sol";
+import {IVersion} from "../../../interfaces/IVersion.sol";
 
 /**
  * An Azorius strategy that allows multiple ERC721 tokens to be registered as governance tokens,

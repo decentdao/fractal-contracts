@@ -2,7 +2,7 @@
 pragma solidity =0.8.19;
 
 import {LinearERC721VotingWithHatsProposalCreation} from "../LinearERC721VotingWithHatsProposalCreation.sol";
-import {IVersion} from "../../interfaces/IVersion.sol";
+import {IVersion} from "../../../interfaces/IVersion.sol";
 
 /**
  * An [Azorius](./Azorius.md) [BaseStrategy](./BaseStrategy.md) implementation that
