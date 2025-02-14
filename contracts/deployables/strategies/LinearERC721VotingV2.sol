@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity =0.8.19;
 
-import {LinearERC721VotingExtensible} from "./LinearERC721VotingExtensible.sol";
+import {LinearERC721Voting} from "./LinearERC721Voting.sol";
 import {IVersion} from "../../interfaces/decent/IVersion.sol";
 
 /**
@@ -15,7 +15,7 @@ import {IVersion} from "../../interfaces/decent/IVersion.sol";
  * total supply of NFTs is not knowable within the IERC721 interface.  This is similar to a multisig
  * "total signers" required, rather than a percentage of the tokens.
  */
-contract LinearERC721VotingV2 is LinearERC721VotingExtensible, IVersion {
+contract LinearERC721VotingV2 is LinearERC721Voting, IVersion {
     /** @inheritdoc IVersion*/
     function getVersion() external pure virtual returns (uint16) {
         // This should be incremented whenever the contract is modified

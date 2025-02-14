@@ -68,10 +68,13 @@ contract LinearERC20Voting is
      * Sets up the contract with its initial parameters.
      *
      * @param initializeParams encoded initialization parameters: `address _owner`,
-     * `ERC20Votes _governanceToken`, `address _azoriusModule`, `uint32 _votingPeriod`,
-     * `uint256 _quorumNumerator`, `uint256 _basisNumerator`
+     * `IVotes _governanceToken`, `address _azoriusModule`, `uint32 _votingPeriod`,
+     * `uint256 _requiredProposerWeight`, `uint256 _quorumNumerator`,
+     * `uint256 _basisNumerator`
      */
-    function setUp(bytes memory initializeParams) public override initializer {
+    function setUp(
+        bytes memory initializeParams
+    ) public virtual override initializer {
         (
             address _owner,
             IVotes _governanceToken,
@@ -104,7 +107,9 @@ contract LinearERC20Voting is
      *
      * @param _votingPeriod voting time period (in blocks)
      */
-    function updateVotingPeriod(uint32 _votingPeriod) external onlyOwner {
+    function updateVotingPeriod(
+        uint32 _votingPeriod
+    ) external virtual onlyOwner {
         _updateVotingPeriod(_votingPeriod);
     }
 
@@ -115,7 +120,7 @@ contract LinearERC20Voting is
      */
     function updateRequiredProposerWeight(
         uint256 _requiredProposerWeight
-    ) external onlyOwner {
+    ) external virtual onlyOwner {
         _updateRequiredProposerWeight(_requiredProposerWeight);
     }
 
@@ -125,7 +130,7 @@ contract LinearERC20Voting is
      * @param _proposalId id of the Proposal to vote on
      * @param _voteType Proposal support as defined in VoteType (NO, YES, ABSTAIN)
      */
-    function vote(uint32 _proposalId, uint8 _voteType) external {
+    function vote(uint32 _proposalId, uint8 _voteType) external virtual {
         _vote(
             _proposalId,
             msg.sender,
@@ -149,6 +154,7 @@ contract LinearERC20Voting is
     )
         external
         view
+        virtual
         returns (
             uint256 noVotes,
             uint256 yesVotes,
@@ -189,12 +195,14 @@ contract LinearERC20Voting is
     function hasVoted(
         uint32 _proposalId,
         address _address
-    ) public view returns (bool) {
+    ) public view virtual returns (bool) {
         return proposalVotes[_proposalId].hasVoted[_address];
     }
 
     /** @inheritdoc BaseStrategy*/
-    function isPassed(uint32 _proposalId) public view override returns (bool) {
+    function isPassed(
+        uint32 _proposalId
+    ) public view virtual override returns (bool) {
         return (block.number > proposalVotes[_proposalId].votingEndBlock && // voting period has ended
             meetsQuorum(
                 getProposalVotingSupply(_proposalId),
@@ -234,7 +242,7 @@ contract LinearERC20Voting is
     function getVotingWeight(
         address _voter,
         uint32 _proposalId
-    ) public view returns (uint256) {
+    ) public view virtual returns (uint256) {
         return
             governanceToken.getPastVotes(
                 _voter,
@@ -243,7 +251,9 @@ contract LinearERC20Voting is
     }
 
     /** @inheritdoc BaseStrategy*/
-    function isProposer(address _address) public view override returns (bool) {
+    function isProposer(
+        address _address
+    ) public view virtual override returns (bool) {
         return
             governanceToken.getPastVotes(_address, block.number - 1) >=
             requiredProposerWeight;
@@ -252,12 +262,12 @@ contract LinearERC20Voting is
     /** @inheritdoc BaseStrategy*/
     function votingEndBlock(
         uint32 _proposalId
-    ) public view override returns (uint32) {
+    ) public view virtual override returns (uint32) {
         return proposalVotes[_proposalId].votingEndBlock;
     }
 
     /** Internal implementation of `updateVotingPeriod`. */
-    function _updateVotingPeriod(uint32 _votingPeriod) internal {
+    function _updateVotingPeriod(uint32 _votingPeriod) internal virtual {
         votingPeriod = _votingPeriod;
         emit VotingPeriodUpdated(_votingPeriod);
     }
@@ -265,7 +275,7 @@ contract LinearERC20Voting is
     /** Internal implementation of `updateRequiredProposerWeight`. */
     function _updateRequiredProposerWeight(
         uint256 _requiredProposerWeight
-    ) internal {
+    ) internal virtual {
         requiredProposerWeight = _requiredProposerWeight;
         emit RequiredProposerWeightUpdated(_requiredProposerWeight);
     }
@@ -284,7 +294,7 @@ contract LinearERC20Voting is
         address _voter,
         uint8 _voteType,
         uint256 _weight
-    ) internal {
+    ) internal virtual {
         if (proposalVotes[_proposalId].votingEndBlock == 0)
             revert InvalidProposal();
         if (block.number > proposalVotes[_proposalId].votingEndBlock)
@@ -309,7 +319,7 @@ contract LinearERC20Voting is
     /** @inheritdoc BaseQuorumPercent*/
     function quorumVotes(
         uint32 _proposalId
-    ) public view override returns (uint256) {
+    ) public view virtual override returns (uint256) {
         return
             (quorumNumerator * getProposalVotingSupply(_proposalId)) /
             QUORUM_DENOMINATOR;

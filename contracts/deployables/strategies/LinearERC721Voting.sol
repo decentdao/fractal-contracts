@@ -2,8 +2,8 @@
 pragma solidity =0.8.19;
 
 import {IERC721VotingStrategy} from "../../interfaces/decent/IERC721VotingStrategy.sol";
-import {IAzorius} from "../../interfaces/decent/IAzorius.sol";
 import {BaseVotingBasisPercent} from "./BaseVotingBasisPercent.sol";
+import {IAzorius} from "../../interfaces/decent/IAzorius.sol";
 import {BaseStrategy} from "./BaseStrategy.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
@@ -105,7 +105,9 @@ contract LinearERC721Voting is
      * `uint32 _votingPeriod`, `uint256 _quorumThreshold`, `uint256 _proposerThreshold`,
      * `uint256 _basisNumerator`
      */
-    function setUp(bytes memory initializeParams) public override initializer {
+    function setUp(
+        bytes memory initializeParams
+    ) public virtual override initializer {
         (
             address _owner,
             address[] memory _tokens,
@@ -160,7 +162,7 @@ contract LinearERC721Voting is
     function addGovernanceToken(
         address _tokenAddress,
         uint256 _weight
-    ) external onlyOwner {
+    ) external virtual onlyOwner {
         _addGovernanceToken(_tokenAddress, _weight);
     }
 
@@ -169,7 +171,9 @@ contract LinearERC721Voting is
      *
      * @param _votingPeriod voting time period (in blocks)
      */
-    function updateVotingPeriod(uint32 _votingPeriod) external onlyOwner {
+    function updateVotingPeriod(
+        uint32 _votingPeriod
+    ) external virtual onlyOwner {
         _updateVotingPeriod(_votingPeriod);
     }
 
@@ -180,7 +184,7 @@ contract LinearERC721Voting is
      */
     function updateQuorumThreshold(
         uint256 _quorumThreshold
-    ) external onlyOwner {
+    ) external virtual onlyOwner {
         _updateQuorumThreshold(_quorumThreshold);
     }
 
@@ -191,14 +195,19 @@ contract LinearERC721Voting is
      */
     function updateProposerThreshold(
         uint256 _proposerThreshold
-    ) external onlyOwner {
+    ) external virtual onlyOwner {
         _updateProposerThreshold(_proposerThreshold);
     }
 
     /**
      * Returns whole list of governance tokens addresses
      */
-    function getAllTokenAddresses() external view returns (address[] memory) {
+    function getAllTokenAddresses()
+        external
+        view
+        virtual
+        returns (address[] memory)
+    {
         return tokenAddresses;
     }
 
@@ -217,6 +226,7 @@ contract LinearERC721Voting is
     )
         external
         view
+        virtual
         returns (
             uint256 noVotes,
             uint256 yesVotes,
@@ -245,7 +255,7 @@ contract LinearERC721Voting is
         uint8 _voteType,
         address[] memory _tokenAddresses,
         uint256[] memory _tokenIds
-    ) external {
+    ) external virtual {
         if (_tokenAddresses.length != _tokenIds.length) revert InvalidParams();
         _vote(_proposalId, msg.sender, _voteType, _tokenAddresses, _tokenIds);
     }
@@ -253,7 +263,7 @@ contract LinearERC721Voting is
     /** @inheritdoc IERC721VotingStrategy*/
     function getTokenWeight(
         address _tokenAddress
-    ) external view override returns (uint256) {
+    ) external view virtual override returns (uint256) {
         return tokenWeights[_tokenAddress];
     }
 
@@ -268,7 +278,7 @@ contract LinearERC721Voting is
         uint32 _proposalId,
         address _tokenAddress,
         uint256 _tokenId
-    ) external view returns (bool) {
+    ) external view virtual returns (bool) {
         return proposalVotes[_proposalId].hasVoted[_tokenAddress][_tokenId];
     }
 
@@ -277,7 +287,9 @@ contract LinearERC721Voting is
      *
      * @param _tokenAddress the ERC-721 token to remove
      */
-    function removeGovernanceToken(address _tokenAddress) external onlyOwner {
+    function removeGovernanceToken(
+        address _tokenAddress
+    ) external virtual onlyOwner {
         if (tokenWeights[_tokenAddress] == 0) revert TokenNotSet();
 
         tokenWeights[_tokenAddress] = 0;
@@ -312,7 +324,9 @@ contract LinearERC721Voting is
     }
 
     /** @inheritdoc BaseStrategy*/
-    function isPassed(uint32 _proposalId) public view override returns (bool) {
+    function isPassed(
+        uint32 _proposalId
+    ) public view virtual override returns (bool) {
         return (block.number > proposalVotes[_proposalId].votingEndBlock && // voting period has ended
             quorumThreshold <=
             proposalVotes[_proposalId].yesVotes +
@@ -324,7 +338,9 @@ contract LinearERC721Voting is
     }
 
     /** @inheritdoc BaseStrategy*/
-    function isProposer(address _address) public view override returns (bool) {
+    function isProposer(
+        address _address
+    ) public view virtual override returns (bool) {
         uint256 totalWeight = 0;
         for (uint i = 0; i < tokenAddresses.length; ) {
             address tokenAddress = tokenAddresses[i];
@@ -341,7 +357,7 @@ contract LinearERC721Voting is
     /** @inheritdoc BaseStrategy*/
     function votingEndBlock(
         uint32 _proposalId
-    ) public view override returns (uint32) {
+    ) public view virtual override returns (uint32) {
         return proposalVotes[_proposalId].votingEndBlock;
     }
 
@@ -349,7 +365,7 @@ contract LinearERC721Voting is
     function _addGovernanceToken(
         address _tokenAddress,
         uint256 _weight
-    ) internal {
+    ) internal virtual {
         if (!IERC721(_tokenAddress).supportsInterface(0x80ac58cd))
             revert InvalidTokenAddress();
 
@@ -364,19 +380,21 @@ contract LinearERC721Voting is
     }
 
     /** Internal implementation of `updateVotingPeriod`. */
-    function _updateVotingPeriod(uint32 _votingPeriod) internal {
+    function _updateVotingPeriod(uint32 _votingPeriod) internal virtual {
         votingPeriod = _votingPeriod;
         emit VotingPeriodUpdated(_votingPeriod);
     }
 
     /** Internal implementation of `updateQuorumThreshold`. */
-    function _updateQuorumThreshold(uint256 _quorumThreshold) internal {
+    function _updateQuorumThreshold(uint256 _quorumThreshold) internal virtual {
         quorumThreshold = _quorumThreshold;
         emit QuorumThresholdUpdated(quorumThreshold);
     }
 
     /** Internal implementation of `updateProposerThreshold`. */
-    function _updateProposerThreshold(uint256 _proposerThreshold) internal {
+    function _updateProposerThreshold(
+        uint256 _proposerThreshold
+    ) internal virtual {
         proposerThreshold = _proposerThreshold;
         emit ProposerThresholdUpdated(_proposerThreshold);
     }
@@ -396,7 +414,7 @@ contract LinearERC721Voting is
         uint8 _voteType,
         address[] memory _tokenAddresses,
         uint256[] memory _tokenIds
-    ) internal {
+    ) internal virtual {
         uint256 weight;
 
         // verifies the voter holds the NFTs and returns the total weight associated with their tokens

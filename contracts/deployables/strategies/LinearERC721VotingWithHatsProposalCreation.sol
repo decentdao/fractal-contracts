@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.19;
 
-import {LinearERC721VotingExtensible} from "./LinearERC721VotingExtensible.sol";
+import {LinearERC721Voting} from "./LinearERC721Voting.sol";
 import {HatsProposalCreationWhitelist} from "./HatsProposalCreationWhitelist.sol";
 import {IHats} from "../../interfaces/hats/IHats.sol";
 
@@ -12,7 +12,7 @@ import {IHats} from "../../interfaces/hats/IHats.sol";
  */
 contract LinearERC721VotingWithHatsProposalCreation is
     HatsProposalCreationWhitelist,
-    LinearERC721VotingExtensible
+    LinearERC721Voting
 {
     /**
      * Sets up the contract with its initial parameters.
@@ -24,10 +24,7 @@ contract LinearERC721VotingWithHatsProposalCreation is
      */
     function setUp(
         bytes memory initializeParams
-    )
-        public
-        override(HatsProposalCreationWhitelist, LinearERC721VotingExtensible)
-    {
+    ) public override(HatsProposalCreationWhitelist, LinearERC721Voting) {
         (
             address _owner,
             address[] memory _tokens,
@@ -53,7 +50,7 @@ contract LinearERC721VotingWithHatsProposalCreation is
                 )
             );
 
-        LinearERC721VotingExtensible.setUp(
+        LinearERC721Voting.setUp(
             abi.encode(
                 _owner,
                 _tokens,
@@ -77,7 +74,7 @@ contract LinearERC721VotingWithHatsProposalCreation is
     )
         public
         view
-        override(HatsProposalCreationWhitelist, LinearERC721VotingExtensible)
+        override(HatsProposalCreationWhitelist, LinearERC721Voting)
         returns (bool)
     {
         return HatsProposalCreationWhitelist.isProposer(_address);
