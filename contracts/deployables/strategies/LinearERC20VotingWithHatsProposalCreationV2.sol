@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity =0.8.19;
 
-import {LinearERC20VotingExtensible} from "./LinearERC20VotingExtensible.sol";
+import {LinearERC20Voting} from "./LinearERC20Voting.sol";
 import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
 import {LinearERC20VotingWithHatsProposalCreation} from "./LinearERC20VotingWithHatsProposalCreation.sol";
 import {IVersion} from "../../interfaces/decent/IVersion.sol";
@@ -23,7 +23,7 @@ contract LinearERC20VotingWithHatsProposalCreationV2 is
         return 2;
     }
 
-    /** @inheritdoc LinearERC20VotingExtensible*/
+    /** @inheritdoc LinearERC20Voting*/
     function vote(
         uint32 _proposalId,
         uint8 _voteType

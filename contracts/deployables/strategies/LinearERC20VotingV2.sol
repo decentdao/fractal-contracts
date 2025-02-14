@@ -2,7 +2,7 @@
 pragma solidity =0.8.19;
 
 import {IVersion} from "../../interfaces/decent/IVersion.sol";
-import {LinearERC20VotingExtensible} from "./LinearERC20VotingExtensible.sol";
+import {LinearERC20Voting} from "./LinearERC20Voting.sol";
 import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
 
 /**
@@ -12,7 +12,7 @@ import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
  */
 contract LinearERC20VotingV2 is
     IVersion,
-    LinearERC20VotingExtensible,
+    LinearERC20Voting,
     ERC4337VoterSupport
 {
     /** @inheritdoc IVersion*/
@@ -21,7 +21,7 @@ contract LinearERC20VotingV2 is
         return 2;
     }
 
-    /** @inheritdoc LinearERC20VotingExtensible*/
+    /** @inheritdoc LinearERC20Voting*/
     function vote(
         uint32 _proposalId,
         uint8 _voteType
