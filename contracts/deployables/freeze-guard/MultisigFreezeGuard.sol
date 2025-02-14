@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity =0.8.19;
+pragma solidity ^0.8.28;
 
 import {IMultisigFreezeGuard} from "../../interfaces/decent/IMultisigFreezeGuard.sol";
 import {IBaseFreezeVoting} from "../../interfaces/decent/IBaseFreezeVoting.sol";

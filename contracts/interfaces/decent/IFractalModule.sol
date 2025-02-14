@@ -1,8 +1,8 @@
 //SPDX-License-Identifier: MIT
-pragma solidity =0.8.19;
+pragma solidity ^0.8.28;
 
-import { Enum } from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
-import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
  * A specification for a Safe module contract that allows for a "parent-child"
@@ -13,7 +13,6 @@ import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol
  * DAOs.
  */
 interface IFractalModule {
-
     /**
      * Allows an authorized address to execute arbitrary transactions on the Safe.
      *

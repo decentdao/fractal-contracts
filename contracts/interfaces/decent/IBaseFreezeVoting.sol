@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
-pragma solidity =0.8.19;
+pragma solidity ^0.8.28;
 
-import { Enum } from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 
 /**
  * A specification for a contract which manages the ability to call for and cast a vote
@@ -13,7 +13,6 @@ import { Enum } from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
  * module (see [MultisigFreezeGuard](../MultisigFreezeGuard.md) / [AzoriusFreezeGuard](../AzoriusFreezeGuard.md)).
  */
 interface IBaseFreezeVoting {
-
     /**
      * Allows an address to cast a "freeze vote", which is a vote to freeze the DAO
      * from executing transactions, even if they've already passed via a Proposal.

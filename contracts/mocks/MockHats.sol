@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.19;
+pragma solidity ^0.8.28;
 
 import {IHats} from "../interfaces/hats/IHats.sol";
 import {IHatsIdUtilities} from "../interfaces/hats/IHatsIdUtilities.sol";

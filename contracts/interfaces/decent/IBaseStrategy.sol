@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity =0.8.19;
+pragma solidity ^0.8.28;
 
 /**
  * The specification for a voting strategy in Azorius.
@@ -12,9 +12,8 @@ pragma solidity =0.8.19;
  * a requirement for the Azorius protocol.
  */
 interface IBaseStrategy {
-
     /**
-     * Sets the address of the [Azorius](../Azorius.md) contract this 
+     * Sets the address of the [Azorius](../Azorius.md) contract this
      * [BaseStrategy](../BaseStrategy.md) is being used on.
      *
      * @param _azoriusModule address of the Azorius Safe module
@@ -22,7 +21,7 @@ interface IBaseStrategy {
     function setAzorius(address _azoriusModule) external;
 
     /**
-     * Called by the [Azorius](../Azorius.md) module. This notifies this 
+     * Called by the [Azorius](../Azorius.md) module. This notifies this
      * [BaseStrategy](../BaseStrategy.md) that a new Proposal has been created.
      *
      * @param _data arbitrary data to pass to this BaseStrategy

@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
-pragma solidity =0.8.19;
+pragma solidity ^0.8.28;
 
-import { Enum } from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 
 /**
  * The base interface for the Azorius governance Safe module.
@@ -34,12 +34,11 @@ import { Enum } from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
  * `EXPIRED` - a passed proposal which is not executed before its `executionPeriod` has
  *          elapsed will be `EXPIRED`, and can no longer be executed.
  *
- * `FAILED` - a failed proposal (as defined by its [BaseStrategy](../BaseStrategy.md) 
- *          `isPassed` function). For a basic strategy, this would mean it received more 
- *          NO votes than YES or did not achieve quorum. 
+ * `FAILED` - a failed proposal (as defined by its [BaseStrategy](../BaseStrategy.md)
+ *          `isPassed` function). For a basic strategy, this would mean it received more
+ *          NO votes than YES or did not achieve quorum.
  */
 interface IAzorius {
-
     /** Represents a transaction to perform on the blockchain. */
     struct Transaction {
         address to; // destination address of the transaction
@@ -106,7 +105,7 @@ interface IAzorius {
      * New Proposals begin immediately in the `ACTIVE` state.
      *
      * @param _strategy address of the BaseStrategy implementation which the Proposal will use
-     * @param _data arbitrary data passed to the BaseStrategy implementation. This may not be used by all strategies, 
+     * @param _data arbitrary data passed to the BaseStrategy implementation. This may not be used by all strategies,
      * but is included in case future strategy contracts have a need for it
      * @param _transactions array of transactions to propose
      * @param _metadata additional data such as a title/description to submit with the proposal
@@ -168,7 +167,9 @@ interface IAzorius {
      * @return ProposalState uint256 ProposalState enum value representing the
      *         current state of the proposal
      */
-    function proposalState(uint32 _proposalId) external view returns (ProposalState);
+    function proposalState(
+        uint32 _proposalId
+    ) external view returns (ProposalState);
 
     /**
      * Generates the data for the module transaction hash (required for signing).
@@ -211,7 +212,10 @@ interface IAzorius {
      * @param _txIndex index of the transaction within the Proposal
      * @return bytes32 hash of the specified transaction
      */
-    function getProposalTxHash(uint32 _proposalId, uint32 _txIndex) external view returns (bytes32);
+    function getProposalTxHash(
+        uint32 _proposalId,
+        uint32 _txIndex
+    ) external view returns (bytes32);
 
     /**
      * Returns the transaction hashes associated with a given `proposalId`.
@@ -219,7 +223,9 @@ interface IAzorius {
      * @param _proposalId identifier of the Proposal to get transaction hashes for
      * @return bytes32[] array of transaction hashes
      */
-    function getProposalTxHashes(uint32 _proposalId) external view returns (bytes32[] memory);
+    function getProposalTxHashes(
+        uint32 _proposalId
+    ) external view returns (bytes32[] memory);
 
     /**
      * Returns details about the specified Proposal.
@@ -231,7 +237,11 @@ interface IAzorius {
      * @return _executionPeriod time (in blocks) the Proposal must be executed within, after timelock ends
      * @return _executionCounter counter of how many of the Proposals transactions have been executed
      */
-    function getProposal(uint32 _proposalId) external view
+    function getProposal(
+        uint32 _proposalId
+    )
+        external
+        view
         returns (
             address _strategy,
             bytes32[] memory _txHashes,

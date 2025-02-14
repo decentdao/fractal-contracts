@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
-pragma solidity =0.8.19;
+pragma solidity ^0.8.28;
 
-import { Enum } from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 
 /**
  * A specification for a Safe Guard contract which allows for multi-sig DAOs (Safes)
@@ -22,7 +22,6 @@ import { Enum } from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
  * See https://docs.safe.global/learn/safe-core/safe-core-protocol/guards.
  */
 interface IMultisigFreezeGuard {
-
     /**
      * Allows the caller to begin the `timelock` of a transaction.
      *
@@ -83,5 +82,7 @@ interface IMultisigFreezeGuard {
      * @param _signaturesHash hash of the transaction signatures
      * @return uint32 block number in which the transaction began its timelock period
      */
-    function getTransactionTimelockedBlock(bytes32 _signaturesHash) external view returns (uint32);
+    function getTransactionTimelockedBlock(
+        bytes32 _signaturesHash
+    ) external view returns (uint32);
 }

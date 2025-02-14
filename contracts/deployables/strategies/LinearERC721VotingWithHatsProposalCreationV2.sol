@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.19;
+pragma solidity ^0.8.28;
 
 import {LinearERC721VotingWithHatsProposalCreation} from "./LinearERC721VotingWithHatsProposalCreation.sol";
 import {IVersion} from "../../interfaces/decent/IVersion.sol";
