@@ -2,7 +2,8 @@
 pragma solidity =0.8.19;
 
 import {IERC20Claim} from "../../interfaces/erc20/IERC20Claim.sol";
-import {VotesERC20, FactoryFriendly} from "./VotesERC20.sol";
+import {VotesERC20} from "./VotesERC20.sol";
+import {FactoryFriendly} from "@gnosis.pm/zodiac/contracts/factory/FactoryFriendly.sol";
 import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
