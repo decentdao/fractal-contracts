@@ -3,6 +3,7 @@ pragma solidity =0.8.19;
 
 import {LinearERC721VotingExtensible} from "../LinearERC721VotingExtensible.sol";
 import {IVersion} from "../../../interfaces/IVersion.sol";
+import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
 
 /**
  * An Azorius strategy that allows multiple ERC721 tokens to be registered as governance tokens,
@@ -15,10 +16,22 @@ import {IVersion} from "../../../interfaces/IVersion.sol";
  * total supply of NFTs is not knowable within the IERC721 interface.  This is similar to a multisig
  * "total signers" required, rather than a percentage of the tokens.
  */
-contract LinearERC721VotingV2 is LinearERC721VotingExtensible, IVersion {
+contract LinearERC721VotingV2 is LinearERC721VotingExtensible, IVersion, ERC4337VoterSupport {
     /** @inheritdoc IVersion*/
     function getVersion() external pure virtual returns (uint16) {
         // This should be incremented whenever the contract is modified
         return 2;
+    }
+
+    /** @inheritdoc LinearERC721VotingExtensible*/
+    function vote(
+        uint32 _proposalId,
+        uint8 _voteType,
+        address[] memory _tokenAddresses,
+        uint256[] memory _tokenIds
+    ) external virtual override {
+        if (_tokenAddresses.length != _tokenIds.length) revert InvalidParams();
+        address voter = _voter(msg.sender);
+        _vote(_proposalId, voter, _voteType, _tokenAddresses, _tokenIds);
     }
 }
