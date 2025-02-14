@@ -49,11 +49,6 @@ library UserOperationLib {
         }
     }
 
-    bytes32 internal constant PACKED_USEROP_TYPEHASH =
-        keccak256(
-            "PackedUserOperation(address sender,uint256 nonce,bytes initCode,bytes callData,bytes32 accountGasLimits,uint256 preVerificationGas,bytes32 gasFees,bytes paymasterAndData)"
-        );
-
     /**
      * Pack the user operation data into bytes for hashing.
      * @param userOp - The user operation data.
@@ -72,7 +67,6 @@ library UserOperationLib {
 
         return
             abi.encode(
-                UserOperationLib.PACKED_USEROP_TYPEHASH,
                 sender,
                 nonce,
                 hashInitCode,

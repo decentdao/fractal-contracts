@@ -13,7 +13,6 @@ import "./PackedUserOperation.sol";
 import "./IStakeManager.sol";
 import "./IAggregator.sol";
 import "./INonceManager.sol";
-import "./ISenderCreator.sol";
 
 interface IEntryPoint is IStakeManager, INonceManager {
     /***
@@ -56,7 +55,7 @@ interface IEntryPoint is IStakeManager, INonceManager {
      * @param userOpHash   - The request unique identifier.
      * @param sender       - The sender of this request.
      * @param nonce        - The nonce used in the request.
-     * @param revertReason - The return bytes from the reverted "callData" call.
+     * @param revertReason - The return bytes from the (reverted) call to "callData".
      */
     event UserOperationRevertReason(
         bytes32 indexed userOpHash,
@@ -70,7 +69,7 @@ interface IEntryPoint is IStakeManager, INonceManager {
      * @param userOpHash   - The request unique identifier.
      * @param sender       - The sender of this request.
      * @param nonce        - The nonce used in the request.
-     * @param revertReason - The return bytes from the reverted call to "postOp".
+     * @param revertReason - The return bytes from the (reverted) call to "callData".
      */
     event PostOpRevertReason(
         bytes32 indexed userOpHash,
@@ -221,9 +220,4 @@ interface IEntryPoint is IStakeManager, INonceManager {
      * @param data data to pass to target in a delegatecall
      */
     function delegateAndRevert(address target, bytes calldata data) external;
-
-    /**
-     * @notice Retrieves the immutable SenderCreator contract which is responsible for deployment of sender contracts.
-     */
-    function senderCreator() external view returns (ISenderCreator);
 }

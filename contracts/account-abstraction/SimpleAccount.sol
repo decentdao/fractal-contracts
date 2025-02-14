@@ -9,19 +9,8 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "./BaseAccount.sol";
+import "./Helpers.sol";
 import "./TokenCallbackHandler.sol";
-
-/*
- * For simulation purposes, validateUserOp (and validatePaymasterUserOp)
- * must return this value in case of signature failure, instead of revert.
- */
-uint256 constant SIG_VALIDATION_FAILED = 1;
-
-/*
- * For simulation purposes, validateUserOp (and validatePaymasterUserOp)
- * return this value on success.
- */
-uint256 constant SIG_VALIDATION_SUCCESS = 0;
 
 /**
  * minimal account.
@@ -142,8 +131,10 @@ contract SimpleAccount is
         PackedUserOperation calldata userOp,
         bytes32 userOpHash
     ) internal virtual override returns (uint256 validationData) {
-        //userOpHash can be generated using eth_signTypedData_v4
-        if (owner != ECDSA.recover(userOpHash, userOp.signature))
+        // MessageHashUtils.toEthSignedMessageHash(userOpHash) replaced with ECDSA.toEthSignedMessageHash(userOpHash)
+        // (split from ECDSA in OZv5)
+        bytes32 hash = ECDSA.toEthSignedMessageHash(userOpHash);
+        if (owner != ECDSA.recover(hash, userOp.signature))
             return SIG_VALIDATION_FAILED;
         return SIG_VALIDATION_SUCCESS;
     }

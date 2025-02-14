@@ -4,8 +4,6 @@ pragma solidity ^0.8.23;
 import "@openzeppelin/contracts/utils/Create2.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
-import "../interfaces/account-abstraction/IEntryPoint.sol";
-import "../interfaces/account-abstraction/ISenderCreator.sol";
 import "./SimpleAccount.sol";
 
 /**
@@ -16,11 +14,9 @@ import "./SimpleAccount.sol";
  */
 contract SimpleAccountFactory {
     SimpleAccount public immutable accountImplementation;
-    ISenderCreator public immutable senderCreator;
 
     constructor(IEntryPoint _entryPoint) {
         accountImplementation = new SimpleAccount(_entryPoint);
-        senderCreator = _entryPoint.senderCreator();
     }
 
     /**
@@ -33,10 +29,6 @@ contract SimpleAccountFactory {
         address owner,
         uint256 salt
     ) public returns (SimpleAccount ret) {
-        require(
-            msg.sender == address(senderCreator),
-            "only callable from SenderCreator"
-        );
         address addr = getAddress(owner, salt);
         uint256 codeSize = addr.code.length;
         if (codeSize > 0) {
