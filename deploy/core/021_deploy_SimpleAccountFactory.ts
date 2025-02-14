@@ -1,19 +1,19 @@
+import { getNamedAccounts } from 'hardhat';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
 
-const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const { deployments, getNamedAccounts } = hre;
-  const { deploy } = deployments;
+const deploySimpleAccountFactory: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts();
 
-  await deploy('SimpleAccountFactory', {
+  const entrypointAddress = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789';
+
+  await hre.deployments.deploy('SimpleAccountFactory', {
     from: deployer,
-    args: ['0x0000000071727de22e5e9d8baf0edac6f37da032'],
+    args: [entrypointAddress],
     log: true,
     gasLimit: 6e6,
     deterministicDeployment: true,
   });
 };
 
-export default func;
-func.tags = ['SimpleAccountFactory'];
+export default deploySimpleAccountFactory;
