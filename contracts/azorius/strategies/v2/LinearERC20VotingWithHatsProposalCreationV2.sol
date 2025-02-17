@@ -24,7 +24,10 @@ contract LinearERC20VotingWithHatsProposalCreationV2 is
     }
 
     /** @inheritdoc LinearERC20VotingExtensible*/
-    function vote(uint32 _proposalId, uint8 _voteType) external virtual override {
+    function vote(
+        uint32 _proposalId,
+        uint8 _voteType
+    ) external virtual override {
         address voter = _voter(msg.sender);
         _vote(
             _proposalId,

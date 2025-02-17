@@ -16,7 +16,11 @@ import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
  * total supply of NFTs is not knowable within the IERC721 interface.  This is similar to a multisig
  * "total signers" required, rather than a percentage of the tokens.
  */
-contract LinearERC721VotingV2 is LinearERC721VotingExtensible, IVersion, ERC4337VoterSupport {
+contract LinearERC721VotingV2 is
+    LinearERC721VotingExtensible,
+    IVersion,
+    ERC4337VoterSupport
+{
     /** @inheritdoc IVersion*/
     function getVersion() external pure virtual returns (uint16) {
         // This should be incremented whenever the contract is modified
@@ -31,6 +35,12 @@ contract LinearERC721VotingV2 is LinearERC721VotingExtensible, IVersion, ERC4337
         uint256[] memory _tokenIds
     ) external virtual override {
         if (_tokenAddresses.length != _tokenIds.length) revert InvalidParams();
-        _vote(_proposalId, _voter(msg.sender), _voteType, _tokenAddresses, _tokenIds);
+        _vote(
+            _proposalId,
+            _voter(msg.sender),
+            _voteType,
+            _tokenAddresses,
+            _tokenIds
+        );
     }
 }

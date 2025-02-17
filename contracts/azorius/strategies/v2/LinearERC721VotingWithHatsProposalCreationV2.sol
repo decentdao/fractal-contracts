@@ -31,6 +31,12 @@ contract LinearERC721VotingWithHatsProposalCreationV2 is
         uint256[] memory _tokenIds
     ) external virtual override {
         if (_tokenAddresses.length != _tokenIds.length) revert InvalidParams();
-        _vote(_proposalId, _voter(msg.sender), _voteType, _tokenAddresses, _tokenIds);
+        _vote(
+            _proposalId,
+            _voter(msg.sender),
+            _voteType,
+            _tokenAddresses,
+            _tokenIds
+        );
     }
 }
