@@ -5,7 +5,7 @@ import { DeployFunction } from 'hardhat-deploy/types';
 const deploySimpleAccountFactory: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts();
 
-  const entrypointAddress = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789';
+  const entrypointAddress = '0x0000000071727De22E5E9d8BAf0edAc6f37da032';
 
   await hre.deployments.deploy('SimpleAccountFactory', {
     from: deployer,
