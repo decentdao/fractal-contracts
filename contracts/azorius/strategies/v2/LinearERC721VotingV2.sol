@@ -31,7 +31,6 @@ contract LinearERC721VotingV2 is LinearERC721VotingExtensible, IVersion, ERC4337
         uint256[] memory _tokenIds
     ) external virtual override {
         if (_tokenAddresses.length != _tokenIds.length) revert InvalidParams();
-        address voter = _voter(msg.sender);
-        _vote(_proposalId, voter, _voteType, _tokenAddresses, _tokenIds);
+        _vote(_proposalId, _voter(msg.sender), _voteType, _tokenAddresses, _tokenIds);
     }
 }
