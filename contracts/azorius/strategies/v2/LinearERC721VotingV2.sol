@@ -3,7 +3,10 @@ pragma solidity =0.8.19;
 
 import {LinearERC721VotingExtensible} from "../LinearERC721VotingExtensible.sol";
 import {IVersion} from "../../../interfaces/IVersion.sol";
+import {ERC721VotingWeight, IERC721VotingWeight} from "../../../interfaces/IERC721VotingWeight.sol";
 import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
+import {ERC721VotingWeightSupport} from "./ERC721VotingWeightSupport.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /**
  * An Azorius strategy that allows multiple ERC721 tokens to be registered as governance tokens,
@@ -19,7 +22,9 @@ import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
 contract LinearERC721VotingV2 is
     LinearERC721VotingExtensible,
     IVersion,
-    ERC4337VoterSupport
+    IERC721VotingWeight,
+    ERC4337VoterSupport,
+    ERC721VotingWeightSupport
 {
     /** @inheritdoc IVersion*/
     function getVersion() external pure virtual returns (uint16) {
@@ -42,5 +47,33 @@ contract LinearERC721VotingV2 is
             _tokenAddresses,
             _tokenIds
         );
+    }
+
+    /** @inheritdoc IERC721VotingWeight*/
+    function votingWeight(
+        address _address,
+        address[] memory _tokenAddresses,
+        uint256[] memory _tokenIds
+    ) external view override returns (uint256) {
+        return
+            _votingWeight(_address, tokenWeights, _tokenAddresses, _tokenIds);
+    }
+
+    /** @inheritdoc IERC721VotingWeight*/
+    function unusedVotingPower(
+        address _address,
+        uint32 _proposalId,
+        address[] memory _tokenAddresses,
+        uint256[] memory _tokenIds
+    ) external view override returns (ERC721VotingWeight memory) {
+        return
+            _unusedVotingPower(
+                _address,
+                _proposalId,
+                tokenWeights,
+                proposalVotes,
+                _tokenAddresses,
+                _tokenIds
+            );
     }
 }
