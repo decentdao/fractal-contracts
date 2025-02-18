@@ -6,27 +6,25 @@ pragma solidity ^0.8.19;
  * Mock contract for testing
  */
 contract MockContract {
-  event DidSomething(string message);
+    event DidSomething(string message);
 
-  error Reverting();
+    error Reverting();
 
-  function doSomething() public {
-    doSomethingWithParam("doSomething()");
-  }
+    function doSomething() public {
+        doSomethingWithParam("doSomething()");
+    }
 
-  function doSomethingWithParam(string memory _message) public {
-    emit DidSomething(_message);
-  }
+    function doSomethingWithParam(string memory _message) public {
+        emit DidSomething(_message);
+    }
 
-  function returnSomething(string memory _s)
-    external
-    pure
-    returns (string memory)
-  {
-    return _s;
-  }
+    function returnSomething(
+        string memory _s
+    ) external pure returns (string memory) {
+        return _s;
+    }
 
-  function revertSomething() external pure {
-    revert Reverting();
-  }
+    function revertSomething() external pure {
+        revert Reverting();
+    }
 }
