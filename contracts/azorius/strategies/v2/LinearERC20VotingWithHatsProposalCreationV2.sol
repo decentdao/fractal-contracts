@@ -5,6 +5,8 @@ import {LinearERC20VotingWithHatsProposalCreation} from "../LinearERC20VotingWit
 import {LinearERC20VotingExtensible} from "../LinearERC20VotingExtensible.sol";
 import {IVersion} from "../../../interfaces/IVersion.sol";
 import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
+import {IBaseStrategy} from "../../interfaces/IBaseStrategy.sol";
+import {ERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
 /**
  * An [Azorius](./Azorius.md) [BaseStrategy](./BaseStrategy.md) implementation that
@@ -14,7 +16,8 @@ import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
 contract LinearERC20VotingWithHatsProposalCreationV2 is
     LinearERC20VotingWithHatsProposalCreation,
     IVersion,
-    ERC4337VoterSupport
+    ERC4337VoterSupport,
+    ERC165
 {
     /** @inheritdoc IVersion*/
     function getVersion() external pure override returns (uint16) {
@@ -35,5 +38,14 @@ contract LinearERC20VotingWithHatsProposalCreationV2 is
             _voteType,
             getVotingWeight(voter, _proposalId)
         );
+    }
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override returns (bool) {
+        return
+            interfaceId == type(IVersion).interfaceId ||
+            interfaceId == type(IBaseStrategy).interfaceId ||
+            super.supportsInterface(interfaceId);
     }
 }
