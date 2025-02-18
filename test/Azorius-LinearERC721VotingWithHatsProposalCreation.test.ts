@@ -254,8 +254,9 @@ describe('LinearERC721VotingWithHatsProposalCreation', () => {
       ],
     );
 
-    await expect(linearERC721VotingWithHats.setUp(setupParams)).to.be.revertedWith(
-      'Initializable: contract is already initialized',
+    await expect(linearERC721VotingWithHats.setUp(setupParams)).to.be.revertedWithCustomError(
+      linearERC721VotingWithHats,
+      'InvalidInitialization',
     );
   });
 });

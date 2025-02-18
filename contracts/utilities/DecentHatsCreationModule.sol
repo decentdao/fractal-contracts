@@ -6,8 +6,8 @@ import {IERC6551Registry} from "../interfaces/erc6551/IERC6551Registry.sol";
 import {IHats} from "../interfaces/hats/IHats.sol";
 import {IHatsModuleFactory} from "../interfaces/hats/IHatsModuleFactory.sol";
 import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
-import {IAvatar} from "@gnosis.pm/zodiac/contracts/interfaces/IAvatar.sol";
-import {ModuleProxyFactory} from "@gnosis.pm/zodiac/contracts/factory/ModuleProxyFactory.sol";
+import {IAvatar} from "@gnosis-guild/zodiac/contracts/interfaces/IAvatar.sol";
+import {ModuleProxyFactory} from "@gnosis-guild/zodiac/contracts/factory/ModuleProxyFactory.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 contract DecentHatsCreationModule is DecentHatsModuleUtils {

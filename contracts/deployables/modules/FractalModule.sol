@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {IFractalModule} from "../../interfaces/decent/IFractalModule.sol";
-import {Module, Enum} from "@gnosis.pm/zodiac/contracts/core/Module.sol";
+import {GuardableModule, Enum} from "@gnosis-guild/zodiac/contracts/core/GuardableModule.sol";
 
 /**
  * Implementation of [IFractalModule](./interfaces/IFractalModule.md).
@@ -13,7 +13,7 @@ import {Module, Enum} from "@gnosis.pm/zodiac/contracts/core/Module.sol";
  * transactions on the Safe, which in our implementation is the set of parent
  * DAOs.
  */
-contract FractalModule is IFractalModule, Module {
+contract FractalModule is IFractalModule, GuardableModule {
     /** Mapping of whether an address is a controller (typically a parentDAO). */
     mapping(address => bool) public controllers;
 
@@ -41,7 +41,6 @@ contract FractalModule is IFractalModule, Module {
      * `address _avatar`, `address _target`, `address[] memory _controllers`
      */
     function setUp(bytes memory initializeParams) public override initializer {
-        __Ownable_init();
         (
             address _owner, // controlling DAO
             address _avatar,
@@ -52,6 +51,7 @@ contract FractalModule is IFractalModule, Module {
                 (address, address, address, address[])
             );
 
+        __Ownable_init(msg.sender);
         setAvatar(_avatar);
         setTarget(_target);
         addControllers(_controllers);

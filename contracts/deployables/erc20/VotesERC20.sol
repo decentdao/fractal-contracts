@@ -1,13 +1,20 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {FactoryFriendly} from "@gnosis.pm/zodiac/contracts/factory/FactoryFriendly.sol";
+import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
+import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import {NoncesUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/NoncesUpgradeable.sol";
 import {ERC20VotesUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20VotesUpgradeable.sol";
+import {ERC20PermitUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 
 /**
- * An implementation of the Open Zeppelin `IVotes` voting token standard.
+ * An implementation of the OpenZeppelin `IVotes` voting token standard.
  */
-contract VotesERC20 is ERC20VotesUpgradeable, FactoryFriendly {
+contract VotesERC20 is
+    ERC20VotesUpgradeable,
+    ERC20PermitUpgradeable,
+    FactoryFriendly
+{
     constructor() {
         _disableInitializers();
     }
@@ -34,6 +41,7 @@ contract VotesERC20 is ERC20VotesUpgradeable, FactoryFriendly {
 
         __ERC20_init(_name, _symbol);
         __ERC20Permit_init(_name);
+        __ERC20Votes_init();
 
         uint256 holderCount = _allocationAddresses.length;
         for (uint256 i; i < holderCount; ) {
@@ -42,5 +50,25 @@ contract VotesERC20 is ERC20VotesUpgradeable, FactoryFriendly {
                 ++i;
             }
         }
+    }
+
+    function _update(
+        address from,
+        address to,
+        uint256 value
+    ) internal virtual override(ERC20Upgradeable, ERC20VotesUpgradeable) {
+        super._update(from, to, value);
+    }
+
+    function nonces(
+        address owner
+    )
+        public
+        view
+        virtual
+        override(ERC20PermitUpgradeable, NoncesUpgradeable)
+        returns (uint256)
+    {
+        return super.nonces(owner);
     }
 }

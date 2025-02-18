@@ -37,8 +37,7 @@ contract MultisigFreezeVoting is BaseFreezeVoting {
                 (address, uint256, uint32, uint32, address)
             );
 
-        __Ownable_init();
-        _transferOwnership(_owner);
+        __Ownable_init(_owner);
         _updateFreezeVotesThreshold(_freezeVotesThreshold);
         _updateFreezeProposalPeriod(_freezeProposalPeriod);
         _updateFreezePeriod(_freezePeriod);

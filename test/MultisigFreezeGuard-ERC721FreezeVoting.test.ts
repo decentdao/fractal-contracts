@@ -752,18 +752,19 @@ describe('Child Multisig DAO with Azorius Parent', () => {
     });
 
     it('Only owner methods must be called by vetoGuard owner', async () => {
-      await expect(freezeVoting.connect(tokenVetoer1).unfreeze()).to.be.revertedWith(
-        'Ownable: caller is not the owner',
+      await expect(freezeVoting.connect(tokenVetoer1).unfreeze()).to.be.revertedWithCustomError(
+        freezeVoting,
+        'OwnableUnauthorizedAccount',
       );
       await expect(
         freezeVoting.connect(tokenVetoer1).updateFreezeVotesThreshold(0),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(freezeVoting, 'OwnableUnauthorizedAccount');
       await expect(
         freezeVoting.connect(tokenVetoer1).updateFreezeProposalPeriod(0),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
-      await expect(freezeVoting.connect(tokenVetoer1).updateFreezePeriod(0)).to.be.revertedWith(
-        'Ownable: caller is not the owner',
-      );
+      ).to.be.revertedWithCustomError(freezeVoting, 'OwnableUnauthorizedAccount');
+      await expect(
+        freezeVoting.connect(tokenVetoer1).updateFreezePeriod(0),
+      ).to.be.revertedWithCustomError(freezeVoting, 'OwnableUnauthorizedAccount');
     });
 
     it('Only the freeze voting owner can update the freeze votes threshold', async () => {
@@ -775,7 +776,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
 
       await expect(
         freezeVoting.connect(tokenVetoer1).updateFreezeVotesThreshold(3000),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(freezeVoting, 'OwnableUnauthorizedAccount');
     });
 
     it('Only the freeze voting owner can update the freeze proposal period', async () => {
@@ -787,7 +788,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
 
       await expect(
         freezeVoting.connect(tokenVetoer1).updateFreezeProposalPeriod(14),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(freezeVoting, 'OwnableUnauthorizedAccount');
     });
 
     it('Only the freeze voting owner can update the freeze period', async () => {
@@ -797,9 +798,9 @@ describe('Child Multisig DAO with Azorius Parent', () => {
 
       expect(await freezeVoting.freezePeriod()).to.eq(300);
 
-      await expect(freezeVoting.connect(tokenVetoer1).updateFreezePeriod(400)).to.be.revertedWith(
-        'Ownable: caller is not the owner',
-      );
+      await expect(
+        freezeVoting.connect(tokenVetoer1).updateFreezePeriod(400),
+      ).to.be.revertedWithCustomError(freezeVoting, 'OwnableUnauthorizedAccount');
     });
 
     it('Only the freeze guard owner can update the timelock period', async () => {
@@ -809,9 +810,9 @@ describe('Child Multisig DAO with Azorius Parent', () => {
 
       expect(await freezeGuard.timelockPeriod()).to.eq(70);
 
-      await expect(freezeGuard.connect(tokenVetoer1).updateTimelockPeriod(80)).to.be.revertedWith(
-        'Ownable: caller is not the owner',
-      );
+      await expect(
+        freezeGuard.connect(tokenVetoer1).updateTimelockPeriod(80),
+      ).to.be.revertedWithCustomError(freezeGuard, 'OwnableUnauthorizedAccount');
     });
 
     it('Only the freeze guard owner can update the execution period', async () => {
@@ -821,9 +822,9 @@ describe('Child Multisig DAO with Azorius Parent', () => {
 
       expect(await freezeGuard.executionPeriod()).to.eq(80);
 
-      await expect(freezeGuard.connect(tokenVetoer1).updateExecutionPeriod(90)).to.be.revertedWith(
-        'Ownable: caller is not the owner',
-      );
+      await expect(
+        freezeGuard.connect(tokenVetoer1).updateExecutionPeriod(90),
+      ).to.be.revertedWithCustomError(freezeGuard, 'OwnableUnauthorizedAccount');
     });
   });
 });

@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import {IBaseStrategy} from "../../interfaces/decent/IBaseStrategy.sol";
 import {IAzorius, Enum} from "../../interfaces/decent/IAzorius.sol";
-import {Module} from "@gnosis.pm/zodiac/contracts/core/Module.sol";
+import {GuardableModule} from "@gnosis-guild/zodiac/contracts/core/GuardableModule.sol";
 
 /**
  * A Safe module which allows for composable governance.
@@ -15,7 +15,7 @@ import {Module} from "@gnosis.pm/zodiac/contracts/core/Module.sol";
  * All voting details are delegated to [BaseStrategy](./BaseStrategy.md) implementations, of which an Azorius DAO can
  * have any number.
  */
-contract Azorius is Module, IAzorius {
+contract Azorius is IAzorius, GuardableModule {
     /**
      * The sentinel node of the linked list of enabled [BaseStrategies](./BaseStrategy.md).
      *
@@ -117,9 +117,10 @@ contract Azorius is Module, IAzorius {
                 initializeParams,
                 (address, address, address, address[], uint32, uint32)
             );
-        __Ownable_init();
-        avatar = _avatar;
-        target = _target;
+
+        __Ownable_init(msg.sender);
+        setAvatar(_avatar);
+        setTarget(_target);
         _setUpStrategies(_strategies);
         transferOwnership(_owner);
         _updateTimelockPeriod(_timelockPeriod);

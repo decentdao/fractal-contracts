@@ -7,7 +7,7 @@ import {IHatsModuleFactory} from "../interfaces/hats/IHatsModuleFactory.sol";
 import {ISablierV2LockupLinear} from "../interfaces/sablier/ISablierV2LockupLinear.sol";
 import {LockupLinear, Broker} from "../interfaces/sablier/types/DataTypes.sol";
 import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
-import {IAvatar} from "@gnosis.pm/zodiac/contracts/interfaces/IAvatar.sol";
+import {IAvatar} from "@gnosis-guild/zodiac/contracts/interfaces/IAvatar.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
