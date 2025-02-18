@@ -4,15 +4,13 @@ pragma solidity ^0.8.28;
 import {FactoryFriendly} from "@gnosis.pm/zodiac/contracts/factory/FactoryFriendly.sol";
 import {ERC165Storage} from "@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
 import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import {ERC20VotesUpgradeable, ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20VotesUpgradeable.sol";
-import {ERC20SnapshotUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20SnapshotUpgradeable.sol";
+import {ERC20VotesUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20VotesUpgradeable.sol";
 
 /**
  * An implementation of the Open Zeppelin `IVotes` voting token standard.
  */
 contract VotesERC20 is
     IERC20Upgradeable,
-    ERC20SnapshotUpgradeable,
     ERC20VotesUpgradeable,
     ERC165Storage,
     FactoryFriendly
@@ -52,48 +50,5 @@ contract VotesERC20 is
                 ++i;
             }
         }
-    }
-
-    /**
-     * See `ERC20SnapshotUpgradeable._snapshot()`.
-     */
-    function captureSnapShot() external returns (uint256 snapId) {
-        snapId = _snapshot();
-    }
-
-    // -- The functions below are overrides required by extended contracts. --
-
-    /** Overridden without modification. */
-    function _mint(
-        address to,
-        uint256 amount
-    ) internal virtual override(ERC20Upgradeable, ERC20VotesUpgradeable) {
-        super._mint(to, amount);
-    }
-
-    /** Overridden without modification. */
-    function _burn(
-        address account,
-        uint256 amount
-    ) internal virtual override(ERC20Upgradeable, ERC20VotesUpgradeable) {
-        super._burn(account, amount);
-    }
-
-    /** Overridden without modification. */
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual override(ERC20Upgradeable, ERC20SnapshotUpgradeable) {
-        super._beforeTokenTransfer(from, to, amount);
-    }
-
-    /** Overridden without modification. */
-    function _afterTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual override(ERC20Upgradeable, ERC20VotesUpgradeable) {
-        super._afterTokenTransfer(from, to, amount);
     }
 }
