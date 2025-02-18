@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
-import {IAvatar} from "@gnosis.pm/zodiac/contracts/interfaces/IAvatar.sol";
+import {IAvatar} from "@gnosis-guild/zodiac/contracts/interfaces/IAvatar.sol";
 import {ISablierV2Lockup} from "../interfaces/sablier/ISablierV2Lockup.sol";
 import {Lockup} from "../interfaces/sablier/types/DataTypes.sol";
 

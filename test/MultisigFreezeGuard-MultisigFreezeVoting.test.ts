@@ -1169,18 +1169,18 @@ describe('Child Multisig DAO with Multisig Parent', () => {
     });
 
     it('Only owner methods must be called by the owner', async () => {
-      await expect(freezeVoting.connect(childMultisigOwner1).unfreeze()).to.be.revertedWith(
-        'Ownable: caller is not the owner',
-      );
+      await expect(
+        freezeVoting.connect(childMultisigOwner1).unfreeze(),
+      ).to.be.revertedWithCustomError(freezeVoting, 'OwnableUnauthorizedAccount');
       await expect(
         freezeVoting.connect(childMultisigOwner1).updateFreezeVotesThreshold(0),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(freezeVoting, 'OwnableUnauthorizedAccount');
       await expect(
         freezeVoting.connect(childMultisigOwner1).updateFreezeProposalPeriod(0),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(freezeVoting, 'OwnableUnauthorizedAccount');
       await expect(
         freezeVoting.connect(childMultisigOwner1).updateFreezePeriod(0),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(freezeVoting, 'OwnableUnauthorizedAccount');
     });
   });
 });

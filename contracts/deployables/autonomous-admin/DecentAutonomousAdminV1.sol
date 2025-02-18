@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {IHatsElectionsEligibility} from "../../interfaces/hats/modules/IHatsElectionsEligibility.sol";
-import {FactoryFriendly} from "@gnosis.pm/zodiac/contracts/factory/FactoryFriendly.sol";
+import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
 import {ERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import {IDecentAutonomousAdminV1} from "../../interfaces/decent/IDecentAutonomousAdminV1.sol";
 

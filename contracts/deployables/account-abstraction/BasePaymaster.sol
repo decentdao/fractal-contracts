@@ -23,9 +23,10 @@ abstract contract BasePaymaster is IPaymaster, OwnableUpgradeable {
         UserOperationLib.PAYMASTER_DATA_OFFSET;
 
     function __BasePaymaster_init(
+        address _owner,
         IEntryPoint _entryPoint
     ) internal onlyInitializing {
-        __Ownable_init();
+        __Ownable_init(_owner);
         _validateEntryPointInterface(_entryPoint);
         entryPoint = _entryPoint;
     }

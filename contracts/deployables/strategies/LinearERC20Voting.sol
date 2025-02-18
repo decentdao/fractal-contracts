@@ -91,8 +91,7 @@ contract LinearERC20Voting is
             revert InvalidTokenAddress();
 
         governanceToken = _governanceToken;
-        __Ownable_init();
-        transferOwnership(_owner);
+        __Ownable_init(_owner);
         _setAzorius(_azoriusModule);
         _updateQuorumNumerator(_quorumNumerator);
         _updateBasisNumerator(_basisNumerator);

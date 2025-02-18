@@ -4,10 +4,10 @@ pragma solidity ^0.8.28;
 import {IMultisigFreezeGuard} from "../../interfaces/decent/IMultisigFreezeGuard.sol";
 import {IBaseFreezeVoting} from "../../interfaces/decent/IBaseFreezeVoting.sol";
 import {ISafe} from "../../interfaces/safe/ISafe.sol";
-import {IGuard} from "@gnosis.pm/zodiac/contracts/interfaces/IGuard.sol";
-import {FactoryFriendly} from "@gnosis.pm/zodiac/contracts/factory/FactoryFriendly.sol";
+import {IGuard} from "@gnosis-guild/zodiac/contracts/interfaces/IGuard.sol";
+import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
 import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
-import {BaseGuard} from "@gnosis.pm/zodiac/contracts/guard/BaseGuard.sol";
+import {BaseGuard} from "@gnosis-guild/zodiac/contracts/guard/BaseGuard.sol";
 
 /**
  * Implementation of [IMultisigFreezeGuard](./interfaces/IMultisigFreezeGuard.md).
@@ -67,7 +67,6 @@ contract MultisigFreezeGuard is
      * `uint256 _executionPeriod`, `address _owner`, `address _freezeVoting`, `address _childGnosisSafe`
      */
     function setUp(bytes memory initializeParams) public override initializer {
-        __Ownable_init();
         (
             uint32 _timelockPeriod,
             uint32 _executionPeriod,
@@ -81,7 +80,7 @@ contract MultisigFreezeGuard is
 
         _updateTimelockPeriod(_timelockPeriod);
         _updateExecutionPeriod(_executionPeriod);
-        transferOwnership(_owner);
+        __Ownable_init(_owner);
         freezeVoting = IBaseFreezeVoting(_freezeVoting);
         childGnosisSafe = ISafe(_childGnosisSafe);
 

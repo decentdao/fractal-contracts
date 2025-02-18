@@ -142,8 +142,7 @@ contract LinearERC721Voting is
             }
         }
 
-        __Ownable_init();
-        transferOwnership(_owner);
+        __Ownable_init(_owner);
         _setAzorius(_azoriusModule);
         _updateQuorumThreshold(_quorumThreshold);
         _updateProposerThreshold(_proposerThreshold);
