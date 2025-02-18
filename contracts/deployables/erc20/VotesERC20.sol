@@ -2,19 +2,12 @@
 pragma solidity ^0.8.28;
 
 import {FactoryFriendly} from "@gnosis.pm/zodiac/contracts/factory/FactoryFriendly.sol";
-import {ERC165Storage} from "@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
-import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import {ERC20VotesUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20VotesUpgradeable.sol";
 
 /**
  * An implementation of the Open Zeppelin `IVotes` voting token standard.
  */
-contract VotesERC20 is
-    IERC20Upgradeable,
-    ERC20VotesUpgradeable,
-    ERC165Storage,
-    FactoryFriendly
-{
+contract VotesERC20 is ERC20VotesUpgradeable, FactoryFriendly {
     constructor() {
         _disableInitializers();
     }
@@ -41,7 +34,6 @@ contract VotesERC20 is
 
         __ERC20_init(_name, _symbol);
         __ERC20Permit_init(_name);
-        _registerInterface(type(IERC20Upgradeable).interfaceId);
 
         uint256 holderCount = _allocationAddresses.length;
         for (uint256 i; i < holderCount; ) {
