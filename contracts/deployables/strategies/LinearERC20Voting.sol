@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
-import {BaseStrategy, IBaseStrategy} from "./BaseStrategy.sol";
+import {BaseStrategy} from "./BaseStrategy.sol";
 import {BaseQuorumPercent} from "./BaseQuorumPercent.sol";
 import {BaseVotingBasisPercent} from "./BaseVotingBasisPercent.sol";
 import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";

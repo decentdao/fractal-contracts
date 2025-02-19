@@ -11,7 +11,7 @@ pragma solidity ^0.8.28;
  * voting period or quorum, that is a detail of the individual strategy itself, and not
  * a requirement for the Azorius protocol.
  */
-interface IBaseStrategy {
+interface IBaseStrategyV1 {
     /**
      * Sets the address of the [Azorius](../Azorius.md) contract this
      * [BaseStrategy](../BaseStrategy.md) is being used on.
