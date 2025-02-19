@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import {LinearERC20VotingV1} from "./LinearERC20VotingV1.sol";
 import {ERC4337VoterSupportV1} from "./ERC4337VoterSupportV1.sol";
-import {LinearERC20VotingWithHatsProposalCreation} from "./LinearERC20VotingWithHatsProposalCreation.sol";
+import {LinearERC20VotingWithHatsProposalCreationV1} from "./LinearERC20VotingWithHatsProposalCreationV1.sol";
 import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 
 /**
@@ -12,7 +12,7 @@ import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
  * restricted to users wearing whitelisted Hats.
  */
 contract LinearERC20VotingWithHatsProposalCreationV2 is
-    LinearERC20VotingWithHatsProposalCreation,
+    LinearERC20VotingWithHatsProposalCreationV1,
     IVersion,
     ERC4337VoterSupportV1
 {

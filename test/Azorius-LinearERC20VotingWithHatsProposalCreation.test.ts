@@ -7,8 +7,8 @@ import hre from 'hardhat';
 import {
   GnosisSafe,
   GnosisSafeProxyFactory,
-  LinearERC20VotingWithHatsProposalCreation,
-  LinearERC20VotingWithHatsProposalCreation__factory,
+  LinearERC20VotingWithHatsProposalCreationV1,
+  LinearERC20VotingWithHatsProposalCreationV1__factory,
   AzoriusV1,
   AzoriusV1__factory,
   VotesERC20V1,
@@ -35,8 +35,8 @@ describe('LinearERC20VotingWithHatsProposalCreation', () => {
   let gnosisSafe: GnosisSafe;
   let azorius: AzoriusV1;
   let azoriusMastercopy: AzoriusV1;
-  let linearERC20VotingWithHats: LinearERC20VotingWithHatsProposalCreation;
-  let linearERC20VotingWithHatsMastercopy: LinearERC20VotingWithHatsProposalCreation;
+  let linearERC20VotingWithHats: LinearERC20VotingWithHatsProposalCreationV1;
+  let linearERC20VotingWithHatsMastercopy: LinearERC20VotingWithHatsProposalCreationV1;
   let votesERC20Mastercopy: VotesERC20V1;
   let votesERC20: VotesERC20V1;
   let gnosisSafeProxyFactory: GnosisSafeProxyFactory;
@@ -149,12 +149,12 @@ describe('LinearERC20VotingWithHatsProposalCreation', () => {
 
     // Deploy LinearERC20VotingWithHatsProposalCreation
     linearERC20VotingWithHatsMastercopy =
-      await new LinearERC20VotingWithHatsProposalCreation__factory(deployer).deploy();
+      await new LinearERC20VotingWithHatsProposalCreationV1__factory(deployer).deploy();
 
     const mockHatsContractAddress = '0x1234567890123456789012345678901234567890';
 
     const linearERC20VotingWithHatsSetupCalldata =
-      LinearERC20VotingWithHatsProposalCreation__factory.createInterface().encodeFunctionData(
+      LinearERC20VotingWithHatsProposalCreationV1__factory.createInterface().encodeFunctionData(
         'setUp',
         [
           abiCoder.encode(
@@ -195,7 +195,7 @@ describe('LinearERC20VotingWithHatsProposalCreation', () => {
       '10031021',
     );
 
-    linearERC20VotingWithHats = LinearERC20VotingWithHatsProposalCreation__factory.connect(
+    linearERC20VotingWithHats = LinearERC20VotingWithHatsProposalCreationV1__factory.connect(
       predictedLinearERC20VotingWithHatsAddress,
       deployer,
     );
