@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
-import {LinearERC721Voting} from "./LinearERC721Voting.sol";
+import {LinearERC721VotingV1} from "./LinearERC721VotingV1.sol";
 import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {ERC4337VoterSupportV1} from "./ERC4337VoterSupportV1.sol";
 
@@ -18,7 +18,7 @@ import {ERC4337VoterSupportV1} from "./ERC4337VoterSupportV1.sol";
  */
 contract LinearERC721VotingV2 is
     IVersion,
-    LinearERC721Voting,
+    LinearERC721VotingV1,
     ERC4337VoterSupportV1
 {
     /** @inheritdoc IVersion*/
@@ -27,7 +27,7 @@ contract LinearERC721VotingV2 is
         return 2;
     }
 
-    /** @inheritdoc LinearERC721Voting*/
+    /** @inheritdoc LinearERC721VotingV1*/
     function vote(
         uint32 _proposalId,
         uint8 _voteType,

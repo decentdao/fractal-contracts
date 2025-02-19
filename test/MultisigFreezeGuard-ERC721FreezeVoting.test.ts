@@ -11,8 +11,8 @@ import {
   MockERC721__factory,
   AzoriusV1,
   AzoriusV1__factory,
-  LinearERC721Voting,
-  LinearERC721Voting__factory,
+  LinearERC721VotingV1,
+  LinearERC721VotingV1__factory,
   GnosisSafeL2__factory,
   GnosisSafeL2,
 } from '../typechain-types';
@@ -38,8 +38,8 @@ describe('Child Multisig DAO with Azorius Parent', () => {
   let freezeVotingMastercopy: ERC721FreezeVotingV1;
   let freezeVoting: ERC721FreezeVotingV1;
   let mockNFT: MockERC721;
-  let linearERC721Voting: LinearERC721Voting;
-  let linearERC721VotingMastercopy: LinearERC721Voting;
+  let linearERC721Voting: LinearERC721VotingV1;
+  let linearERC721VotingMastercopy: LinearERC721VotingV1;
   let azoriusMastercopy: AzoriusV1;
   let azorius: AzoriusV1;
 
@@ -153,11 +153,11 @@ describe('Child Multisig DAO with Azorius Parent', () => {
     azorius = AzoriusV1__factory.connect(predictedAzoriusAddress, deployer);
 
     // Deploy Linear ERC721 Voting Mastercopy
-    linearERC721VotingMastercopy = await new LinearERC721Voting__factory(deployer).deploy();
+    linearERC721VotingMastercopy = await new LinearERC721VotingV1__factory(deployer).deploy();
 
     const linearERC721VotingSetupCalldata =
       // eslint-disable-next-line camelcase
-      LinearERC721Voting__factory.createInterface().encodeFunctionData('setUp', [
+      LinearERC721VotingV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           [
             'address',
@@ -195,7 +195,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    linearERC721Voting = LinearERC721Voting__factory.connect(
+    linearERC721Voting = LinearERC721VotingV1__factory.connect(
       predictedlinearERC721VotingAddress,
       deployer,
     );

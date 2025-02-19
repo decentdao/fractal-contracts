@@ -18,7 +18,7 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
  * total supply of NFTs is not knowable within the IERC721 interface.  This is similar to a multisig
  * "total signers" required, rather than a percentage of the tokens.
  */
-contract LinearERC721Voting is
+contract LinearERC721VotingV1 is
     BaseStrategyV1,
     BaseVotingBasisPercentV1,
     IERC721VotingStrategyV1
