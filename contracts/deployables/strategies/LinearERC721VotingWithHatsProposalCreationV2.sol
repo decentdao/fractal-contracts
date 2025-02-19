@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {LinearERC721Voting} from "./LinearERC721Voting.sol";
+import {LinearERC721VotingV1} from "./LinearERC721VotingV1.sol";
 import {ERC4337VoterSupportV1} from "./ERC4337VoterSupportV1.sol";
 import {LinearERC721VotingWithHatsProposalCreation} from "./LinearERC721VotingWithHatsProposalCreation.sol";
 import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
@@ -23,7 +23,7 @@ contract LinearERC721VotingWithHatsProposalCreationV2 is
         return 2;
     }
 
-    /** @inheritdoc LinearERC721Voting*/
+    /** @inheritdoc LinearERC721VotingV1*/
     function vote(
         uint32 _proposalId,
         uint8 _voteType,
