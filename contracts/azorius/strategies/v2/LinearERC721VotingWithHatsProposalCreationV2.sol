@@ -56,7 +56,7 @@ contract LinearERC721VotingWithHatsProposalCreationV2 is
     }
 
     /** @inheritdoc IERC721VotingWeight*/
-    function unusedVotingPower(
+    function unusedVotingWeight(
         address _address,
         uint32 _proposalId,
         address[] memory _tokenAddresses,
