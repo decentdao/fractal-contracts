@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {IFractalModule} from "../../interfaces/decent/IFractalModule.sol";
+import {IFractalModuleV1} from "../../interfaces/decent/IFractalModuleV1.sol";
 import {GuardableModule, Enum} from "@gnosis-guild/zodiac/contracts/core/GuardableModule.sol";
 
 /**
@@ -13,7 +13,7 @@ import {GuardableModule, Enum} from "@gnosis-guild/zodiac/contracts/core/Guardab
  * transactions on the Safe, which in our implementation is the set of parent
  * DAOs.
  */
-contract FractalModule is IFractalModule, GuardableModule {
+contract FractalModule is IFractalModuleV1, GuardableModule {
     /** Mapping of whether an address is a controller (typically a parentDAO). */
     mapping(address => bool) public controllers;
 
@@ -58,7 +58,7 @@ contract FractalModule is IFractalModule, GuardableModule {
         transferOwnership(_owner);
     }
 
-    /** @inheritdoc IFractalModule*/
+    /** @inheritdoc IFractalModuleV1*/
     function removeControllers(
         address[] memory _controllers
     ) external onlyOwner {
@@ -72,7 +72,7 @@ contract FractalModule is IFractalModule, GuardableModule {
         emit ControllersRemoved(_controllers);
     }
 
-    /** @inheritdoc IFractalModule*/
+    /** @inheritdoc IFractalModuleV1*/
     function execTx(bytes memory execTxData) public onlyAuthorized {
         (
             address _target,
@@ -83,7 +83,7 @@ contract FractalModule is IFractalModule, GuardableModule {
         if (!exec(_target, _value, _data, _operation)) revert TxFailed();
     }
 
-    /** @inheritdoc IFractalModule*/
+    /** @inheritdoc IFractalModuleV1*/
     function addControllers(address[] memory _controllers) public onlyOwner {
         uint256 controllersLength = _controllers.length;
         for (uint256 i; i < controllersLength; ) {
