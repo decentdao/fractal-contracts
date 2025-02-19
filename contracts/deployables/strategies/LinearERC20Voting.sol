@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import {BaseStrategyV1} from "./BaseStrategyV1.sol";
 import {BaseQuorumPercentV1} from "./BaseQuorumPercentV1.sol";
-import {BaseVotingBasisPercent} from "./BaseVotingBasisPercent.sol";
+import {BaseVotingBasisPercentV1} from "./BaseVotingBasisPercentV1.sol";
 import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
 
 /**
@@ -14,7 +14,7 @@ import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
 contract LinearERC20Voting is
     BaseStrategyV1,
     BaseQuorumPercentV1,
-    BaseVotingBasisPercent
+    BaseVotingBasisPercentV1
 {
     /**
      * The voting options for a Proposal.
