@@ -1,16 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity =0.8.19;
 
-/**
- * Interface to get the owner of a smart account
- */
-interface IOwnership {
-    /**
-     * Returns the owner address, could be EOA for regular voters, but could be DAO Safe or other smart contract
-     *
-     */
-    function owner() external pure returns (address);
-}
+import {IOwnership} from "../../../interfaces/IOwnership.sol";
 
 abstract contract ERC4337VoterSupport {
     /**
