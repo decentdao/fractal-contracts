@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
-import {IOwnership} from "../../interfaces/decent/deployables/IOwnership.sol";
+import {IOwnershipV1} from "../../interfaces/decent/deployables/IOwnershipV1.sol";
 
 abstract contract ERC4337VoterSupport {
     /**
@@ -24,7 +24,7 @@ abstract contract ERC4337VoterSupport {
         }
 
         // If it's a contract, try to get its owner
-        try IOwnership(_msgSender).owner() returns (address _value) {
+        try IOwnershipV1(_msgSender).owner() returns (address _value) {
             return _value;
         } catch {
             return _msgSender;
