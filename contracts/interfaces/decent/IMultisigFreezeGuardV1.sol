@@ -21,7 +21,7 @@ import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
  *
  * See https://docs.safe.global/learn/safe-core/safe-core-protocol/guards.
  */
-interface IMultisigFreezeGuard {
+interface IMultisigFreezeGuardV1 {
     /**
      * Allows the caller to begin the `timelock` of a transaction.
      *

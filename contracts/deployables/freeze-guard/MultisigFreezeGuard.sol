@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {IMultisigFreezeGuard} from "../../interfaces/decent/IMultisigFreezeGuard.sol";
+import {IMultisigFreezeGuardV1} from "../../interfaces/decent/IMultisigFreezeGuardV1.sol";
 import {IBaseFreezeVotingV1} from "../../interfaces/decent/IBaseFreezeVotingV1.sol";
 import {ISafe} from "../../interfaces/safe/ISafe.sol";
 import {IGuard} from "@gnosis-guild/zodiac/contracts/interfaces/IGuard.sol";
@@ -15,7 +15,7 @@ import {BaseGuard} from "@gnosis-guild/zodiac/contracts/guard/BaseGuard.sol";
 contract MultisigFreezeGuard is
     FactoryFriendly,
     IGuard,
-    IMultisigFreezeGuard,
+    IMultisigFreezeGuardV1,
     BaseGuard
 {
     /** Timelock period (in blocks). */
@@ -92,7 +92,7 @@ contract MultisigFreezeGuard is
         );
     }
 
-    /** @inheritdoc IMultisigFreezeGuard*/
+    /** @inheritdoc IMultisigFreezeGuardV1*/
     function timelockTransaction(
         address to,
         uint256 value,
@@ -139,12 +139,12 @@ contract MultisigFreezeGuard is
         emit TransactionTimelocked(msg.sender, transactionHash, signatures);
     }
 
-    /** @inheritdoc IMultisigFreezeGuard*/
+    /** @inheritdoc IMultisigFreezeGuardV1*/
     function updateTimelockPeriod(uint32 _timelockPeriod) external onlyOwner {
         _updateTimelockPeriod(_timelockPeriod);
     }
 
-    /** @inheritdoc IMultisigFreezeGuard*/
+    /** @inheritdoc IMultisigFreezeGuardV1*/
     function updateExecutionPeriod(uint32 _executionPeriod) external onlyOwner {
         executionPeriod = _executionPeriod;
     }
@@ -197,7 +197,7 @@ contract MultisigFreezeGuard is
         // not implementated
     }
 
-    /** @inheritdoc IMultisigFreezeGuard*/
+    /** @inheritdoc IMultisigFreezeGuardV1*/
     function getTransactionTimelockedBlock(
         bytes32 _signaturesHash
     ) public view returns (uint32) {
