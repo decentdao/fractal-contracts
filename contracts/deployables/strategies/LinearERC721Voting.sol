@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
-import {IERC721VotingStrategy} from "../../interfaces/decent/deployables/IERC721VotingStrategy.sol";
+import {IERC721VotingStrategyV1} from "../../interfaces/decent/deployables/IERC721VotingStrategyV1.sol";
 import {BaseVotingBasisPercent} from "./BaseVotingBasisPercent.sol";
 import {IAzoriusV1} from "../../interfaces/decent/deployables/IAzoriusV1.sol";
 import {BaseStrategy} from "./BaseStrategy.sol";
@@ -21,7 +21,7 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 contract LinearERC721Voting is
     BaseStrategy,
     BaseVotingBasisPercent,
-    IERC721VotingStrategy
+    IERC721VotingStrategyV1
 {
     /**
      * The voting options for a Proposal.
@@ -259,7 +259,7 @@ contract LinearERC721Voting is
         _vote(_proposalId, msg.sender, _voteType, _tokenAddresses, _tokenIds);
     }
 
-    /** @inheritdoc IERC721VotingStrategy*/
+    /** @inheritdoc IERC721VotingStrategyV1*/
     function getTokenWeight(
         address _tokenAddress
     ) external view virtual override returns (uint256) {

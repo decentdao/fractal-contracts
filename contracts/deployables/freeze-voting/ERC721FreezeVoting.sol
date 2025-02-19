@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {IERC721VotingStrategy} from "../../interfaces/decent/deployables/IERC721VotingStrategy.sol";
+import {IERC721VotingStrategyV1} from "../../interfaces/decent/deployables/IERC721VotingStrategyV1.sol";
 import {BaseFreezeVoting} from "./BaseFreezeVoting.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
@@ -11,7 +11,7 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
  */
 contract ERC721FreezeVoting is BaseFreezeVoting {
     /** A reference to the voting strategy of the parent DAO. */
-    IERC721VotingStrategy public strategy;
+    IERC721VotingStrategyV1 public strategy;
 
     /**
      * Mapping of block the freeze vote was started on, to the token address, to token id,
@@ -51,7 +51,7 @@ contract ERC721FreezeVoting is BaseFreezeVoting {
         _updateFreezeProposalPeriod(_freezeProposalPeriod);
         _updateFreezePeriod(_freezePeriod);
         freezePeriod = _freezePeriod;
-        strategy = IERC721VotingStrategy(_strategy);
+        strategy = IERC721VotingStrategyV1(_strategy);
 
         emit ERC721FreezeVotingSetUp(_owner, _strategy);
     }
