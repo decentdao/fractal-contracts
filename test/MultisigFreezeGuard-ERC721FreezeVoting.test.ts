@@ -6,7 +6,7 @@ import {
   ERC721FreezeVoting__factory,
   MultisigFreezeGuardV1,
   MultisigFreezeGuardV1__factory,
-  ERC20FreezeVoting__factory,
+  ERC20FreezeVotingV1__factory,
   MockERC721,
   MockERC721__factory,
   Azorius__factory,
@@ -206,7 +206,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
     // Initialize FreezeVoting contract
     const freezeVotingSetupData =
       // eslint-disable-next-line camelcase
-      ERC20FreezeVoting__factory.createInterface().encodeFunctionData('setUp', [
+      ERC20FreezeVotingV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'uint256', 'uint32', 'uint32', 'address'],
           [

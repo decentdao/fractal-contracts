@@ -9,7 +9,7 @@ import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
  * A [BaseFreezeVoting](./BaseFreezeVoting.md) implementation which handles
  * freezes on ERC20 based token voting DAOs.
  */
-contract ERC20FreezeVoting is BaseFreezeVotingV1 {
+contract ERC20FreezeVotingV1 is BaseFreezeVotingV1 {
     /** A reference to the ERC20 voting token of the subDAO. */
     IVotes public votesERC20;
 

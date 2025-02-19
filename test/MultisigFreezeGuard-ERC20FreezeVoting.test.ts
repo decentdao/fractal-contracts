@@ -4,8 +4,8 @@ import hre, { ethers } from 'hardhat';
 import {
   VotesERC20V1,
   VotesERC20V1__factory,
-  ERC20FreezeVoting,
-  ERC20FreezeVoting__factory,
+  ERC20FreezeVotingV1,
+  ERC20FreezeVotingV1__factory,
   MultisigFreezeGuardV1,
   MultisigFreezeGuardV1__factory,
   GnosisSafeL2__factory,
@@ -30,8 +30,8 @@ describe('Child Multisig DAO with Azorius Parent', () => {
   let gnosisSafe: GnosisSafeL2;
   let freezeGuardMastercopy: MultisigFreezeGuardV1;
   let freezeGuard: MultisigFreezeGuardV1;
-  let freezeVotingMastercopy: ERC20FreezeVoting;
-  let freezeVoting: ERC20FreezeVoting;
+  let freezeVotingMastercopy: ERC20FreezeVotingV1;
+  let freezeVoting: ERC20FreezeVotingV1;
   let votesERC20Mastercopy: VotesERC20V1;
   let votesERC20: VotesERC20V1;
 
@@ -127,12 +127,12 @@ describe('Child Multisig DAO with Azorius Parent', () => {
     await votesERC20.connect(tokenVetoer2).delegate(tokenVetoer2.address);
 
     // Deploy ERC20FreezeVoting mastercopy contract
-    freezeVotingMastercopy = await new ERC20FreezeVoting__factory(deployer).deploy();
+    freezeVotingMastercopy = await new ERC20FreezeVotingV1__factory(deployer).deploy();
 
     // Initialize FreezeVoting contract
     const freezeVotingSetupData =
       // eslint-disable-next-line camelcase
-      ERC20FreezeVoting__factory.createInterface().encodeFunctionData('setUp', [
+      ERC20FreezeVotingV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'uint256', 'uint32', 'uint32', 'address'],
           [
@@ -158,7 +158,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    freezeVoting = ERC20FreezeVoting__factory.connect(predictedFreezeVotingAddress, deployer);
+    freezeVoting = ERC20FreezeVotingV1__factory.connect(predictedFreezeVotingAddress, deployer);
 
     // Deploy FreezeGuard mastercopy contract
     freezeGuardMastercopy = await new MultisigFreezeGuardV1__factory(deployer).deploy();
