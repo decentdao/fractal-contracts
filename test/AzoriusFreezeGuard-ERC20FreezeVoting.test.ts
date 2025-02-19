@@ -13,8 +13,8 @@ import {
   AzoriusFreezeGuard__factory,
   ERC20FreezeVoting,
   ERC20FreezeVoting__factory,
-  VotesERC20,
-  VotesERC20__factory,
+  VotesERC20V1,
+  VotesERC20V1__factory,
   ModuleProxyFactory,
   GnosisSafeL2__factory,
 } from '../typechain-types';
@@ -45,9 +45,9 @@ describe('Azorius Child DAO with Azorius Parent', () => {
   let linearERC20VotingMastercopy: LinearERC20Voting;
   let freezeVotingMastercopy: ERC20FreezeVoting;
   let freezeVoting: ERC20FreezeVoting;
-  let votesERC20Mastercopy: VotesERC20;
-  let parentVotesERC20: VotesERC20;
-  let childVotesERC20: VotesERC20;
+  let votesERC20Mastercopy: VotesERC20V1;
+  let parentVotesERC20: VotesERC20V1;
+  let childVotesERC20: VotesERC20V1;
   let gnosisSafeProxyFactory: GnosisSafeProxyFactory;
   let moduleProxyFactory: ModuleProxyFactory;
 
@@ -113,11 +113,11 @@ describe('Azorius Child DAO with Azorius Parent', () => {
     childGnosisSafe = GnosisSafeL2__factory.connect(predictedGnosisSafeAddress, deployer);
 
     // Deploy Votes ERC20 Mastercopy
-    votesERC20Mastercopy = await new VotesERC20__factory(deployer).deploy();
+    votesERC20Mastercopy = await new VotesERC20V1__factory(deployer).deploy();
 
     const childVotesERC20SetupData =
       // eslint-disable-next-line camelcase
-      VotesERC20__factory.createInterface().encodeFunctionData('setUp', [
+      VotesERC20V1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['string', 'string', 'address[]', 'uint256[]'],
           [
@@ -146,14 +146,14 @@ describe('Azorius Child DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    childVotesERC20 = VotesERC20__factory.connect(predictedChildVotesERC20Address, deployer);
+    childVotesERC20 = VotesERC20V1__factory.connect(predictedChildVotesERC20Address, deployer);
 
     // Parent Votes ERC-20
-    parentVotesERC20 = await new VotesERC20__factory(deployer).deploy();
+    parentVotesERC20 = await new VotesERC20V1__factory(deployer).deploy();
 
     const parentVotesERC20SetupData =
       // eslint-disable-next-line camelcase
-      VotesERC20__factory.createInterface().encodeFunctionData('setUp', [
+      VotesERC20V1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['string', 'string', 'address[]', 'uint256[]'],
           [
@@ -178,7 +178,7 @@ describe('Azorius Child DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    parentVotesERC20 = VotesERC20__factory.connect(predictedParentVotesERC20Address, deployer);
+    parentVotesERC20 = VotesERC20V1__factory.connect(predictedParentVotesERC20Address, deployer);
 
     // Token holders delegate their votes to themselves
     await childVotesERC20.connect(childTokenHolder1).delegate(childTokenHolder1.address);

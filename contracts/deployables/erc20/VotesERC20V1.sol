@@ -10,7 +10,7 @@ import {ERC20PermitUpgradeable} from "@openzeppelin/contracts-upgradeable/token/
 /**
  * An implementation of the OpenZeppelin `IVotes` voting token standard.
  */
-contract VotesERC20 is
+contract VotesERC20V1 is
     ERC20VotesUpgradeable,
     ERC20PermitUpgradeable,
     FactoryFriendly

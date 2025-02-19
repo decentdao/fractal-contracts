@@ -9,8 +9,8 @@ import {
   LinearERC20VotingV2__factory,
   Azorius,
   Azorius__factory,
-  VotesERC20,
-  VotesERC20__factory,
+  VotesERC20V1,
+  VotesERC20V1__factory,
   ModuleProxyFactory,
   GnosisSafeL2__factory,
 } from '../typechain-types';
@@ -35,8 +35,8 @@ describe('Safe with Azorius module and linearERC20VotingV2', () => {
   let azoriusMastercopy: Azorius;
   let linearERC20Voting: LinearERC20VotingV2;
   let linearERC20VotingMastercopy: LinearERC20VotingV2;
-  let votesERC20Mastercopy: VotesERC20;
-  let votesERC20: VotesERC20;
+  let votesERC20Mastercopy: VotesERC20V1;
+  let votesERC20: VotesERC20V1;
   let gnosisSafeProxyFactory: GnosisSafeProxyFactory;
   let moduleProxyFactory: ModuleProxyFactory;
 
@@ -89,11 +89,11 @@ describe('Safe with Azorius module and linearERC20VotingV2', () => {
     gnosisSafe = GnosisSafeL2__factory.connect(predictedGnosisSafeAddress, deployer);
 
     // Deploy Votes ERC-20 mastercopy contract
-    votesERC20Mastercopy = await new VotesERC20__factory(deployer).deploy();
+    votesERC20Mastercopy = await new VotesERC20V1__factory(deployer).deploy();
 
     const votesERC20SetupCalldata =
       // eslint-disable-next-line camelcase
-      VotesERC20__factory.createInterface().encodeFunctionData('setUp', [
+      VotesERC20V1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['string', 'string', 'address[]', 'uint256[]'],
           ['DCNT', 'DCNT', [await gnosisSafe.getAddress()], [100]],
@@ -113,7 +113,7 @@ describe('Safe with Azorius module and linearERC20VotingV2', () => {
       '10031021',
     );
 
-    votesERC20 = VotesERC20__factory.connect(predictedVotesERC20Address, deployer);
+    votesERC20 = VotesERC20V1__factory.connect(predictedVotesERC20Address, deployer);
 
     // Deploy Azorius module
     azoriusMastercopy = await new Azorius__factory(deployer).deploy();

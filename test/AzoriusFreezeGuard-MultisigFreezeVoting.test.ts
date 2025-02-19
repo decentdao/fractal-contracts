@@ -12,8 +12,8 @@ import {
   AzoriusFreezeGuard__factory,
   MultisigFreezeVoting,
   MultisigFreezeVoting__factory,
-  VotesERC20,
-  VotesERC20__factory,
+  VotesERC20V1,
+  VotesERC20V1__factory,
   ModuleProxyFactory,
   GnosisSafeL2__factory,
   GnosisSafeL2,
@@ -46,8 +46,8 @@ describe('Azorius Child DAO with Multisig parent', () => {
   let linearERC20Voting: LinearERC20Voting;
   let freezeVotingMastercopy: MultisigFreezeVoting;
   let freezeVoting: MultisigFreezeVoting;
-  let votesERC20Mastercopy: VotesERC20;
-  let childVotesERC20: VotesERC20;
+  let votesERC20Mastercopy: VotesERC20V1;
+  let childVotesERC20: VotesERC20V1;
   let gnosisSafeProxyFactory: GnosisSafeProxyFactory;
   let moduleProxyFactory: ModuleProxyFactory;
 
@@ -150,11 +150,11 @@ describe('Azorius Child DAO with Multisig parent', () => {
     childGnosisSafe = GnosisSafeL2__factory.connect(predictedChildGnosisSafeAddress, deployer);
 
     // Deploy Votes ERC-20 Mastercopy
-    votesERC20Mastercopy = await new VotesERC20__factory(deployer).deploy();
+    votesERC20Mastercopy = await new VotesERC20V1__factory(deployer).deploy();
 
     const childVotesERC20SetupData =
       // eslint-disable-next-line camelcase
-      VotesERC20__factory.createInterface().encodeFunctionData('setUp', [
+      VotesERC20V1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['string', 'string', 'address[]', 'uint256[]'],
           [
@@ -170,8 +170,6 @@ describe('Azorius Child DAO with Multisig parent', () => {
         ),
       ]);
 
-    // await childVotesERC20.setUp(childVotesERC20SetupData);
-
     await moduleProxyFactory.deployModule(
       await votesERC20Mastercopy.getAddress(),
       childVotesERC20SetupData,
@@ -185,7 +183,7 @@ describe('Azorius Child DAO with Multisig parent', () => {
       '10031021',
     );
 
-    childVotesERC20 = VotesERC20__factory.connect(predictedChildVotesERC20Address, deployer);
+    childVotesERC20 = VotesERC20V1__factory.connect(predictedChildVotesERC20Address, deployer);
 
     // Token holders delegate their votes to themselves
     await childVotesERC20.connect(childTokenHolder1).delegate(childTokenHolder1.address);

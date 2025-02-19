@@ -11,8 +11,8 @@ import {
   MockVotingStrategy__factory,
   Azorius,
   Azorius__factory,
-  VotesERC20,
-  VotesERC20__factory,
+  VotesERC20V1,
+  VotesERC20V1__factory,
   ModuleProxyFactory,
   GnosisSafeL2__factory,
 } from '../typechain-types';
@@ -39,8 +39,8 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
   let linearERC20Voting: LinearERC20Voting;
   let linearERC20VotingMastercopy: LinearERC20Voting;
   let mockVotingStrategy: MockVotingStrategy;
-  let votesERC20Mastercopy: VotesERC20;
-  let votesERC20: VotesERC20;
+  let votesERC20Mastercopy: VotesERC20V1;
+  let votesERC20: VotesERC20V1;
   let gnosisSafeProxyFactory: GnosisSafeProxyFactory;
   let moduleProxyFactory: ModuleProxyFactory;
 
@@ -106,11 +106,11 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
     gnosisSafe = GnosisSafeL2__factory.connect(predictedGnosisSafeAddress, deployer);
 
     // Deploy Votes ERC-20 mastercopy contract
-    votesERC20Mastercopy = await new VotesERC20__factory(deployer).deploy();
+    votesERC20Mastercopy = await new VotesERC20V1__factory(deployer).deploy();
 
     const votesERC20SetupCalldata =
       // eslint-disable-next-line camelcase
-      VotesERC20__factory.createInterface().encodeFunctionData('setUp', [
+      VotesERC20V1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['string', 'string', 'address[]', 'uint256[]'],
           [
@@ -140,7 +140,7 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
       '10031021',
     );
 
-    votesERC20 = VotesERC20__factory.connect(predictedVotesERC20Address, deployer);
+    votesERC20 = VotesERC20V1__factory.connect(predictedVotesERC20Address, deployer);
 
     // Token holders delegate votes
     // Token holder 1 delegates to token holder 2, so final vote counts should be:
