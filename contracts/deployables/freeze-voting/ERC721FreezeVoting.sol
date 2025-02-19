@@ -2,14 +2,14 @@
 pragma solidity ^0.8.28;
 
 import {IERC721VotingStrategyV1} from "../../interfaces/decent/deployables/IERC721VotingStrategyV1.sol";
-import {BaseFreezeVoting} from "./BaseFreezeVoting.sol";
+import {BaseFreezeVotingV1} from "./BaseFreezeVotingV1.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /**
  * A [BaseFreezeVoting](./BaseFreezeVoting.md) implementation which handles
  * freezes on ERC721 based token voting DAOs.
  */
-contract ERC721FreezeVoting is BaseFreezeVoting {
+contract ERC721FreezeVoting is BaseFreezeVotingV1 {
     /** A reference to the voting strategy of the parent DAO. */
     IERC721VotingStrategyV1 public strategy;
 
@@ -56,7 +56,7 @@ contract ERC721FreezeVoting is BaseFreezeVoting {
         emit ERC721FreezeVotingSetUp(_owner, _strategy);
     }
 
-    /** @inheritdoc BaseFreezeVoting*/
+    /** @inheritdoc BaseFreezeVotingV1*/
     function castFreezeVote() external pure override {
         revert NotSupported();
     }
