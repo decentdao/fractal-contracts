@@ -5,6 +5,7 @@ import {IERC721VotingStrategyV1} from "../../interfaces/decent/deployables/IERC7
 import {BaseVotingBasisPercentV1} from "./BaseVotingBasisPercentV1.sol";
 import {IAzoriusV1} from "../../interfaces/decent/deployables/IAzoriusV1.sol";
 import {BaseStrategyV1} from "./BaseStrategyV1.sol";
+import {ERC4337VoterSupportV1} from "./ERC4337VoterSupportV1.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /**
@@ -21,7 +22,8 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 contract LinearERC721VotingV1 is
     BaseStrategyV1,
     BaseVotingBasisPercentV1,
-    IERC721VotingStrategyV1
+    IERC721VotingStrategyV1,
+    ERC4337VoterSupportV1
 {
     /**
      * The voting options for a Proposal.
@@ -256,7 +258,13 @@ contract LinearERC721VotingV1 is
         uint256[] memory _tokenIds
     ) external virtual {
         if (_tokenAddresses.length != _tokenIds.length) revert InvalidParams();
-        _vote(_proposalId, msg.sender, _voteType, _tokenAddresses, _tokenIds);
+        _vote(
+            _proposalId,
+            _voter(msg.sender),
+            _voteType,
+            _tokenAddresses,
+            _tokenIds
+        );
     }
 
     /** @inheritdoc IERC721VotingStrategyV1*/
