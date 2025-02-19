@@ -813,9 +813,7 @@ describe('Azorius Child DAO with Azorius Parent', () => {
     ).to.be.revertedWithCustomError(freezeGuard, 'DAOFrozen()');
 
     // Increase time so that freeze has ended
-    for (let i = 0; i <= 100; i++) {
-      await hre.network.provider.send('evm_mine');
-    }
+    await time.advanceBlocks(100);
 
     const tokenTransferData3 = childVotesERC20.interface.encodeFunctionData('transfer', [
       deployer.address,
