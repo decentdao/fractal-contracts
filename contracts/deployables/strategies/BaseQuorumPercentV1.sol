@@ -7,7 +7,7 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
  * An Azorius extension contract that enables percent based quorums.
  * Intended to be implemented by [BaseStrategy](./BaseStrategy.md) implementations.
  */
-abstract contract BaseQuorumPercent is OwnableUpgradeable {
+abstract contract BaseQuorumPercentV1 is OwnableUpgradeable {
     /** The numerator to use when calculating quorum (adjustable). */
     uint256 public quorumNumerator;
 
