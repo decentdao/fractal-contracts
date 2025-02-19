@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IHats} from "../../interfaces/hats/IHats.sol";
 
-abstract contract HatsProposalCreationWhitelist is OwnableUpgradeable {
+abstract contract HatsProposalCreationWhitelistV1 is OwnableUpgradeable {
     event HatWhitelisted(uint256 hatId);
     event HatRemovedFromWhitelist(uint256 hatId);
 

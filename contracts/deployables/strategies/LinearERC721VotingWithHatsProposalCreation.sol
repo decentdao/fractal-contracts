@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {LinearERC721Voting} from "./LinearERC721Voting.sol";
-import {HatsProposalCreationWhitelist} from "./HatsProposalCreationWhitelist.sol";
+import {HatsProposalCreationWhitelistV1} from "./HatsProposalCreationWhitelistV1.sol";
 import {IHats} from "../../interfaces/hats/IHats.sol";
 
 /**
@@ -11,7 +11,7 @@ import {IHats} from "../../interfaces/hats/IHats.sol";
  * restricted to users wearing whitelisted Hats.
  */
 contract LinearERC721VotingWithHatsProposalCreation is
-    HatsProposalCreationWhitelist,
+    HatsProposalCreationWhitelistV1,
     LinearERC721Voting
 {
     /**
@@ -24,7 +24,7 @@ contract LinearERC721VotingWithHatsProposalCreation is
      */
     function setUp(
         bytes memory initializeParams
-    ) public override(HatsProposalCreationWhitelist, LinearERC721Voting) {
+    ) public override(HatsProposalCreationWhitelistV1, LinearERC721Voting) {
         (
             address _owner,
             address[] memory _tokens,
@@ -63,20 +63,20 @@ contract LinearERC721VotingWithHatsProposalCreation is
             )
         );
 
-        HatsProposalCreationWhitelist.setUp(
+        HatsProposalCreationWhitelistV1.setUp(
             abi.encode(_hatsContract, _initialWhitelistedHats)
         );
     }
 
-    /** @inheritdoc HatsProposalCreationWhitelist*/
+    /** @inheritdoc HatsProposalCreationWhitelistV1*/
     function isProposer(
         address _address
     )
         public
         view
-        override(HatsProposalCreationWhitelist, LinearERC721Voting)
+        override(HatsProposalCreationWhitelistV1, LinearERC721Voting)
         returns (bool)
     {
-        return HatsProposalCreationWhitelist.isProposer(_address);
+        return HatsProposalCreationWhitelistV1.isProposer(_address);
     }
 }
