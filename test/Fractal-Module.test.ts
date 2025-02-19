@@ -5,8 +5,8 @@ import {
   VotesERC20V1__factory,
   FractalModule,
   FractalModule__factory,
-  MultisigFreezeGuard,
-  MultisigFreezeGuard__factory,
+  MultisigFreezeGuardV1,
+  MultisigFreezeGuardV1__factory,
   ModuleProxyFactory,
   GnosisSafeProxyFactory,
   GnosisSafeL2,
@@ -36,7 +36,7 @@ describe('Fractal Module Tests', () => {
   // Deployed contracts
   let gnosisSafe: GnosisSafeL2;
   let multiSendCallOnly: MultiSendCallOnly;
-  let freezeGuard: MultisigFreezeGuard;
+  let freezeGuard: MultisigFreezeGuardV1;
   let moduleImpl: FractalModule;
   let fractalModule: FractalModule;
 
@@ -88,10 +88,10 @@ describe('Fractal Module Tests', () => {
 
     /// /////////////  GUARD ///////////////////
     // DEPLOY GUARD
-    freezeGuard = await new MultisigFreezeGuard__factory(deployer).deploy();
+    freezeGuard = await new MultisigFreezeGuardV1__factory(deployer).deploy();
     freezeGuardSetup =
       // eslint-disable-next-line camelcase
-      MultisigFreezeGuard__factory.createInterface().encodeFunctionData('setUp', [
+      MultisigFreezeGuardV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['uint256', 'uint256', 'address', 'address', 'address'],
           [10, 10, owner1.address, owner1.address, await gnosisSafe.getAddress()],

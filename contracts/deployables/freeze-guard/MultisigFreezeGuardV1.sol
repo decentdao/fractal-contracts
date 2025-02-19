@@ -12,7 +12,7 @@ import {BaseGuard} from "@gnosis-guild/zodiac/contracts/guard/BaseGuard.sol";
 /**
  * Implementation of [IMultisigFreezeGuard](./interfaces/IMultisigFreezeGuard.md).
  */
-contract MultisigFreezeGuard is
+contract MultisigFreezeGuardV1 is
     FactoryFriendly,
     IGuard,
     IMultisigFreezeGuardV1,

@@ -7,8 +7,8 @@ import {
   VotesERC20V1__factory,
   MultisigFreezeVoting,
   MultisigFreezeVoting__factory,
-  MultisigFreezeGuard,
-  MultisigFreezeGuard__factory,
+  MultisigFreezeGuardV1,
+  MultisigFreezeGuardV1__factory,
   GnosisSafeL2__factory,
   GnosisSafeL2,
 } from '../typechain-types';
@@ -30,7 +30,7 @@ import time from './time';
 describe('Child Multisig DAO with Multisig Parent', () => {
   // Deployed contracts
   let childGnosisSafe: GnosisSafeL2;
-  let freezeGuard: MultisigFreezeGuard;
+  let freezeGuard: MultisigFreezeGuardV1;
   let freezeVotingMastercopy: MultisigFreezeVoting;
   let freezeVoting: MultisigFreezeVoting;
   let votesERC20Mastercopy: VotesERC20V1;
@@ -196,12 +196,12 @@ describe('Child Multisig DAO with Multisig Parent', () => {
     freezeVoting = MultisigFreezeVoting__factory.connect(predictedFreezeVotingAddress, deployer);
 
     // Deploy FreezeGuard mastercopy contract
-    const freezeGuardMastercopy = await new MultisigFreezeGuard__factory(deployer).deploy();
+    const freezeGuardMastercopy = await new MultisigFreezeGuardV1__factory(deployer).deploy();
 
     // Deploy MultisigFreezeGuard contract with a 60 block timelock period and 60 block execution period
     const freezeGuardSetupData =
       // eslint-disable-next-line camelcase
-      MultisigFreezeGuard__factory.createInterface().encodeFunctionData('setUp', [
+      MultisigFreezeGuardV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['uint32', 'uint32', 'address', 'address', 'address'],
           [
@@ -227,7 +227,7 @@ describe('Child Multisig DAO with Multisig Parent', () => {
       '10031021',
     );
 
-    freezeGuard = MultisigFreezeGuard__factory.connect(predictedFreezeGuardAddress, deployer);
+    freezeGuard = MultisigFreezeGuardV1__factory.connect(predictedFreezeGuardAddress, deployer);
 
     // Create transaction to set the guard address
     const setGuardData = childGnosisSafe.interface.encodeFunctionData('setGuard', [
