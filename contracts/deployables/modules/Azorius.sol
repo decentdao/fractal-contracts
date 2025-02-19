@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {IBaseStrategy} from "../../interfaces/decent/IBaseStrategy.sol";
-import {IAzorius, Enum} from "../../interfaces/decent/IAzorius.sol";
+import {IAzoriusV1, Enum} from "../../interfaces/decent/IAzoriusV1.sol";
 import {GuardableModule} from "@gnosis-guild/zodiac/contracts/core/GuardableModule.sol";
 
 /**
@@ -15,7 +15,7 @@ import {GuardableModule} from "@gnosis-guild/zodiac/contracts/core/GuardableModu
  * All voting details are delegated to [BaseStrategy](./BaseStrategy.md) implementations, of which an Azorius DAO can
  * have any number.
  */
-contract Azorius is IAzorius, GuardableModule {
+contract Azorius is IAzoriusV1, GuardableModule {
     /**
      * The sentinel node of the linked list of enabled [BaseStrategies](./BaseStrategy.md).
      *
@@ -129,17 +129,17 @@ contract Azorius is IAzorius, GuardableModule {
         emit AzoriusSetUp(msg.sender, _owner, _avatar, _target);
     }
 
-    /** @inheritdoc IAzorius*/
+    /** @inheritdoc IAzoriusV1*/
     function updateTimelockPeriod(uint32 _timelockPeriod) external onlyOwner {
         _updateTimelockPeriod(_timelockPeriod);
     }
 
-    /** @inheritdoc IAzorius*/
+    /** @inheritdoc IAzoriusV1*/
     function updateExecutionPeriod(uint32 _executionPeriod) external onlyOwner {
         _updateExecutionPeriod(_executionPeriod);
     }
 
-    /** @inheritdoc IAzorius*/
+    /** @inheritdoc IAzoriusV1*/
     function submitProposal(
         address _strategy,
         bytes memory _data,
@@ -186,7 +186,7 @@ contract Azorius is IAzorius, GuardableModule {
         totalProposalCount++;
     }
 
-    /** @inheritdoc IAzorius*/
+    /** @inheritdoc IAzoriusV1*/
     function executeProposal(
         uint32 _proposalId,
         address[] memory _targets,
@@ -221,7 +221,7 @@ contract Azorius is IAzorius, GuardableModule {
         emit ProposalExecuted(_proposalId, txHashes);
     }
 
-    /** @inheritdoc IAzorius*/
+    /** @inheritdoc IAzoriusV1*/
     function getStrategies(
         address _startAddress,
         uint256 _count
@@ -248,7 +248,7 @@ contract Azorius is IAzorius, GuardableModule {
         }
     }
 
-    /** @inheritdoc IAzorius*/
+    /** @inheritdoc IAzoriusV1*/
     function getProposalTxHash(
         uint32 _proposalId,
         uint32 _txIndex
@@ -256,14 +256,14 @@ contract Azorius is IAzorius, GuardableModule {
         return proposals[_proposalId].txHashes[_txIndex];
     }
 
-    /** @inheritdoc IAzorius*/
+    /** @inheritdoc IAzoriusV1*/
     function getProposalTxHashes(
         uint32 _proposalId
     ) external view returns (bytes32[] memory) {
         return proposals[_proposalId].txHashes;
     }
 
-    /** @inheritdoc IAzorius*/
+    /** @inheritdoc IAzoriusV1*/
     function getProposal(
         uint32 _proposalId
     )
@@ -284,7 +284,7 @@ contract Azorius is IAzorius, GuardableModule {
         _executionCounter = proposals[_proposalId].executionCounter;
     }
 
-    /** @inheritdoc IAzorius*/
+    /** @inheritdoc IAzoriusV1*/
     function enableStrategy(address _strategy) public override onlyOwner {
         if (_strategy == address(0) || _strategy == SENTINEL_STRATEGY)
             revert InvalidStrategy();
@@ -296,7 +296,7 @@ contract Azorius is IAzorius, GuardableModule {
         emit EnabledStrategy(_strategy);
     }
 
-    /** @inheritdoc IAzorius*/
+    /** @inheritdoc IAzoriusV1*/
     function disableStrategy(
         address _prevStrategy,
         address _strategy
@@ -311,14 +311,14 @@ contract Azorius is IAzorius, GuardableModule {
         emit DisabledStrategy(_strategy);
     }
 
-    /** @inheritdoc IAzorius*/
+    /** @inheritdoc IAzoriusV1*/
     function isStrategyEnabled(address _strategy) public view returns (bool) {
         return
             SENTINEL_STRATEGY != _strategy &&
             strategies[_strategy] != address(0);
     }
 
-    /** @inheritdoc IAzorius*/
+    /** @inheritdoc IAzoriusV1*/
     function proposalState(
         uint32 _proposalId
     ) public view returns (ProposalState) {
@@ -353,7 +353,7 @@ contract Azorius is IAzorius, GuardableModule {
         }
     }
 
-    /** @inheritdoc IAzorius*/
+    /** @inheritdoc IAzoriusV1*/
     function generateTxHashData(
         address _to,
         uint256 _value,
@@ -384,7 +384,7 @@ contract Azorius is IAzorius, GuardableModule {
             );
     }
 
-    /** @inheritdoc IAzorius*/
+    /** @inheritdoc IAzoriusV1*/
     function getTxHash(
         address _to,
         uint256 _value,

@@ -38,7 +38,7 @@ import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
  *          `isPassed` function). For a basic strategy, this would mean it received more
  *          NO votes than YES or did not achieve quorum.
  */
-interface IAzorius {
+interface IAzoriusV1 {
     /** Represents a transaction to perform on the blockchain. */
     struct Transaction {
         address to; // destination address of the transaction
