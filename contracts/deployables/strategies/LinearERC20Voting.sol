@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
-import {BaseStrategy} from "./BaseStrategy.sol";
+import {BaseStrategyV1} from "./BaseStrategyV1.sol";
 import {BaseQuorumPercentV1} from "./BaseQuorumPercentV1.sol";
 import {BaseVotingBasisPercent} from "./BaseVotingBasisPercent.sol";
 import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
@@ -12,7 +12,7 @@ import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
  * in an `ERC20Votes` token equals 1 vote for a Proposal.
  */
 contract LinearERC20Voting is
-    BaseStrategy,
+    BaseStrategyV1,
     BaseQuorumPercentV1,
     BaseVotingBasisPercent
 {
@@ -171,7 +171,7 @@ contract LinearERC20Voting is
         votingSupply = getProposalVotingSupply(_proposalId);
     }
 
-    /** @inheritdoc BaseStrategy*/
+    /** @inheritdoc BaseStrategyV1*/
     function initializeProposal(
         bytes memory _data
     ) public virtual override onlyAzorius {
@@ -198,7 +198,7 @@ contract LinearERC20Voting is
         return proposalVotes[_proposalId].hasVoted[_address];
     }
 
-    /** @inheritdoc BaseStrategy*/
+    /** @inheritdoc BaseStrategyV1*/
     function isPassed(
         uint32 _proposalId
     ) public view virtual override returns (bool) {
@@ -249,7 +249,7 @@ contract LinearERC20Voting is
             );
     }
 
-    /** @inheritdoc BaseStrategy*/
+    /** @inheritdoc BaseStrategyV1*/
     function isProposer(
         address _address
     ) public view virtual override returns (bool) {
@@ -258,7 +258,7 @@ contract LinearERC20Voting is
             requiredProposerWeight;
     }
 
-    /** @inheritdoc BaseStrategy*/
+    /** @inheritdoc BaseStrategyV1*/
     function votingEndBlock(
         uint32 _proposalId
     ) public view virtual override returns (uint32) {

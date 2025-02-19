@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 import {IERC721VotingStrategyV1} from "../../interfaces/decent/deployables/IERC721VotingStrategyV1.sol";
 import {BaseVotingBasisPercent} from "./BaseVotingBasisPercent.sol";
 import {IAzoriusV1} from "../../interfaces/decent/deployables/IAzoriusV1.sol";
-import {BaseStrategy} from "./BaseStrategy.sol";
+import {BaseStrategyV1} from "./BaseStrategyV1.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /**
@@ -19,7 +19,7 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
  * "total signers" required, rather than a percentage of the tokens.
  */
 contract LinearERC721Voting is
-    BaseStrategy,
+    BaseStrategyV1,
     BaseVotingBasisPercent,
     IERC721VotingStrategyV1
 {
@@ -309,7 +309,7 @@ contract LinearERC721Voting is
         emit GovernanceTokenRemoved(_tokenAddress);
     }
 
-    /** @inheritdoc BaseStrategy*/
+    /** @inheritdoc BaseStrategyV1*/
     function initializeProposal(
         bytes memory _data
     ) public virtual override onlyAzorius {
@@ -322,7 +322,7 @@ contract LinearERC721Voting is
         emit ProposalInitialized(proposalId, _votingEndBlock);
     }
 
-    /** @inheritdoc BaseStrategy*/
+    /** @inheritdoc BaseStrategyV1*/
     function isPassed(
         uint32 _proposalId
     ) public view virtual override returns (bool) {
@@ -336,7 +336,7 @@ contract LinearERC721Voting is
             )); // yes votes meets the basis
     }
 
-    /** @inheritdoc BaseStrategy*/
+    /** @inheritdoc BaseStrategyV1*/
     function isProposer(
         address _address
     ) public view virtual override returns (bool) {
@@ -353,7 +353,7 @@ contract LinearERC721Voting is
         return totalWeight >= proposerThreshold;
     }
 
-    /** @inheritdoc BaseStrategy*/
+    /** @inheritdoc BaseStrategyV1*/
     function votingEndBlock(
         uint32 _proposalId
     ) public view virtual override returns (uint32) {

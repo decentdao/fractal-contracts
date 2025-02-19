@@ -9,7 +9,7 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 /**
  * The base abstract contract for all voting strategies in Azorius.
  */
-abstract contract BaseStrategy is
+abstract contract BaseStrategyV1 is
     OwnableUpgradeable,
     FactoryFriendly,
     IBaseStrategyV1
