@@ -9,8 +9,8 @@ import {
   LinearERC20Voting__factory,
   Azorius,
   Azorius__factory,
-  AzoriusFreezeGuard,
-  AzoriusFreezeGuard__factory,
+  AzoriusFreezeGuardV1,
+  AzoriusFreezeGuardV1__factory,
   ERC20FreezeVoting,
   ERC20FreezeVoting__factory,
   VotesERC20V1,
@@ -37,8 +37,8 @@ import time from './time';
 describe('Azorius Child DAO with Azorius Parent', () => {
   // Deployed contracts
   let childGnosisSafe: GnosisSafe;
-  let freezeGuardMastercopy: AzoriusFreezeGuard;
-  let freezeGuard: AzoriusFreezeGuard;
+  let freezeGuardMastercopy: AzoriusFreezeGuardV1;
+  let freezeGuard: AzoriusFreezeGuardV1;
   let azoriusMastercopy: Azorius;
   let azoriusModule: Azorius;
   let linearERC20Voting: LinearERC20Voting;
@@ -295,7 +295,7 @@ describe('Azorius Child DAO with Azorius Parent', () => {
     freezeVoting = ERC20FreezeVoting__factory.connect(predictedFreezeVotingAddress, deployer);
 
     // Deploy and setUp Azorius Freeze Guard contract
-    freezeGuardMastercopy = await new AzoriusFreezeGuard__factory(deployer).deploy();
+    freezeGuardMastercopy = await new AzoriusFreezeGuardV1__factory(deployer).deploy();
 
     const freezeGuardSetupCalldata =
       // eslint-disable-next-line camelcase
@@ -322,7 +322,7 @@ describe('Azorius Child DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    freezeGuard = AzoriusFreezeGuard__factory.connect(predictedFreezeGuardAddress, deployer);
+    freezeGuard = AzoriusFreezeGuardV1__factory.connect(predictedFreezeGuardAddress, deployer);
 
     // Set the Azorius Freeze Guard as the Guard on the Azorius Module
     await azoriusModule.connect(mockParentDAO).setGuard(await freezeGuard.getAddress());

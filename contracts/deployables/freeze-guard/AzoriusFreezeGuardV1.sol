@@ -13,7 +13,7 @@ import {BaseGuard} from "@gnosis-guild/zodiac/contracts/guard/BaseGuard.sol";
  *
  * See https://docs.safe.global/learn/safe-core/safe-core-protocol/guards.
  */
-contract AzoriusFreezeGuard is FactoryFriendly, IGuard, BaseGuard {
+contract AzoriusFreezeGuardV1 is FactoryFriendly, IGuard, BaseGuard {
     /**
      * A reference to the freeze voting contract, which manages the freeze
      * voting process and maintains the frozen / unfrozen state of the DAO.
