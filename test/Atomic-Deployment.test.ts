@@ -11,8 +11,8 @@ import {
   ModuleProxyFactory,
   MultiSendCallOnly,
   MultiSendCallOnly__factory,
-  MultisigFreezeGuard,
-  MultisigFreezeGuard__factory,
+  MultisigFreezeGuardV1,
+  MultisigFreezeGuardV1__factory,
 } from '../typechain-types';
 import {
   getGnosisSafeL2Singleton,
@@ -37,8 +37,8 @@ describe('Atomic Gnosis Safe Deployment', () => {
   let gnosisSafe: GnosisSafeL2;
   let moduleProxyFactory: ModuleProxyFactory;
   let multiSendCallOnly: MultiSendCallOnly;
-  let freezeGuard: MultisigFreezeGuard;
-  let freezeGuardImplementation: MultisigFreezeGuard;
+  let freezeGuard: MultisigFreezeGuardV1;
+  let freezeGuardImplementation: MultisigFreezeGuardV1;
   let fractalModuleSingleton: FractalModule;
   let fractalModule: FractalModule;
 
@@ -97,10 +97,10 @@ describe('Atomic Gnosis Safe Deployment', () => {
 
     /// /////////////  GUARD ///////////////////
     // DEPLOY GUARD
-    freezeGuardImplementation = await new MultisigFreezeGuard__factory(deployer).deploy();
+    freezeGuardImplementation = await new MultisigFreezeGuardV1__factory(deployer).deploy();
     freezeGuardFactoryInit =
       // eslint-disable-next-line camelcase
-      MultisigFreezeGuard__factory.createInterface().encodeFunctionData('setUp', [
+      MultisigFreezeGuardV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['uint256', 'uint256', 'address', 'address', 'address'],
           [10, 20, owner1.address, owner1.address, await gnosisSafe.getAddress()],
@@ -114,7 +114,7 @@ describe('Atomic Gnosis Safe Deployment', () => {
       '10031021',
     );
 
-    freezeGuard = MultisigFreezeGuard__factory.connect(predictedFreezeGuard, deployer);
+    freezeGuard = MultisigFreezeGuardV1__factory.connect(predictedFreezeGuard, deployer);
 
     /// /////////////// MODULE ////////////////
     // DEPLOY Fractal Module

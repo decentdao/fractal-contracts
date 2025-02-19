@@ -4,8 +4,8 @@ import hre, { ethers } from 'hardhat';
 import {
   ERC721FreezeVoting,
   ERC721FreezeVoting__factory,
-  MultisigFreezeGuard,
-  MultisigFreezeGuard__factory,
+  MultisigFreezeGuardV1,
+  MultisigFreezeGuardV1__factory,
   ERC20FreezeVoting__factory,
   MockERC721,
   MockERC721__factory,
@@ -33,8 +33,8 @@ import time from './time';
 describe('Child Multisig DAO with Azorius Parent', () => {
   // Deployed contracts
   let gnosisSafe: GnosisSafeL2;
-  let freezeGuardMastercopy: MultisigFreezeGuard;
-  let freezeGuard: MultisigFreezeGuard;
+  let freezeGuardMastercopy: MultisigFreezeGuardV1;
+  let freezeGuard: MultisigFreezeGuardV1;
   let freezeVotingMastercopy: ERC721FreezeVoting;
   let freezeVoting: ERC721FreezeVoting;
   let mockNFT: MockERC721;
@@ -235,12 +235,12 @@ describe('Child Multisig DAO with Azorius Parent', () => {
     freezeVoting = ERC721FreezeVoting__factory.connect(predictedFreezeVotingAddress, deployer);
 
     // Deploy FreezeGuard mastercopy contract
-    freezeGuardMastercopy = await new MultisigFreezeGuard__factory(deployer).deploy();
+    freezeGuardMastercopy = await new MultisigFreezeGuardV1__factory(deployer).deploy();
 
     // Deploy MultisigFreezeGuard contract with a 60 block timelock period, and a 60 block execution period
     const freezeGuardSetupData =
       // eslint-disable-next-line camelcase
-      MultisigFreezeGuard__factory.createInterface().encodeFunctionData('setUp', [
+      MultisigFreezeGuardV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['uint32', 'uint32', 'address', 'address', 'address'],
           [
@@ -266,7 +266,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    freezeGuard = MultisigFreezeGuard__factory.connect(predictedFreezeGuardAddress, deployer);
+    freezeGuard = MultisigFreezeGuardV1__factory.connect(predictedFreezeGuardAddress, deployer);
 
     // Create transaction to set the guard address
     const setGuardData = gnosisSafe.interface.encodeFunctionData('setGuard', [
