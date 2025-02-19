@@ -3,8 +3,8 @@ import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import {
   AzoriusV1__factory,
-  FractalModule,
-  FractalModule__factory,
+  FractalModuleV1,
+  FractalModuleV1__factory,
   GnosisSafeL2,
   GnosisSafeL2__factory,
   GnosisSafeProxyFactory,
@@ -39,8 +39,8 @@ describe('Atomic Gnosis Safe Deployment', () => {
   let multiSendCallOnly: MultiSendCallOnly;
   let freezeGuard: MultisigFreezeGuardV1;
   let freezeGuardImplementation: MultisigFreezeGuardV1;
-  let fractalModuleSingleton: FractalModule;
-  let fractalModule: FractalModule;
+  let fractalModuleSingleton: FractalModuleV1;
+  let fractalModule: FractalModuleV1;
 
   // Predicted Contracts
   let predictedFractalModule: string;
@@ -118,12 +118,12 @@ describe('Atomic Gnosis Safe Deployment', () => {
 
     /// /////////////// MODULE ////////////////
     // DEPLOY Fractal Module
-    fractalModuleSingleton = await new FractalModule__factory(deployer).deploy();
+    fractalModuleSingleton = await new FractalModuleV1__factory(deployer).deploy();
 
     // SETUP Module
     setModuleCalldata =
       // eslint-disable-next-line camelcase
-      FractalModule__factory.createInterface().encodeFunctionData('setUp', [
+      FractalModuleV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address', 'address', 'address[]'],
           [
@@ -142,7 +142,7 @@ describe('Atomic Gnosis Safe Deployment', () => {
       '10031021',
     );
 
-    fractalModule = FractalModule__factory.connect(predictedFractalModule, deployer);
+    fractalModule = FractalModuleV1__factory.connect(predictedFractalModule, deployer);
 
     // TX Array
     sigs =

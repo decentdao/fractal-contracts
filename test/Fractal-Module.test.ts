@@ -3,8 +3,8 @@ import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import {
   VotesERC20V1__factory,
-  FractalModule,
-  FractalModule__factory,
+  FractalModuleV1,
+  FractalModuleV1__factory,
   MultisigFreezeGuardV1,
   MultisigFreezeGuardV1__factory,
   ModuleProxyFactory,
@@ -37,8 +37,8 @@ describe('Fractal Module Tests', () => {
   let gnosisSafe: GnosisSafeL2;
   let multiSendCallOnly: MultiSendCallOnly;
   let freezeGuard: MultisigFreezeGuardV1;
-  let moduleImpl: FractalModule;
-  let fractalModule: FractalModule;
+  let moduleImpl: FractalModuleV1;
+  let fractalModule: FractalModuleV1;
 
   // Wallets
   let deployer: SignerWithAddress;
@@ -100,12 +100,12 @@ describe('Fractal Module Tests', () => {
 
     /// /////////////// MODULE ////////////////
     // DEPLOY Fractal Module
-    moduleImpl = await new FractalModule__factory(deployer).deploy();
+    moduleImpl = await new FractalModuleV1__factory(deployer).deploy();
 
     // SETUP Module
     setModuleCalldata =
       // eslint-disable-next-line camelcase
-      FractalModule__factory.createInterface().encodeFunctionData('setUp', [
+      FractalModuleV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address', 'address', 'address[]'],
           [
@@ -124,7 +124,7 @@ describe('Fractal Module Tests', () => {
       '10031021',
     );
 
-    fractalModule = FractalModule__factory.connect(predictedFractalModule, deployer);
+    fractalModule = FractalModuleV1__factory.connect(predictedFractalModule, deployer);
   });
 
   describe('Fractal Module', () => {
