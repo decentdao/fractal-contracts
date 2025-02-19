@@ -24,8 +24,8 @@ interface IERC721VotingWeight {
      */
     function votingWeight(
         address _address,
-        address[] memory _tokenAddresses,
-        uint256[] memory _tokenIds
+        address[] calldata _tokenAddresses,
+        uint256[] calldata _tokenIds
     ) external view returns (uint256);
 
     /**
@@ -35,7 +35,7 @@ interface IERC721VotingWeight {
     function unusedVotingPower(
         address _address,
         uint32 _proposalId,
-        address[] memory _tokenAddresses,
-        uint256[] memory _tokenIds
+        address[] calldata _tokenAddresses,
+        uint256[] calldata _tokenIds
     ) external view returns (ERC721VotingWeight memory);
 }

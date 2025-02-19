@@ -50,7 +50,7 @@ contract LinearERC20VotingWithHatsProposalCreationV2 is
     function unusedVotingWeight(
         address _address,
         uint32 _proposalId
-    ) external view override returns (uint256) {
+    ) public view override returns (uint256) {
         return
             governanceToken.getPastVotes(
                 _address,

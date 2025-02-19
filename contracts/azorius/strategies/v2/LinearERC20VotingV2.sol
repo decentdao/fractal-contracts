@@ -48,7 +48,7 @@ contract LinearERC20VotingV2 is
     function unusedVotingWeight(
         address _address,
         uint32 _proposalId
-    ) external view override returns (uint256) {
+    ) public view override returns (uint256) {
         // This is the same as LinearERC20VotingExtensible.getVotingWeight except external vs public
         return
             governanceToken.getPastVotes(

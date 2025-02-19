@@ -65,7 +65,7 @@ contract LinearERC721VotingV2 is
         uint32 _proposalId,
         address[] memory _tokenAddresses,
         uint256[] memory _tokenIds
-    ) external view override returns (ERC721VotingWeight memory) {
+    ) public view override returns (ERC721VotingWeight memory) {
         return
             _unusedVotingPower(
                 _address,
