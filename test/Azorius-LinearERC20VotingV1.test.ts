@@ -9,8 +9,8 @@ import {
   LinearERC20Voting__factory,
   MockVotingStrategy,
   MockVotingStrategy__factory,
-  Azorius,
-  Azorius__factory,
+  AzoriusV1,
+  AzoriusV1__factory,
   VotesERC20V1,
   VotesERC20V1__factory,
   ModuleProxyFactory,
@@ -34,8 +34,8 @@ import time from './time';
 describe('Safe with Azorius module and linearERC20Voting', () => {
   // Deployed contracts
   let gnosisSafe: GnosisSafe;
-  let azorius: Azorius;
-  let azoriusMastercopy: Azorius;
+  let azorius: AzoriusV1;
+  let azoriusMastercopy: AzoriusV1;
   let linearERC20Voting: LinearERC20Voting;
   let linearERC20VotingMastercopy: LinearERC20Voting;
   let mockVotingStrategy: MockVotingStrategy;
@@ -152,11 +152,11 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
     await votesERC20.connect(tokenHolder3).delegate(tokenHolder3.address);
 
     // Deploy Azorius module
-    azoriusMastercopy = await new Azorius__factory(deployer).deploy();
+    azoriusMastercopy = await new AzoriusV1__factory(deployer).deploy();
 
     const azoriusSetupCalldata =
       // eslint-disable-next-line camelcase
-      Azorius__factory.createInterface().encodeFunctionData('setUp', [
+      AzoriusV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address', 'address', 'address[]', 'uint32', 'uint32'],
           [
@@ -183,7 +183,7 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
       '10031021',
     );
 
-    azorius = Azorius__factory.connect(predictedAzoriusAddress, deployer);
+    azorius = AzoriusV1__factory.connect(predictedAzoriusAddress, deployer);
 
     // Deploy Linear ERC20 Voting Mastercopy
     linearERC20VotingMastercopy = await new LinearERC20Voting__factory(deployer).deploy();
@@ -1224,11 +1224,11 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
       const abiCoder = new ethers.AbiCoder();
 
       // Deploy Azorius module
-      azorius = await new Azorius__factory(deployer).deploy();
+      azorius = await new AzoriusV1__factory(deployer).deploy();
 
       const azoriusSetupCalldata =
         // eslint-disable-next-line camelcase
-        Azorius__factory.createInterface().encodeFunctionData('setUp', [
+        AzoriusV1__factory.createInterface().encodeFunctionData('setUp', [
           abiCoder.encode(
             ['address', 'address', 'address', 'address[]', 'uint256', 'uint256'],
             [
@@ -1255,7 +1255,7 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
         '10031021',
       );
 
-      azorius = Azorius__factory.connect(predictedAzoriusAddress, deployer);
+      azorius = AzoriusV1__factory.connect(predictedAzoriusAddress, deployer);
 
       expect(await azorius.isStrategyEnabled(tokenHolder1.address)).to.eq(true);
       expect(await azorius.isStrategyEnabled(tokenHolder2.address)).to.eq(true);

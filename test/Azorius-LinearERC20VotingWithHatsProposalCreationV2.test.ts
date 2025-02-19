@@ -9,8 +9,8 @@ import {
   GnosisSafeProxyFactory,
   LinearERC20VotingWithHatsProposalCreationV2,
   LinearERC20VotingWithHatsProposalCreationV2__factory,
-  Azorius,
-  Azorius__factory,
+  AzoriusV1,
+  AzoriusV1__factory,
   VotesERC20V1,
   VotesERC20V1__factory,
   ModuleProxyFactory,
@@ -33,8 +33,8 @@ import {
 describe('LinearERC20VotingWithHatsProposalCreationV2', () => {
   // Deployed contracts
   let gnosisSafe: GnosisSafe;
-  let azorius: Azorius;
-  let azoriusMastercopy: Azorius;
+  let azorius: AzoriusV1;
+  let azoriusMastercopy: AzoriusV1;
   let linearERC20VotingWithHats: LinearERC20VotingWithHatsProposalCreationV2;
   let linearERC20VotingWithHatsMastercopy: LinearERC20VotingWithHatsProposalCreationV2;
   let votesERC20Mastercopy: VotesERC20V1;
@@ -114,11 +114,11 @@ describe('LinearERC20VotingWithHatsProposalCreationV2', () => {
     votesERC20 = VotesERC20V1__factory.connect(predictedVotesERC20Address, deployer);
 
     // Deploy Azorius module
-    azoriusMastercopy = await new Azorius__factory(deployer).deploy();
+    azoriusMastercopy = await new AzoriusV1__factory(deployer).deploy();
 
     const azoriusSetupCalldata =
       // eslint-disable-next-line camelcase
-      Azorius__factory.createInterface().encodeFunctionData('setUp', [
+      AzoriusV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address', 'address', 'address[]', 'uint32', 'uint32'],
           [
@@ -145,7 +145,7 @@ describe('LinearERC20VotingWithHatsProposalCreationV2', () => {
       '10031021',
     );
 
-    azorius = Azorius__factory.connect(predictedAzoriusAddress, deployer);
+    azorius = AzoriusV1__factory.connect(predictedAzoriusAddress, deployer);
 
     // Deploy LinearERC20VotingWithHatsProposalCreationV2
     linearERC20VotingWithHatsMastercopy =
