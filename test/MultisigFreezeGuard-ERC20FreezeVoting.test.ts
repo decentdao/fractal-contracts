@@ -2,8 +2,8 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import {
-  VotesERC20,
-  VotesERC20__factory,
+  VotesERC20V1,
+  VotesERC20V1__factory,
   ERC20FreezeVoting,
   ERC20FreezeVoting__factory,
   MultisigFreezeGuard,
@@ -32,8 +32,8 @@ describe('Child Multisig DAO with Azorius Parent', () => {
   let freezeGuard: MultisigFreezeGuard;
   let freezeVotingMastercopy: ERC20FreezeVoting;
   let freezeVoting: ERC20FreezeVoting;
-  let votesERC20Mastercopy: VotesERC20;
-  let votesERC20: VotesERC20;
+  let votesERC20Mastercopy: VotesERC20V1;
+  let votesERC20: VotesERC20V1;
 
   // Wallets
   let deployer: SignerWithAddress;
@@ -90,12 +90,12 @@ describe('Child Multisig DAO with Azorius Parent', () => {
     gnosisSafe = GnosisSafeL2__factory.connect(predictedGnosisSafeAddress, deployer);
 
     // Deploy token mastercopy
-    votesERC20Mastercopy = await new VotesERC20__factory(deployer).deploy();
+    votesERC20Mastercopy = await new VotesERC20V1__factory(deployer).deploy();
 
     const abiCoder = new ethers.AbiCoder(); // encode data
     const votesERC20SetupData =
       // eslint-disable-next-line camelcase
-      VotesERC20__factory.createInterface().encodeFunctionData('setUp', [
+      VotesERC20V1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['string', 'string', 'address[]', 'uint256[]'],
           [
@@ -120,7 +120,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    votesERC20 = await hre.ethers.getContractAt('VotesERC20', predictedVotesERC20Address);
+    votesERC20 = VotesERC20V1__factory.connect(predictedVotesERC20Address, deployer);
 
     // Vetoers delegate their votes to themselves
     await votesERC20.connect(tokenVetoer1).delegate(tokenVetoer1.address);
@@ -158,10 +158,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    freezeVoting = await hre.ethers.getContractAt(
-      'ERC20FreezeVoting',
-      predictedFreezeVotingAddress,
-    );
+    freezeVoting = ERC20FreezeVoting__factory.connect(predictedFreezeVotingAddress, deployer);
 
     // Deploy FreezeGuard mastercopy contract
     freezeGuardMastercopy = await new MultisigFreezeGuard__factory(deployer).deploy();
@@ -195,10 +192,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    freezeGuard = await hre.ethers.getContractAt(
-      'MultisigFreezeGuard',
-      predictedFreezeGuardAddress,
-    );
+    freezeGuard = MultisigFreezeGuard__factory.connect(predictedFreezeGuardAddress, deployer);
 
     // Create transaction to set the guard address
     const setGuardData = gnosisSafe.interface.encodeFunctionData('setGuard', [
