@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {BaseStrategy} from "./BaseStrategy.sol";
-import {BaseQuorumPercent} from "./BaseQuorumPercent.sol";
+import {BaseQuorumPercentV1} from "./BaseQuorumPercentV1.sol";
 import {BaseVotingBasisPercent} from "./BaseVotingBasisPercent.sol";
 import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
 
@@ -13,7 +13,7 @@ import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
  */
 contract LinearERC20Voting is
     BaseStrategy,
-    BaseQuorumPercent,
+    BaseQuorumPercentV1,
     BaseVotingBasisPercent
 {
     /**
@@ -315,7 +315,7 @@ contract LinearERC20Voting is
         emit Voted(_voter, _proposalId, _voteType, _weight);
     }
 
-    /** @inheritdoc BaseQuorumPercent*/
+    /** @inheritdoc BaseQuorumPercentV1*/
     function quorumVotes(
         uint32 _proposalId
     ) public view virtual override returns (uint256) {
