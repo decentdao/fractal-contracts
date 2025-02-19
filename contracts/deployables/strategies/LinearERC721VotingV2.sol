@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {LinearERC721Voting} from "./LinearERC721Voting.sol";
-import {IVersion} from "../../interfaces/decent/IVersion.sol";
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
 
 /**

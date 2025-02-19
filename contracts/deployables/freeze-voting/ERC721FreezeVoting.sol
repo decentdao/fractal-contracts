@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {IERC721VotingStrategyV1} from "../../interfaces/decent/IERC721VotingStrategyV1.sol";
+import {IERC721VotingStrategyV1} from "../../interfaces/decent/deployables/IERC721VotingStrategyV1.sol";
 import {BaseFreezeVoting} from "./BaseFreezeVoting.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 

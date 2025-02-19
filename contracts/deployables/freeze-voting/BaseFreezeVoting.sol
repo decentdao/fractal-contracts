@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
-import {IBaseFreezeVotingV1} from "../../interfaces/decent/IBaseFreezeVotingV1.sol";
+import {IBaseFreezeVotingV1} from "../../interfaces/decent/deployables/IBaseFreezeVotingV1.sol";
 
 /**
  * The base abstract contract which holds the state of a vote to freeze a childDAO.

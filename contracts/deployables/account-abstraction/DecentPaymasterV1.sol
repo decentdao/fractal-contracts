@@ -2,8 +2,8 @@
 pragma solidity ^0.8.28;
 
 import {BasePaymasterV1, IEntryPoint} from "./BasePaymasterV1.sol";
-import {IDecentPaymasterV1} from "../../interfaces/decent/IDecentPaymasterV1.sol";
-import {IVersion} from "../../interfaces/decent/IVersion.sol";
+import {IDecentPaymasterV1} from "../../interfaces/decent/deployables/IDecentPaymasterV1.sol";
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {PackedUserOperation, IPaymaster} from "@account-abstraction/contracts/interfaces/IPaymaster.sol";
 import {ERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 

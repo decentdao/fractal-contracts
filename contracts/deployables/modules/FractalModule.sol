@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {IFractalModuleV1} from "../../interfaces/decent/IFractalModuleV1.sol";
+import {IFractalModuleV1} from "../../interfaces/decent/deployables/IFractalModuleV1.sol";
 import {GuardableModule, Enum} from "@gnosis-guild/zodiac/contracts/core/GuardableModule.sol";
 
 /**

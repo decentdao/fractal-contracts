@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
-import {IAzoriusV1} from "../../interfaces/decent/IAzoriusV1.sol";
-import {IBaseStrategyV1} from "../../interfaces/decent/IBaseStrategyV1.sol";
+import {IAzoriusV1} from "../../interfaces/decent/deployables/IAzoriusV1.sol";
+import {IBaseStrategyV1} from "../../interfaces/decent/deployables/IBaseStrategyV1.sol";
 import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 

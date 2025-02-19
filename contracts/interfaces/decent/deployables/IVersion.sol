@@ -7,7 +7,6 @@ pragma solidity ^0.8.28;
 interface IVersion {
     /**
      * Returns the current version of the contract
-     *
      */
     function getVersion() external pure returns (uint16);
 }
