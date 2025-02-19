@@ -7,8 +7,8 @@ import hre from 'hardhat';
 import {
   GnosisSafe,
   GnosisSafeProxyFactory,
-  LinearERC721VotingWithHatsProposalCreation,
-  LinearERC721VotingWithHatsProposalCreation__factory,
+  LinearERC721VotingWithHatsProposalCreationV1,
+  LinearERC721VotingWithHatsProposalCreationV1__factory,
   AzoriusV1,
   AzoriusV1__factory,
   MockERC721,
@@ -36,8 +36,8 @@ describe('LinearERC721VotingWithHatsProposalCreation', () => {
   let gnosisSafe: GnosisSafe;
   let azorius: AzoriusV1;
   let azoriusMastercopy: AzoriusV1;
-  let linearERC721VotingWithHats: LinearERC721VotingWithHatsProposalCreation;
-  let linearERC721VotingWithHatsMastercopy: LinearERC721VotingWithHatsProposalCreation;
+  let linearERC721VotingWithHats: LinearERC721VotingWithHatsProposalCreationV1;
+  let linearERC721VotingWithHatsMastercopy: LinearERC721VotingWithHatsProposalCreationV1;
   let mockERC721: MockERC721;
   let gnosisSafeProxyFactory: GnosisSafeProxyFactory;
   let moduleProxyFactory: ModuleProxyFactory;
@@ -128,12 +128,12 @@ describe('LinearERC721VotingWithHatsProposalCreation', () => {
 
     // Deploy LinearERC721VotingWithHatsProposalCreation
     linearERC721VotingWithHatsMastercopy =
-      await new LinearERC721VotingWithHatsProposalCreation__factory(deployer).deploy();
+      await new LinearERC721VotingWithHatsProposalCreationV1__factory(deployer).deploy();
 
     const mockHatsContractAddress = '0x1234567890123456789012345678901234567890';
 
     const linearERC721VotingWithHatsSetupCalldata =
-      LinearERC721VotingWithHatsProposalCreation__factory.createInterface().encodeFunctionData(
+      LinearERC721VotingWithHatsProposalCreationV1__factory.createInterface().encodeFunctionData(
         'setUp',
         [
           abiCoder.encode(
@@ -176,7 +176,7 @@ describe('LinearERC721VotingWithHatsProposalCreation', () => {
       '10031021',
     );
 
-    linearERC721VotingWithHats = LinearERC721VotingWithHatsProposalCreation__factory.connect(
+    linearERC721VotingWithHats = LinearERC721VotingWithHatsProposalCreationV1__factory.connect(
       predictedLinearERC721VotingWithHatsAddress,
       deployer,
     );
