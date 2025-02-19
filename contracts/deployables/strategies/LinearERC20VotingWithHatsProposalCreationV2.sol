@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {LinearERC20Voting} from "./LinearERC20Voting.sol";
-import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
+import {ERC4337VoterSupportV1} from "./ERC4337VoterSupportV1.sol";
 import {LinearERC20VotingWithHatsProposalCreation} from "./LinearERC20VotingWithHatsProposalCreation.sol";
 import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 
@@ -14,7 +14,7 @@ import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 contract LinearERC20VotingWithHatsProposalCreationV2 is
     LinearERC20VotingWithHatsProposalCreation,
     IVersion,
-    ERC4337VoterSupport
+    ERC4337VoterSupportV1
 {
     /** @inheritdoc IVersion*/
     function getVersion() external pure override returns (uint16) {

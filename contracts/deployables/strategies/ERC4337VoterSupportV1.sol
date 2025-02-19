@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import {IOwnershipV1} from "../../interfaces/decent/deployables/IOwnershipV1.sol";
 
-abstract contract ERC4337VoterSupport {
+abstract contract ERC4337VoterSupportV1 {
     /**
      * Returns the address of the voter which owns the voting weight
      * @param _msgSender address of the sender. It can be the wallet address, or the smart account address with EOA as owner
