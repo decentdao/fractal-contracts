@@ -13,7 +13,7 @@ import {GuardableModule, Enum} from "@gnosis-guild/zodiac/contracts/core/Guardab
  * transactions on the Safe, which in our implementation is the set of parent
  * DAOs.
  */
-contract FractalModule is IFractalModuleV1, GuardableModule {
+contract FractalModuleV1 is IFractalModuleV1, GuardableModule {
     /** Mapping of whether an address is a controller (typically a parentDAO). */
     mapping(address => bool) public controllers;
 
