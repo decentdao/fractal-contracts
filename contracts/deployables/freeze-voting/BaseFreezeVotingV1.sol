@@ -21,7 +21,7 @@ import {IBaseFreezeVotingV1} from "../../interfaces/decent/deployables/IBaseFree
  * Following a successful freeze vote, the childDAO will be unable to execute transactions, due to
  * a Safe Transaction Guard, until the `freezePeriod` has elapsed.
  */
-abstract contract BaseFreezeVoting is FactoryFriendly, IBaseFreezeVotingV1 {
+abstract contract BaseFreezeVotingV1 is FactoryFriendly, IBaseFreezeVotingV1 {
     /** Block number the freeze proposal was created at. */
     uint32 public freezeProposalCreatedBlock;
 

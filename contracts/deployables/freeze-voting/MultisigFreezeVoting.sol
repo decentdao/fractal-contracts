@@ -1,13 +1,13 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {BaseFreezeVoting} from "./BaseFreezeVoting.sol";
+import {BaseFreezeVotingV1} from "./BaseFreezeVotingV1.sol";
 import {ISafe} from "../../interfaces/safe/ISafe.sol";
 
 /**
  * A BaseFreezeVoting implementation which handles freezes on multi-sig (Safe) based DAOs.
  */
-contract MultisigFreezeVoting is BaseFreezeVoting {
+contract MultisigFreezeVoting is BaseFreezeVotingV1 {
     ISafe public parentGnosisSafe;
 
     event MultisigFreezeVotingSetup(
@@ -46,7 +46,7 @@ contract MultisigFreezeVoting is BaseFreezeVoting {
         emit MultisigFreezeVotingSetup(_owner, _parentGnosisSafe);
     }
 
-    /** @inheritdoc BaseFreezeVoting*/
+    /** @inheritdoc BaseFreezeVotingV1*/
     function castFreezeVote() external override {
         if (!parentGnosisSafe.isOwner(msg.sender)) revert NotOwner();
 
