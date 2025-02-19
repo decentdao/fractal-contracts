@@ -17,22 +17,22 @@ import {
   ModuleProxyFactory,
   GnosisSafeL2__factory,
   GnosisSafeL2,
-} from '../typechain-types';
+} from '../../typechain-types';
 
 import {
   getGnosisSafeL2Singleton,
   getGnosisSafeProxyFactory,
   getModuleProxyFactory,
-} from './GlobalSafeDeployments.test';
+} from '../global/GlobalSafeDeployments.test';
 import {
   buildSignatureBytes,
   buildSafeTransaction,
   safeSignTypedData,
   predictGnosisSafeAddress,
   calculateProxyAddress,
-} from './helpers';
+} from '../helpers';
 
-import time from './time';
+import time from '../time';
 
 describe('Azorius Child DAO with Multisig parent', () => {
   // Deployed contracts

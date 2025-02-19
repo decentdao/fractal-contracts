@@ -13,20 +13,20 @@ import {
   MultiSendCallOnly__factory,
   MultisigFreezeGuardV1,
   MultisigFreezeGuardV1__factory,
-} from '../typechain-types';
+} from '../../typechain-types';
 import {
   getGnosisSafeL2Singleton,
   getGnosisSafeProxyFactory,
   getModuleProxyFactory,
   getMultiSendCallOnly,
-} from './GlobalSafeDeployments.test';
+} from '../global/GlobalSafeDeployments.test';
 import {
   calculateProxyAddress,
   predictGnosisSafeAddress,
   buildContractCall,
   MetaTransaction,
   encodeMultiSend,
-} from './helpers';
+} from '../helpers';
 
 describe('Atomic Gnosis Safe Deployment', () => {
   // Factories

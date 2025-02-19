@@ -9,9 +9,9 @@ import {
   IPaymaster__factory,
   IDecentPaymasterV1__factory,
   DecentPaymasterV1__factory,
-} from '../typechain-types';
-import { getModuleProxyFactory } from './GlobalSafeDeployments.test';
-import { calculateProxyAddress } from './helpers';
+} from '../../../typechain-types';
+import { getModuleProxyFactory } from '../../global/GlobalSafeDeployments.test';
+import { calculateProxyAddress } from '../../helpers';
 
 interface PackedUserOperation {
   sender: string;

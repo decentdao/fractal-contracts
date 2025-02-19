@@ -6,11 +6,11 @@ import {
   ERC6551Registry,
   GnosisSafeL2,
   GnosisSafeProxyFactory,
-  IAzorius,
+  IAzoriusV1,
   MockContract__factory,
   MockHatsAccount__factory,
 } from '../typechain-types';
-import { getMockContract } from './GlobalSafeDeployments.test';
+import { getMockContract } from './global/GlobalSafeDeployments.test';
 
 export interface MetaTransaction {
   to: string;
@@ -181,7 +181,7 @@ export const encodeMultiSend = (txs: MetaTransaction[]): string => {
   );
 };
 
-export const mockTransaction = async (): Promise<IAzorius.TransactionStruct> => {
+export const mockTransaction = async (): Promise<IAzoriusV1.TransactionStruct> => {
   return {
     to: await getMockContract().getAddress(),
     value: 0n,
@@ -191,7 +191,7 @@ export const mockTransaction = async (): Promise<IAzorius.TransactionStruct> => 
   };
 };
 
-export const mockRevertTransaction = async (): Promise<IAzorius.TransactionStruct> => {
+export const mockRevertTransaction = async (): Promise<IAzoriusV1.TransactionStruct> => {
   return {
     to: await getMockContract().getAddress(),
     value: 0n,

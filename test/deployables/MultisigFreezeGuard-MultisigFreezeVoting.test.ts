@@ -11,21 +11,21 @@ import {
   MultisigFreezeGuardV1__factory,
   GnosisSafeL2__factory,
   GnosisSafeL2,
-} from '../typechain-types';
+} from '../../typechain-types';
 
 import {
   getGnosisSafeL2Singleton,
   getGnosisSafeProxyFactory,
   getModuleProxyFactory,
-} from './GlobalSafeDeployments.test';
+} from '../global/GlobalSafeDeployments.test';
 import {
   buildSignatureBytes,
   buildSafeTransaction,
   safeSignTypedData,
   predictGnosisSafeAddress,
   calculateProxyAddress,
-} from './helpers';
-import time from './time';
+} from '../helpers';
+import time from '../time';
 
 describe('Child Multisig DAO with Multisig Parent', () => {
   // Deployed contracts
