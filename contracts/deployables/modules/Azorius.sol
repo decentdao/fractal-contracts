@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
-import {IBaseStrategy} from "../../interfaces/decent/deployables/IBaseStrategy.sol";
+import {IBaseStrategyV1} from "../../interfaces/decent/deployables/IBaseStrategyV1.sol";
 import {IAzoriusV1, Enum} from "../../interfaces/decent/deployables/IAzoriusV1.sol";
 import {GuardableModule} from "@gnosis-guild/zodiac/contracts/core/GuardableModule.sol";
 
@@ -147,7 +147,7 @@ contract Azorius is IAzoriusV1, GuardableModule {
         string calldata _metadata
     ) external {
         if (!isStrategyEnabled(_strategy)) revert StrategyDisabled();
-        if (!IBaseStrategy(_strategy).isProposer(msg.sender))
+        if (!IBaseStrategyV1(_strategy).isProposer(msg.sender))
             revert InvalidProposer();
 
         bytes32[] memory txHashes = new bytes32[](_transactions.length);
@@ -171,7 +171,7 @@ contract Azorius is IAzoriusV1, GuardableModule {
 
         // not all strategy contracts will necessarily use the txHashes and _data values
         // they are encoded to support any strategy contracts that may need them
-        IBaseStrategy(_strategy).initializeProposal(
+        IBaseStrategyV1(_strategy).initializeProposal(
             abi.encode(totalProposalCount, txHashes, _data)
         );
 
@@ -326,7 +326,7 @@ contract Azorius is IAzoriusV1, GuardableModule {
 
         if (_proposal.strategy == address(0)) revert InvalidProposal();
 
-        IBaseStrategy _strategy = IBaseStrategy(_proposal.strategy);
+        IBaseStrategyV1 _strategy = IBaseStrategyV1(_proposal.strategy);
 
         uint256 votingEndBlock = _strategy.votingEndBlock(_proposalId);
 

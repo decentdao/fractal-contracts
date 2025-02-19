@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {IAzoriusV1} from "../../interfaces/decent/deployables/IAzoriusV1.sol";
-import {IBaseStrategy} from "../../interfaces/decent/deployables/IBaseStrategy.sol";
+import {IBaseStrategyV1} from "../../interfaces/decent/deployables/IBaseStrategyV1.sol";
 import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
@@ -12,7 +12,7 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 abstract contract BaseStrategy is
     OwnableUpgradeable,
     FactoryFriendly,
-    IBaseStrategy
+    IBaseStrategyV1
 {
     event AzoriusSet(address indexed azoriusModule);
     event StrategySetUp(address indexed azoriusModule, address indexed owner);
@@ -34,22 +34,22 @@ abstract contract BaseStrategy is
         _disableInitializers();
     }
 
-    /** @inheritdoc IBaseStrategy*/
+    /** @inheritdoc IBaseStrategyV1*/
     function setAzorius(address _azoriusModule) external onlyOwner {
         azoriusModule = IAzoriusV1(_azoriusModule);
         emit AzoriusSet(_azoriusModule);
     }
 
-    /** @inheritdoc IBaseStrategy*/
+    /** @inheritdoc IBaseStrategyV1*/
     function initializeProposal(bytes memory _data) external virtual;
 
-    /** @inheritdoc IBaseStrategy*/
+    /** @inheritdoc IBaseStrategyV1*/
     function isPassed(uint32 _proposalId) external view virtual returns (bool);
 
-    /** @inheritdoc IBaseStrategy*/
+    /** @inheritdoc IBaseStrategyV1*/
     function isProposer(address _address) external view virtual returns (bool);
 
-    /** @inheritdoc IBaseStrategy*/
+    /** @inheritdoc IBaseStrategyV1*/
     function votingEndBlock(
         uint32 _proposalId
     ) external view virtual returns (uint32);
