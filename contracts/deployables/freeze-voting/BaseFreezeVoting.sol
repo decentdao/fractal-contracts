@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
-import {IBaseFreezeVoting} from "../../interfaces/decent/IBaseFreezeVoting.sol";
+import {IBaseFreezeVotingV1} from "../../interfaces/decent/IBaseFreezeVotingV1.sol";
 
 /**
  * The base abstract contract which holds the state of a vote to freeze a childDAO.
@@ -21,7 +21,7 @@ import {IBaseFreezeVoting} from "../../interfaces/decent/IBaseFreezeVoting.sol";
  * Following a successful freeze vote, the childDAO will be unable to execute transactions, due to
  * a Safe Transaction Guard, until the `freezePeriod` has elapsed.
  */
-abstract contract BaseFreezeVoting is FactoryFriendly, IBaseFreezeVoting {
+abstract contract BaseFreezeVoting is FactoryFriendly, IBaseFreezeVotingV1 {
     /** Block number the freeze proposal was created at. */
     uint32 public freezeProposalCreatedBlock;
 

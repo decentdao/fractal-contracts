@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {IERC721VotingStrategy} from "../../interfaces/decent/IERC721VotingStrategy.sol";
-import {BaseFreezeVoting, IBaseFreezeVoting} from "./BaseFreezeVoting.sol";
+import {BaseFreezeVoting} from "./BaseFreezeVoting.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /**
@@ -56,6 +56,7 @@ contract ERC721FreezeVoting is BaseFreezeVoting {
         emit ERC721FreezeVotingSetUp(_owner, _strategy);
     }
 
+    /** @inheritdoc BaseFreezeVoting*/
     function castFreezeVote() external pure override {
         revert NotSupported();
     }

@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {IBaseFreezeVoting} from "../../interfaces/decent/IBaseFreezeVoting.sol";
+import {IBaseFreezeVotingV1} from "../../interfaces/decent/IBaseFreezeVotingV1.sol";
 import {IGuard} from "@gnosis-guild/zodiac/contracts/interfaces/IGuard.sol";
 import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
 import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
@@ -18,7 +18,7 @@ contract AzoriusFreezeGuard is FactoryFriendly, IGuard, BaseGuard {
      * A reference to the freeze voting contract, which manages the freeze
      * voting process and maintains the frozen / unfrozen state of the DAO.
      */
-    IBaseFreezeVoting public freezeVoting;
+    IBaseFreezeVotingV1 public freezeVoting;
 
     event AzoriusFreezeGuardSetUp(
         address indexed creator,
@@ -44,7 +44,7 @@ contract AzoriusFreezeGuard is FactoryFriendly, IGuard, BaseGuard {
             (address, address)
         );
         __Ownable_init(_owner);
-        freezeVoting = IBaseFreezeVoting(_freezeVoting);
+        freezeVoting = IBaseFreezeVotingV1(_freezeVoting);
 
         emit AzoriusFreezeGuardSetUp(msg.sender, _owner, _freezeVoting);
     }

@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {BaseFreezeVoting, IBaseFreezeVoting} from "./BaseFreezeVoting.sol";
+import {BaseFreezeVoting} from "./BaseFreezeVoting.sol";
 import {ISafe} from "../../interfaces/safe/ISafe.sol";
 
 /**
@@ -46,7 +46,7 @@ contract MultisigFreezeVoting is BaseFreezeVoting {
         emit MultisigFreezeVotingSetup(_owner, _parentGnosisSafe);
     }
 
-    /** @inheritdoc IBaseFreezeVoting*/
+    /** @inheritdoc BaseFreezeVoting*/
     function castFreezeVote() external override {
         if (!parentGnosisSafe.isOwner(msg.sender)) revert NotOwner();
 

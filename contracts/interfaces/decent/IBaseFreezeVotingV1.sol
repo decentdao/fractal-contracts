@@ -12,7 +12,7 @@ import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
  * passes, further transaction executions on the subDAO should be blocked via a Safe guard
  * module (see [MultisigFreezeGuard](../MultisigFreezeGuard.md) / [AzoriusFreezeGuard](../AzoriusFreezeGuard.md)).
  */
-interface IBaseFreezeVoting {
+interface IBaseFreezeVotingV1 {
     /**
      * Allows an address to cast a "freeze vote", which is a vote to freeze the DAO
      * from executing transactions, even if they've already passed via a Proposal.
