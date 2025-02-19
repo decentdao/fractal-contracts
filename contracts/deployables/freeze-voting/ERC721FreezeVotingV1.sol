@@ -9,7 +9,7 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
  * A [BaseFreezeVoting](./BaseFreezeVoting.md) implementation which handles
  * freezes on ERC721 based token voting DAOs.
  */
-contract ERC721FreezeVoting is BaseFreezeVotingV1 {
+contract ERC721FreezeVotingV1 is BaseFreezeVotingV1 {
     /** A reference to the voting strategy of the parent DAO. */
     IERC721VotingStrategyV1 public strategy;
 

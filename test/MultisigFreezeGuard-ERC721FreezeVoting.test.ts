@@ -2,8 +2,8 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import {
-  ERC721FreezeVoting,
-  ERC721FreezeVoting__factory,
+  ERC721FreezeVotingV1,
+  ERC721FreezeVotingV1__factory,
   MultisigFreezeGuardV1,
   MultisigFreezeGuardV1__factory,
   ERC20FreezeVotingV1__factory,
@@ -35,8 +35,8 @@ describe('Child Multisig DAO with Azorius Parent', () => {
   let gnosisSafe: GnosisSafeL2;
   let freezeGuardMastercopy: MultisigFreezeGuardV1;
   let freezeGuard: MultisigFreezeGuardV1;
-  let freezeVotingMastercopy: ERC721FreezeVoting;
-  let freezeVoting: ERC721FreezeVoting;
+  let freezeVotingMastercopy: ERC721FreezeVotingV1;
+  let freezeVoting: ERC721FreezeVotingV1;
   let mockNFT: MockERC721;
   let linearERC721Voting: LinearERC721Voting;
   let linearERC721VotingMastercopy: LinearERC721Voting;
@@ -201,7 +201,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
     );
 
     // Deploy ERC721FreezeVoting mastercopy contract
-    freezeVotingMastercopy = await new ERC721FreezeVoting__factory(deployer).deploy();
+    freezeVotingMastercopy = await new ERC721FreezeVotingV1__factory(deployer).deploy();
 
     // Initialize FreezeVoting contract
     const freezeVotingSetupData =
@@ -232,7 +232,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    freezeVoting = ERC721FreezeVoting__factory.connect(predictedFreezeVotingAddress, deployer);
+    freezeVoting = ERC721FreezeVotingV1__factory.connect(predictedFreezeVotingAddress, deployer);
 
     // Deploy FreezeGuard mastercopy contract
     freezeGuardMastercopy = await new MultisigFreezeGuardV1__factory(deployer).deploy();
