@@ -15,7 +15,7 @@ import {GuardableModule} from "@gnosis-guild/zodiac/contracts/core/GuardableModu
  * All voting details are delegated to [BaseStrategy](./BaseStrategy.md) implementations, of which an Azorius DAO can
  * have any number.
  */
-contract Azorius is IAzoriusV1, GuardableModule {
+contract AzoriusV1 is IAzoriusV1, GuardableModule {
     /**
      * The sentinel node of the linked list of enabled [BaseStrategies](./BaseStrategy.md).
      *

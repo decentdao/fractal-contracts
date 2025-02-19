@@ -6,8 +6,8 @@ import {
   GnosisSafeProxyFactory,
   LinearERC20Voting,
   LinearERC20Voting__factory,
-  Azorius,
-  Azorius__factory,
+  AzoriusV1,
+  AzoriusV1__factory,
   AzoriusFreezeGuardV1,
   AzoriusFreezeGuardV1__factory,
   MultisigFreezeVotingV1,
@@ -40,8 +40,8 @@ describe('Azorius Child DAO with Multisig parent', () => {
   let childGnosisSafe: GnosisSafeL2;
   let freezeGuard: AzoriusFreezeGuardV1;
   let freezeGuardMastercopy: AzoriusFreezeGuardV1;
-  let azoriusMastercopy: Azorius;
-  let azoriusModule: Azorius;
+  let azoriusMastercopy: AzoriusV1;
+  let azoriusModule: AzoriusV1;
   let linearERC20VotingMastercopy: LinearERC20Voting;
   let linearERC20Voting: LinearERC20Voting;
   let freezeVotingMastercopy: MultisigFreezeVotingV1;
@@ -190,11 +190,11 @@ describe('Azorius Child DAO with Multisig parent', () => {
     await childVotesERC20.connect(childTokenHolder2).delegate(childTokenHolder2.address);
 
     // Deploy Azorius module mastercopy
-    azoriusMastercopy = await new Azorius__factory(deployer).deploy();
+    azoriusMastercopy = await new AzoriusV1__factory(deployer).deploy();
 
     const azoriusSetupCalldata =
       // eslint-disable-next-line camelcase
-      Azorius__factory.createInterface().encodeFunctionData('setUp', [
+      AzoriusV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address', 'address', 'address[]', 'uint32', 'uint32'],
           [
@@ -221,7 +221,7 @@ describe('Azorius Child DAO with Multisig parent', () => {
       '10031021',
     );
 
-    azoriusModule = Azorius__factory.connect(predictedAzoriusAddress, deployer);
+    azoriusModule = AzoriusV1__factory.connect(predictedAzoriusAddress, deployer);
 
     // Deploy Linear ERC-20 Voting Strategy Mastercopy
     linearERC20VotingMastercopy = await new LinearERC20Voting__factory(deployer).deploy();

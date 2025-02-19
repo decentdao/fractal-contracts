@@ -2,7 +2,7 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import {
-  Azorius__factory,
+  AzoriusV1__factory,
   FractalModule,
   FractalModule__factory,
   GnosisSafeL2,
@@ -221,9 +221,9 @@ describe('Atomic Gnosis Safe Deployment', () => {
       );
       const encodedSetupAzoriusData =
         // eslint-disable-next-line camelcase
-        Azorius__factory.createInterface().encodeFunctionData('setUp', [encodedInitAzoriusData]);
+        AzoriusV1__factory.createInterface().encodeFunctionData('setUp', [encodedInitAzoriusData]);
 
-      const azoriusSingleton = await new Azorius__factory(deployer).deploy();
+      const azoriusSingleton = await new AzoriusV1__factory(deployer).deploy();
 
       const predictedAzoriusModule = await calculateProxyAddress(
         moduleProxyFactory,
@@ -233,7 +233,7 @@ describe('Atomic Gnosis Safe Deployment', () => {
       );
 
       // eslint-disable-next-line camelcase
-      const azoriusContract = Azorius__factory.connect(predictedAzoriusModule, deployer);
+      const azoriusContract = AzoriusV1__factory.connect(predictedAzoriusModule, deployer);
 
       const txs: MetaTransaction[] = [
         await buildContractCall(
@@ -341,9 +341,9 @@ describe('Atomic Gnosis Safe Deployment', () => {
       );
       const encodedSetupAzoriusData =
         // eslint-disable-next-line camelcase
-        Azorius__factory.createInterface().encodeFunctionData('setUp', [encodedInitAzoriusData]);
+        AzoriusV1__factory.createInterface().encodeFunctionData('setUp', [encodedInitAzoriusData]);
 
-      const azoriusSingleton = await new Azorius__factory(deployer).deploy();
+      const azoriusSingleton = await new AzoriusV1__factory(deployer).deploy();
 
       const predictedAzoriusModule = await calculateProxyAddress(
         moduleProxyFactory,
@@ -353,7 +353,7 @@ describe('Atomic Gnosis Safe Deployment', () => {
       );
 
       // eslint-disable-next-line camelcase
-      const azoriusContract = Azorius__factory.connect(predictedAzoriusModule, deployer);
+      const azoriusContract = AzoriusV1__factory.connect(predictedAzoriusModule, deployer);
 
       const internalTxs: MetaTransaction[] = [
         await buildContractCall(

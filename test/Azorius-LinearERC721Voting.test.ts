@@ -6,8 +6,8 @@ import {
   GnosisSafeProxyFactory,
   LinearERC721Voting,
   LinearERC721Voting__factory,
-  Azorius,
-  Azorius__factory,
+  AzoriusV1,
+  AzoriusV1__factory,
   ModuleProxyFactory,
   MockERC721,
   MockERC721__factory,
@@ -36,8 +36,8 @@ describe('Safe with Azorius module and linearERC721Voting', () => {
 
   // Deployed contracts
   let gnosisSafe: GnosisSafe;
-  let azorius: Azorius;
-  let azoriusMastercopy: Azorius;
+  let azorius: AzoriusV1;
+  let azoriusMastercopy: AzoriusV1;
   let linearERC721Voting: LinearERC721Voting;
   let linearERC721VotingMastercopy: LinearERC721Voting;
   let mockNFT1: MockERC721;
@@ -146,11 +146,11 @@ describe('Safe with Azorius module and linearERC721Voting', () => {
     };
 
     // Deploy Azorius module
-    azoriusMastercopy = await new Azorius__factory(deployer).deploy();
+    azoriusMastercopy = await new AzoriusV1__factory(deployer).deploy();
 
     const azoriusSetupCalldata =
       // eslint-disable-next-line camelcase
-      Azorius__factory.createInterface().encodeFunctionData('setUp', [
+      AzoriusV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address', 'address', 'address[]', 'uint32', 'uint32'],
           [
@@ -177,7 +177,7 @@ describe('Safe with Azorius module and linearERC721Voting', () => {
       '10031021',
     );
 
-    azorius = Azorius__factory.connect(predictedAzoriusAddress, deployer);
+    azorius = AzoriusV1__factory.connect(predictedAzoriusAddress, deployer);
 
     // Deploy Linear ERC721 Voting Mastercopy
     linearERC721VotingMastercopy = await new LinearERC721Voting__factory(deployer).deploy();

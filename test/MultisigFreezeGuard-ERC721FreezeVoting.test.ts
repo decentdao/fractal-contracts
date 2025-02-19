@@ -9,10 +9,10 @@ import {
   ERC20FreezeVotingV1__factory,
   MockERC721,
   MockERC721__factory,
-  Azorius__factory,
+  AzoriusV1,
+  AzoriusV1__factory,
   LinearERC721Voting,
   LinearERC721Voting__factory,
-  Azorius,
   GnosisSafeL2__factory,
   GnosisSafeL2,
 } from '../typechain-types';
@@ -40,8 +40,8 @@ describe('Child Multisig DAO with Azorius Parent', () => {
   let mockNFT: MockERC721;
   let linearERC721Voting: LinearERC721Voting;
   let linearERC721VotingMastercopy: LinearERC721Voting;
-  let azoriusMastercopy: Azorius;
-  let azorius: Azorius;
+  let azoriusMastercopy: AzoriusV1;
+  let azorius: AzoriusV1;
 
   // Wallets
   let deployer: SignerWithAddress;
@@ -119,11 +119,11 @@ describe('Child Multisig DAO with Azorius Parent', () => {
     mintNFTData = mockNFT.interface.encodeFunctionData('mint', [deployer.address]);
 
     // Deploy Azorius module
-    azoriusMastercopy = await new Azorius__factory(deployer).deploy();
+    azoriusMastercopy = await new AzoriusV1__factory(deployer).deploy();
 
     const azoriusSetupCalldata =
       // eslint-disable-next-line camelcase
-      Azorius__factory.createInterface().encodeFunctionData('setUp', [
+      AzoriusV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address', 'address', 'address[]', 'uint32', 'uint32'],
           [
@@ -150,7 +150,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    azorius = Azorius__factory.connect(predictedAzoriusAddress, deployer);
+    azorius = AzoriusV1__factory.connect(predictedAzoriusAddress, deployer);
 
     // Deploy Linear ERC721 Voting Mastercopy
     linearERC721VotingMastercopy = await new LinearERC721Voting__factory(deployer).deploy();
