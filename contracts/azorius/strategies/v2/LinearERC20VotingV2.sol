@@ -5,6 +5,7 @@ import {LinearERC20VotingExtensible} from "../LinearERC20VotingExtensible.sol";
 import {IVersion} from "../../../interfaces/IVersion.sol";
 import {IERC20VotingWeight} from "../../../interfaces/IERC20VotingWeight.sol";
 import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
+import {ERC20VotingWeightSupport} from "./ERC20VotingWeightSupport.sol";
 
 /**
  * An [Azorius](./Azorius.md) [BaseStrategy](./BaseStrategy.md) implementation that
@@ -15,7 +16,7 @@ contract LinearERC20VotingV2 is
     LinearERC20VotingExtensible,
     IVersion,
     IERC20VotingWeight,
-    ERC4337VoterSupport
+    ERC20VotingWeightSupport
 {
     /** @inheritdoc IVersion*/
     function getVersion() external pure virtual returns (uint16) {
@@ -28,12 +29,18 @@ contract LinearERC20VotingV2 is
         uint32 _proposalId,
         uint8 _voteType
     ) external virtual override {
-        address voter = _voter(msg.sender);
+        ERC20VotingWeightSupport.ERC20VoterAndWeight
+            memory voterAndVotingWeight = this._voterAndWeight(
+                msg.sender,
+                _proposalId
+            );
+        if (voterAndVotingWeight._weight == 0) revert InvalidVote();
+
         _vote(
             _proposalId,
-            voter,
+            voterAndVotingWeight._address,
             _voteType,
-            getVotingWeight(voter, _proposalId)
+            voterAndVotingWeight._weight
         );
     }
 

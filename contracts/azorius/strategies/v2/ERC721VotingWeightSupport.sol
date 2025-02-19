@@ -4,8 +4,17 @@ pragma solidity =0.8.19;
 import {ERC721VotingToken, ERC721VotingWeight, IERC721VotingWeight} from "../../../interfaces/IERC721VotingWeight.sol";
 import {LinearERC721VotingExtensible} from "../LinearERC721VotingExtensible.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
 
-abstract contract ERC721VotingWeightSupport {
+abstract contract ERC721VotingWeightSupport is
+    IERC721VotingWeight,
+    ERC4337VoterSupport
+{
+    struct ERC721VoterAndWeight {
+        address _address;
+        ERC721VotingWeight _votingWeight;
+    }
+
     function _votingWeight(
         address _address,
         mapping(address => uint256) storage _tokenWeights,
@@ -84,5 +93,36 @@ abstract contract ERC721VotingWeightSupport {
         }
 
         return result;
+    }
+
+    function _voterAndWeight(
+        address _address,
+        uint32 _proposalId,
+        address[] memory _tokenAddresses,
+        uint256[] memory _tokenIds
+    ) public view returns (ERC721VoterAndWeight memory) {
+        try
+            this.unusedVotingWeight(
+                _address,
+                _proposalId,
+                _tokenAddresses,
+                _tokenIds
+            )
+        returns (ERC721VotingWeight memory votingWeight) {
+            return ERC721VoterAndWeight(_address, votingWeight);
+        } catch Error(string memory reason) {
+            address voter = _voter(_address);
+            if (voter == _address) revert(reason);
+            return
+                ERC721VoterAndWeight(
+                    voter,
+                    this.unusedVotingWeight(
+                        voter,
+                        _proposalId,
+                        _tokenAddresses,
+                        _tokenIds
+                    )
+                );
+        }
     }
 }

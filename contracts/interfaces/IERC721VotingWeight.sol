@@ -32,7 +32,7 @@ interface IERC721VotingWeight {
      * Returns unused voting tokens for a proposal
      * FE should use the result value for the tokenAddresses and tokenIds for the vote() function
      */
-    function unusedVotingPower(
+    function unusedVotingWeight(
         address _address,
         uint32 _proposalId,
         address[] calldata _tokenAddresses,

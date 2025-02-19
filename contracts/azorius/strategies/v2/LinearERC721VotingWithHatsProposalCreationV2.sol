@@ -35,9 +35,19 @@ contract LinearERC721VotingWithHatsProposalCreationV2 is
         uint256[] memory _tokenIds
     ) external virtual override {
         if (_tokenAddresses.length != _tokenIds.length) revert InvalidParams();
+        ERC721VotingWeightSupport.ERC721VoterAndWeight
+            memory voterAndVotingWeight = this._voterAndWeight(
+                msg.sender,
+                _proposalId,
+                _tokenAddresses,
+                _tokenIds
+            );
+        /*
+            This can be more efficient if we pass voterAndVotingWeight._weight into _vote()
+            */
         _vote(
             _proposalId,
-            _voter(msg.sender),
+            voterAndVotingWeight._address,
             _voteType,
             _tokenAddresses,
             _tokenIds
@@ -56,7 +66,7 @@ contract LinearERC721VotingWithHatsProposalCreationV2 is
     }
 
     /** @inheritdoc IERC721VotingWeight*/
-    function unusedVotingPower(
+    function unusedVotingWeight(
         address _address,
         uint32 _proposalId,
         address[] memory _tokenAddresses,

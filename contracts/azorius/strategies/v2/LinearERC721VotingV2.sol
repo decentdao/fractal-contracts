@@ -4,7 +4,6 @@ pragma solidity =0.8.19;
 import {LinearERC721VotingExtensible} from "../LinearERC721VotingExtensible.sol";
 import {IVersion} from "../../../interfaces/IVersion.sol";
 import {ERC721VotingWeight, IERC721VotingWeight} from "../../../interfaces/IERC721VotingWeight.sol";
-import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
 import {ERC721VotingWeightSupport} from "./ERC721VotingWeightSupport.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
@@ -22,8 +21,6 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 contract LinearERC721VotingV2 is
     LinearERC721VotingExtensible,
     IVersion,
-    IERC721VotingWeight,
-    ERC4337VoterSupport,
     ERC721VotingWeightSupport
 {
     /** @inheritdoc IVersion*/
@@ -40,9 +37,20 @@ contract LinearERC721VotingV2 is
         uint256[] memory _tokenIds
     ) external virtual override {
         if (_tokenAddresses.length != _tokenIds.length) revert InvalidParams();
+
+        ERC721VotingWeightSupport.ERC721VoterAndWeight
+            memory voterAndVotingWeight = this._voterAndWeight(
+                msg.sender,
+                _proposalId,
+                _tokenAddresses,
+                _tokenIds
+            );
+        /*
+            This can be more efficient if we pass voterAndVotingWeight._weight into _vote()
+            */
         _vote(
             _proposalId,
-            _voter(msg.sender),
+            voterAndVotingWeight._address,
             _voteType,
             _tokenAddresses,
             _tokenIds
@@ -60,7 +68,7 @@ contract LinearERC721VotingV2 is
     }
 
     /** @inheritdoc IERC721VotingWeight*/
-    function unusedVotingPower(
+    function unusedVotingWeight(
         address _address,
         uint32 _proposalId,
         address[] memory _tokenAddresses,
