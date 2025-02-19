@@ -7,38 +7,38 @@ import hre from 'hardhat';
 import {
   GnosisSafe,
   GnosisSafeProxyFactory,
-  LinearERC721VotingWithHatsProposalCreationV1,
-  LinearERC721VotingWithHatsProposalCreationV1__factory,
+  LinearERC20VotingWithHatsProposalCreationV1,
+  LinearERC20VotingWithHatsProposalCreationV1__factory,
   AzoriusV1,
   AzoriusV1__factory,
-  MockERC721,
-  MockERC721__factory,
+  VotesERC20V1,
+  VotesERC20V1__factory,
   ModuleProxyFactory,
   GnosisSafeL2__factory,
-  GnosisSafe__factory,
-} from '../typechain-types';
+} from '../../typechain-types';
 
 import {
   getGnosisSafeL2Singleton,
   getGnosisSafeProxyFactory,
   getModuleProxyFactory,
-} from './GlobalSafeDeployments.test';
+} from '../global/GlobalSafeDeployments.test';
 import {
   calculateProxyAddress,
   predictGnosisSafeAddress,
   buildSafeTransaction,
   safeSignTypedData,
   buildSignatureBytes,
-} from './helpers';
+} from '../helpers';
 
-describe('LinearERC721VotingWithHatsProposalCreation', () => {
+describe('LinearERC20VotingWithHatsProposalCreation', () => {
   // Deployed contracts
   let gnosisSafe: GnosisSafe;
   let azorius: AzoriusV1;
   let azoriusMastercopy: AzoriusV1;
-  let linearERC721VotingWithHats: LinearERC721VotingWithHatsProposalCreationV1;
-  let linearERC721VotingWithHatsMastercopy: LinearERC721VotingWithHatsProposalCreationV1;
-  let mockERC721: MockERC721;
+  let linearERC20VotingWithHats: LinearERC20VotingWithHatsProposalCreationV1;
+  let linearERC20VotingWithHatsMastercopy: LinearERC20VotingWithHatsProposalCreationV1;
+  let votesERC20Mastercopy: VotesERC20V1;
+  let votesERC20: VotesERC20V1;
   let gnosisSafeProxyFactory: GnosisSafeProxyFactory;
   let moduleProxyFactory: ModuleProxyFactory;
 
@@ -87,10 +87,31 @@ describe('LinearERC721VotingWithHatsProposalCreation', () => {
       saltNum,
     );
 
-    gnosisSafe = GnosisSafe__factory.connect(predictedGnosisSafeAddress, deployer);
+    gnosisSafe = GnosisSafeL2__factory.connect(predictedGnosisSafeAddress, deployer);
 
-    // Deploy MockERC721 contract
-    mockERC721 = await new MockERC721__factory(deployer).deploy();
+    // Deploy Votes ERC-20 mastercopy contract
+    votesERC20Mastercopy = await new VotesERC20V1__factory(deployer).deploy();
+
+    const votesERC20SetupCalldata =
+      // eslint-disable-next-line camelcase
+      VotesERC20V1__factory.createInterface().encodeFunctionData('setUp', [
+        abiCoder.encode(['string', 'string', 'address[]', 'uint256[]'], ['DCNT', 'DCNT', [], []]),
+      ]);
+
+    await moduleProxyFactory.deployModule(
+      await votesERC20Mastercopy.getAddress(),
+      votesERC20SetupCalldata,
+      '10031021',
+    );
+
+    const predictedVotesERC20Address = await calculateProxyAddress(
+      moduleProxyFactory,
+      await votesERC20Mastercopy.getAddress(),
+      votesERC20SetupCalldata,
+      '10031021',
+    );
+
+    votesERC20 = VotesERC20V1__factory.connect(predictedVotesERC20Address, deployer);
 
     // Deploy Azorius module
     azoriusMastercopy = await new AzoriusV1__factory(deployer).deploy();
@@ -126,21 +147,20 @@ describe('LinearERC721VotingWithHatsProposalCreation', () => {
 
     azorius = AzoriusV1__factory.connect(predictedAzoriusAddress, deployer);
 
-    // Deploy LinearERC721VotingWithHatsProposalCreation
-    linearERC721VotingWithHatsMastercopy =
-      await new LinearERC721VotingWithHatsProposalCreationV1__factory(deployer).deploy();
+    // Deploy LinearERC20VotingWithHatsProposalCreation
+    linearERC20VotingWithHatsMastercopy =
+      await new LinearERC20VotingWithHatsProposalCreationV1__factory(deployer).deploy();
 
     const mockHatsContractAddress = '0x1234567890123456789012345678901234567890';
 
-    const linearERC721VotingWithHatsSetupCalldata =
-      LinearERC721VotingWithHatsProposalCreationV1__factory.createInterface().encodeFunctionData(
+    const linearERC20VotingWithHatsSetupCalldata =
+      LinearERC20VotingWithHatsProposalCreationV1__factory.createInterface().encodeFunctionData(
         'setUp',
         [
           abiCoder.encode(
             [
               'address',
-              'address[]',
-              'uint256[]',
+              'address',
               'address',
               'uint32',
               'uint256',
@@ -150,12 +170,11 @@ describe('LinearERC721VotingWithHatsProposalCreation', () => {
             ],
             [
               gnosisSafeOwner.address,
-              [await mockERC721.getAddress()],
-              [1], // weight for the ERC721 token
+              await votesERC20.getAddress(),
               await azorius.getAddress(),
-              60, // voting period
-              500000, // quorum threshold
-              500000, // basis numerator
+              60,
+              500000,
+              500000,
               mockHatsContractAddress,
               [1n], // Use a mock hat ID
             ],
@@ -164,27 +183,27 @@ describe('LinearERC721VotingWithHatsProposalCreation', () => {
       );
 
     await moduleProxyFactory.deployModule(
-      await linearERC721VotingWithHatsMastercopy.getAddress(),
-      linearERC721VotingWithHatsSetupCalldata,
+      await linearERC20VotingWithHatsMastercopy.getAddress(),
+      linearERC20VotingWithHatsSetupCalldata,
       '10031021',
     );
 
-    const predictedLinearERC721VotingWithHatsAddress = await calculateProxyAddress(
+    const predictedLinearERC20VotingWithHatsAddress = await calculateProxyAddress(
       moduleProxyFactory,
-      await linearERC721VotingWithHatsMastercopy.getAddress(),
-      linearERC721VotingWithHatsSetupCalldata,
+      await linearERC20VotingWithHatsMastercopy.getAddress(),
+      linearERC20VotingWithHatsSetupCalldata,
       '10031021',
     );
 
-    linearERC721VotingWithHats = LinearERC721VotingWithHatsProposalCreationV1__factory.connect(
-      predictedLinearERC721VotingWithHatsAddress,
+    linearERC20VotingWithHats = LinearERC20VotingWithHatsProposalCreationV1__factory.connect(
+      predictedLinearERC20VotingWithHatsAddress,
       deployer,
     );
 
     // Enable the strategy on Azorius
     await azorius
       .connect(gnosisSafeOwner)
-      .enableStrategy(await linearERC721VotingWithHats.getAddress());
+      .enableStrategy(await linearERC20VotingWithHats.getAddress());
 
     // Create transaction on Gnosis Safe to setup Azorius module
     const enableAzoriusModuleData = gnosisSafe.interface.encodeFunctionData('enableModule', [
@@ -220,43 +239,31 @@ describe('LinearERC721VotingWithHatsProposalCreation', () => {
   });
 
   it('Gets correctly initialized', async () => {
-    expect(await linearERC721VotingWithHats.owner()).to.eq(gnosisSafeOwner.address);
-    expect(await linearERC721VotingWithHats.tokenAddresses(0)).to.eq(await mockERC721.getAddress());
-    expect(await linearERC721VotingWithHats.tokenWeights(await mockERC721.getAddress())).to.eq(1);
-    expect(await linearERC721VotingWithHats.azoriusModule()).to.eq(await azorius.getAddress());
-    expect(await linearERC721VotingWithHats.hatsContract()).to.eq(
+    expect(await linearERC20VotingWithHats.owner()).to.eq(gnosisSafeOwner.address);
+    expect(await linearERC20VotingWithHats.governanceToken()).to.eq(await votesERC20.getAddress());
+    expect(await linearERC20VotingWithHats.azoriusModule()).to.eq(await azorius.getAddress());
+    expect(await linearERC20VotingWithHats.hatsContract()).to.eq(
       '0x1234567890123456789012345678901234567890',
     );
   });
 
   it('Cannot call setUp function again', async () => {
     const setupParams = ethers.AbiCoder.defaultAbiCoder().encode(
-      [
-        'address',
-        'address[]',
-        'uint256[]',
-        'address',
-        'uint32',
-        'uint256',
-        'uint256',
-        'address',
-        'uint256[]',
-      ],
+      ['address', 'address', 'address', 'uint32', 'uint256', 'uint256', 'address', 'uint256[]'],
       [
         gnosisSafeOwner.address,
-        [await mockERC721.getAddress()],
-        [1],
+        await votesERC20.getAddress(),
         await azorius.getAddress(),
-        60,
-        500000,
-        500000,
+        60, // voting period
+        500000, // quorum numerator
+        500000, // basis numerator
         '0x1234567890123456789012345678901234567890',
         [1n],
       ],
     );
 
-    await expect(linearERC721VotingWithHats.setUp(setupParams)).to.be.revertedWithCustomError(
-      linearERC721VotingWithHats,
+    await expect(linearERC20VotingWithHats.setUp(setupParams)).to.be.revertedWithCustomError(
+      linearERC20VotingWithHats,
       'InvalidInitialization',
     );
   });

@@ -14,13 +14,13 @@ import {
   MockContract__factory,
   GnosisSafeL2__factory,
   GnosisSafe__factory,
-} from '../typechain-types';
+} from '../../typechain-types';
 import {
   getGnosisSafeL2Singleton,
   getGnosisSafeProxyFactory,
   getModuleProxyFactory,
   getMockContract,
-} from './GlobalSafeDeployments.test';
+} from '../global/GlobalSafeDeployments.test';
 import {
   buildSignatureBytes,
   buildSafeTransaction,
@@ -29,8 +29,8 @@ import {
   calculateProxyAddress,
   mockTransaction,
   mockRevertTransaction,
-} from './helpers';
-import time from './time';
+} from '../helpers';
+import time from '../time';
 
 describe('Safe with Azorius module and linearERC721Voting', () => {
   const abiCoder = new ethers.AbiCoder();

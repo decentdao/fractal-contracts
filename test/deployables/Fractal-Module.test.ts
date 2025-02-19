@@ -13,20 +13,20 @@ import {
   GnosisSafeL2__factory,
   MultiSendCallOnly__factory,
   MultiSendCallOnly,
-} from '../typechain-types';
+} from '../../typechain-types';
 import {
   getGnosisSafeL2Singleton,
   getGnosisSafeProxyFactory,
   getModuleProxyFactory,
   getMultiSendCallOnly,
-} from './GlobalSafeDeployments.test';
+} from '../global/GlobalSafeDeployments.test';
 import {
   calculateProxyAddress,
   predictGnosisSafeAddress,
   buildContractCall,
   MetaTransaction,
   encodeMultiSend,
-} from './helpers';
+} from '../helpers';
 
 describe('Fractal Module Tests', () => {
   let gnosisSafeProxyFactory: GnosisSafeProxyFactory;

@@ -9,8 +9,8 @@ import {
   MockHatsProposalCreationWhitelist__factory,
   MockHats,
   MockHats__factory,
-} from '../typechain-types';
-import { topHatIdToHatId } from './helpers';
+} from '../../typechain-types';
+import { topHatIdToHatId } from '../helpers';
 
 describe('HatsProposalCreationWhitelist', () => {
   let mockHatsProposalCreationWhitelist: MockHatsProposalCreationWhitelist;

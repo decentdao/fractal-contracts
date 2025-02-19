@@ -29,7 +29,10 @@ import {
   ModuleProxyFactory__factory,
 } from '../../typechain-types';
 
-import { getGnosisSafeL2Singleton, getGnosisSafeProxyFactory } from '../GlobalSafeDeployments.test';
+import {
+  getGnosisSafeL2Singleton,
+  getGnosisSafeProxyFactory,
+} from '../global/GlobalSafeDeployments.test';
 import {
   executeSafeTransaction,
   getHatAccount,
