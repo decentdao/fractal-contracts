@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import {LinearERC20Voting} from "./LinearERC20Voting.sol";
 import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
-import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
+import {ERC4337VoterSupportV1} from "./ERC4337VoterSupportV1.sol";
 
 /**
  * An [Azorius](./Azorius.md) [BaseStrategy](./BaseStrategy.md) implementation that
@@ -13,7 +13,7 @@ import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
 contract LinearERC20VotingV2 is
     IVersion,
     LinearERC20Voting,
-    ERC4337VoterSupport
+    ERC4337VoterSupportV1
 {
     /** @inheritdoc IVersion*/
     function getVersion() external pure virtual returns (uint16) {
