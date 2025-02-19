@@ -10,7 +10,7 @@ import {IHats} from "../../interfaces/hats/IHats.sol";
  * enables linear (i.e. 1 to 1) ERC20 based token voting, with proposal creation
  * restricted to users wearing whitelisted Hats.
  */
-contract LinearERC20VotingWithHatsProposalCreation is
+contract LinearERC20VotingWithHatsProposalCreationV1 is
     HatsProposalCreationWhitelistV1,
     LinearERC20VotingV1
 {

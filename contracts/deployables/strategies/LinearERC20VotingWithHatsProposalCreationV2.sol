@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
-import {LinearERC20VotingWithHatsProposalCreation} from "./LinearERC20VotingWithHatsProposalCreation.sol";
+import {LinearERC20VotingWithHatsProposalCreationV1} from "./LinearERC20VotingWithHatsProposalCreationV1.sol";
 import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {LinearERC20VotingV1} from "./LinearERC20VotingV1.sol";
 import {ERC4337VoterSupportV1} from "./ERC4337VoterSupportV1.sol";
@@ -13,7 +13,7 @@ import {ERC4337VoterSupportV1} from "./ERC4337VoterSupportV1.sol";
  */
 contract LinearERC20VotingWithHatsProposalCreationV2 is
     IVersion,
-    LinearERC20VotingWithHatsProposalCreation,
+    LinearERC20VotingWithHatsProposalCreationV1,
     ERC4337VoterSupportV1
 {
     /** @inheritdoc IVersion*/
