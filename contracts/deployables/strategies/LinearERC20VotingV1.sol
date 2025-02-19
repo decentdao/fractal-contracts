@@ -11,7 +11,7 @@ import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
  * enables linear (i.e. 1 to 1) token voting. Each token delegated to a given address
  * in an `ERC20Votes` token equals 1 vote for a Proposal.
  */
-contract LinearERC20Voting is
+contract LinearERC20VotingV1 is
     BaseStrategyV1,
     BaseQuorumPercentV1,
     BaseVotingBasisPercentV1

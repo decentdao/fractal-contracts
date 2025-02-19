@@ -5,8 +5,8 @@ import hre, { ethers } from 'hardhat';
 import {
   GnosisSafe,
   GnosisSafeProxyFactory,
-  LinearERC20Voting,
-  LinearERC20Voting__factory,
+  LinearERC20VotingV1,
+  LinearERC20VotingV1__factory,
   AzoriusV1,
   AzoriusV1__factory,
   AzoriusFreezeGuardV1,
@@ -41,8 +41,8 @@ describe('Azorius Child DAO with Azorius Parent', () => {
   let freezeGuard: AzoriusFreezeGuardV1;
   let azoriusMastercopy: AzoriusV1;
   let azoriusModule: AzoriusV1;
-  let linearERC20Voting: LinearERC20Voting;
-  let linearERC20VotingMastercopy: LinearERC20Voting;
+  let linearERC20Voting: LinearERC20VotingV1;
+  let linearERC20VotingMastercopy: LinearERC20VotingV1;
   let freezeVotingMastercopy: ERC20FreezeVotingV1;
   let freezeVoting: ERC20FreezeVotingV1;
   let votesERC20Mastercopy: VotesERC20V1;
@@ -221,11 +221,11 @@ describe('Azorius Child DAO with Azorius Parent', () => {
     azoriusModule = AzoriusV1__factory.connect(predictedAzoriusAddress, deployer);
 
     // Deploy Linear ERC-20 Voting Strategy
-    linearERC20VotingMastercopy = await new LinearERC20Voting__factory(deployer).deploy();
+    linearERC20VotingMastercopy = await new LinearERC20VotingV1__factory(deployer).deploy();
 
     const linearERC20VotingSetupCalldata =
       // eslint-disable-next-line camelcase
-      LinearERC20Voting__factory.createInterface().encodeFunctionData('setUp', [
+      LinearERC20VotingV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address', 'address', 'uint32', 'uint256', 'uint256', 'uint256'],
           [
@@ -253,7 +253,7 @@ describe('Azorius Child DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    linearERC20Voting = LinearERC20Voting__factory.connect(
+    linearERC20Voting = LinearERC20VotingV1__factory.connect(
       predictedLinearERC20VotingAddress,
       deployer,
     );
@@ -299,7 +299,7 @@ describe('Azorius Child DAO with Azorius Parent', () => {
 
     const freezeGuardSetupCalldata =
       // eslint-disable-next-line camelcase
-      LinearERC20Voting__factory.createInterface().encodeFunctionData('setUp', [
+      LinearERC20VotingV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address'],
           [
