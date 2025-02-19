@@ -12,7 +12,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
  * provides helper methods for staking.
  * Validates that the postOp is called only by the entryPoint.
  */
-abstract contract BasePaymaster is IPaymaster, OwnableUpgradeable {
+abstract contract BasePaymasterV1 is IPaymaster, OwnableUpgradeable {
     IEntryPoint public entryPoint;
 
     uint256 internal constant PAYMASTER_VALIDATION_GAS_OFFSET =
