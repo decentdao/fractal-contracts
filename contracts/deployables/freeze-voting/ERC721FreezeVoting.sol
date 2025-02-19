@@ -56,6 +56,7 @@ contract ERC721FreezeVoting is BaseFreezeVoting {
         emit ERC721FreezeVotingSetUp(_owner, _strategy);
     }
 
+    /** @inheritdoc BaseFreezeVoting*/
     function castFreezeVote() external pure override {
         revert NotSupported();
     }

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {IMultisigFreezeGuard} from "../../interfaces/decent/deployables/IMultisigFreezeGuard.sol";
-import {IBaseFreezeVoting} from "../../interfaces/decent/deployables/IBaseFreezeVoting.sol";
+import {IBaseFreezeVotingV1} from "../../interfaces/decent/deployables/IBaseFreezeVotingV1.sol";
 import {ISafe} from "../../interfaces/safe/ISafe.sol";
 import {IGuard} from "@gnosis-guild/zodiac/contracts/interfaces/IGuard.sol";
 import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
@@ -28,7 +28,7 @@ contract MultisigFreezeGuard is
      * Reference to the [IBaseFreezeVoting](./interfaces/IBaseFreezeVoting.md)
      * implementation that determines whether the Safe is frozen.
      */
-    IBaseFreezeVoting public freezeVoting;
+    IBaseFreezeVotingV1 public freezeVoting;
 
     /** Reference to the Safe that can be frozen. */
     ISafe public childGnosisSafe;
@@ -81,7 +81,7 @@ contract MultisigFreezeGuard is
         _updateTimelockPeriod(_timelockPeriod);
         _updateExecutionPeriod(_executionPeriod);
         __Ownable_init(_owner);
-        freezeVoting = IBaseFreezeVoting(_freezeVoting);
+        freezeVoting = IBaseFreezeVotingV1(_freezeVoting);
         childGnosisSafe = ISafe(_childGnosisSafe);
 
         emit MultisigFreezeGuardSetup(
