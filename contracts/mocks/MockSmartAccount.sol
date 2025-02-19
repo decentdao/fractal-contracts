@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {IOwnership} from "../interfaces/decent/IOwnership.sol";
+import {IOwnershipV1} from "../interfaces/decent/IOwnershipV1.sol";
 
-contract MockSmartAccount is IOwnership {
+contract MockSmartAccount is IOwnershipV1 {
     address public owner;
 
     constructor(address _owner) {
