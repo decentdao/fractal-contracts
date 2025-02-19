@@ -8,8 +8,8 @@ import {
   LinearERC20Voting__factory,
   Azorius,
   Azorius__factory,
-  AzoriusFreezeGuard,
-  AzoriusFreezeGuard__factory,
+  AzoriusFreezeGuardV1,
+  AzoriusFreezeGuardV1__factory,
   MultisigFreezeVoting,
   MultisigFreezeVoting__factory,
   VotesERC20V1,
@@ -38,8 +38,8 @@ describe('Azorius Child DAO with Multisig parent', () => {
   // Deployed contracts
   let parentGnosisSafe: GnosisSafeL2;
   let childGnosisSafe: GnosisSafeL2;
-  let freezeGuard: AzoriusFreezeGuard;
-  let freezeGuardMastercopy: AzoriusFreezeGuard;
+  let freezeGuard: AzoriusFreezeGuardV1;
+  let freezeGuardMastercopy: AzoriusFreezeGuardV1;
   let azoriusMastercopy: Azorius;
   let azoriusModule: Azorius;
   let linearERC20VotingMastercopy: LinearERC20Voting;
@@ -300,7 +300,7 @@ describe('Azorius Child DAO with Multisig parent', () => {
     freezeVoting = MultisigFreezeVoting__factory.connect(predictedFreezeVotingAddress, deployer);
 
     // Deploy and setUp AzoriusFreezeGuard mastercopy contract
-    freezeGuardMastercopy = await new AzoriusFreezeGuard__factory(deployer).deploy();
+    freezeGuardMastercopy = await new AzoriusFreezeGuardV1__factory(deployer).deploy();
 
     const freezeGuardSetupCalldata =
       // eslint-disable-next-line camelcase
@@ -327,7 +327,7 @@ describe('Azorius Child DAO with Multisig parent', () => {
       '10031021',
     );
 
-    freezeGuard = AzoriusFreezeGuard__factory.connect(predictedFreezeGuardAddress, deployer);
+    freezeGuard = AzoriusFreezeGuardV1__factory.connect(predictedFreezeGuardAddress, deployer);
 
     // Create transaction on child Gnosis Safe to setup Azorius module
     const enableAzoriusModuleData = childGnosisSafe.interface.encodeFunctionData('enableModule', [
