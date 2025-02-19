@@ -7,7 +7,7 @@ import {ISafe} from "../../interfaces/safe/ISafe.sol";
 /**
  * A BaseFreezeVoting implementation which handles freezes on multi-sig (Safe) based DAOs.
  */
-contract MultisigFreezeVoting is BaseFreezeVotingV1 {
+contract MultisigFreezeVotingV1 is BaseFreezeVotingV1 {
     ISafe public parentGnosisSafe;
 
     event MultisigFreezeVotingSetup(
