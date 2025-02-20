@@ -120,7 +120,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    votesERC20 = await hre.ethers.getContractAt('VotesERC20', predictedVotesERC20Address);
+    votesERC20 = VotesERC20__factory.connect(predictedVotesERC20Address, deployer);
 
     // Vetoers delegate their votes to themselves
     await votesERC20.connect(tokenVetoer1).delegate(tokenVetoer1.address);
@@ -158,10 +158,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    freezeVoting = await hre.ethers.getContractAt(
-      'ERC20FreezeVoting',
-      predictedFreezeVotingAddress,
-    );
+    freezeVoting = ERC20FreezeVoting__factory.connect(predictedFreezeVotingAddress, deployer);
 
     // Deploy FreezeGuard mastercopy contract
     freezeGuardMastercopy = await new MultisigFreezeGuard__factory(deployer).deploy();
@@ -195,10 +192,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    freezeGuard = await hre.ethers.getContractAt(
-      'MultisigFreezeGuard',
-      predictedFreezeGuardAddress,
-    );
+    freezeGuard = MultisigFreezeGuard__factory.connect(predictedFreezeGuardAddress, deployer);
 
     // Create transaction to set the guard address
     const setGuardData = gnosisSafe.interface.encodeFunctionData('setGuard', [

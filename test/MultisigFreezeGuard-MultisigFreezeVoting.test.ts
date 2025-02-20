@@ -160,7 +160,7 @@ describe('Child Multisig DAO with Multisig Parent', () => {
       '10031021',
     );
 
-    votesERC20 = await hre.ethers.getContractAt('VotesERC20', predictedVotesERC20Address);
+    votesERC20 = VotesERC20__factory.connect(predictedVotesERC20Address, deployer);
 
     // Deploy MultisigFreezeVoting mastercopy contract
     freezeVotingMastercopy = await new MultisigFreezeVoting__factory(deployer).deploy();
@@ -193,10 +193,7 @@ describe('Child Multisig DAO with Multisig Parent', () => {
       '10031021',
     );
 
-    freezeVoting = await hre.ethers.getContractAt(
-      'MultisigFreezeVoting',
-      predictedFreezeVotingAddress,
-    );
+    freezeVoting = MultisigFreezeVoting__factory.connect(predictedFreezeVotingAddress, deployer);
 
     // Deploy FreezeGuard mastercopy contract
     const freezeGuardMastercopy = await new MultisigFreezeGuard__factory(deployer).deploy();
@@ -230,10 +227,7 @@ describe('Child Multisig DAO with Multisig Parent', () => {
       '10031021',
     );
 
-    freezeGuard = await hre.ethers.getContractAt(
-      'MultisigFreezeGuard',
-      predictedFreezeGuardAddress,
-    );
+    freezeGuard = MultisigFreezeGuard__factory.connect(predictedFreezeGuardAddress, deployer);
 
     // Create transaction to set the guard address
     const setGuardData = childGnosisSafe.interface.encodeFunctionData('setGuard', [

@@ -56,18 +56,6 @@ describe('Safe with Azorius module and linearERC721VotingV2', () => {
     // Get the signer accounts
     [deployer, gnosisSafeOwner] = await hre.ethers.getSigners();
 
-    // Get Gnosis Safe Proxy factory
-    gnosisSafeProxyFactory = await hre.ethers.getContractAt(
-      'GnosisSafeProxyFactory',
-      await gnosisSafeProxyFactory.getAddress(),
-    );
-
-    // Get module proxy factory
-    moduleProxyFactory = await hre.ethers.getContractAt(
-      'ModuleProxyFactory',
-      await moduleProxyFactory.getAddress(),
-    );
-
     createGnosisSetupCalldata =
       // eslint-disable-next-line camelcase
       GnosisSafeL2__factory.createInterface().encodeFunctionData('setup', [
@@ -95,7 +83,7 @@ describe('Safe with Azorius module and linearERC721VotingV2', () => {
       saltNum,
     );
 
-    gnosisSafe = await hre.ethers.getContractAt('GnosisSafe', predictedGnosisSafeAddress);
+    gnosisSafe = GnosisSafeL2__factory.connect(predictedGnosisSafeAddress, deployer);
 
     // Deploy Mock NFTs
     mockNFT1 = await new MockERC721__factory(deployer).deploy();
@@ -132,7 +120,7 @@ describe('Safe with Azorius module and linearERC721VotingV2', () => {
       '10031021',
     );
 
-    azorius = await hre.ethers.getContractAt('Azorius', predictedAzoriusAddress);
+    azorius = Azorius__factory.connect(predictedAzoriusAddress, deployer);
 
     // Deploy Linear ERC721 Voting Mastercopy
     linearERC721VotingMastercopy = await new LinearERC721VotingV2__factory(deployer).deploy();
@@ -177,9 +165,9 @@ describe('Safe with Azorius module and linearERC721VotingV2', () => {
       '10031021',
     );
 
-    linearERC721Voting = await hre.ethers.getContractAt(
-      'LinearERC721VotingV2',
+    linearERC721Voting = LinearERC721VotingV2__factory.connect(
       predictedlinearERC721VotingAddress,
+      deployer,
     );
 
     // Enable the Linear Voting strategy on Azorius

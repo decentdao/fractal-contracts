@@ -124,7 +124,7 @@ describe('Fractal Module Tests', () => {
       '10031021',
     );
 
-    fractalModule = await hre.ethers.getContractAt('FractalModule', predictedFractalModule);
+    fractalModule = FractalModule__factory.connect(predictedFractalModule, deployer);
   });
 
   describe('Fractal Module', () => {
@@ -282,7 +282,7 @@ describe('Fractal Module Tests', () => {
         '10031021',
       );
 
-      const votesERC20 = await hre.ethers.getContractAt('VotesERC20', predictedVotesERC20Address);
+      const votesERC20 = VotesERC20__factory.connect(predictedVotesERC20Address, deployer);
 
       expect(await votesERC20.balanceOf(await gnosisSafe.getAddress())).to.eq(1000);
       expect(await votesERC20.balanceOf(owner1.address)).to.eq(0);

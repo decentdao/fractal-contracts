@@ -86,7 +86,7 @@ describe('LinearERC721VotingWithHatsProposalCreationV2', () => {
       saltNum,
     );
 
-    gnosisSafe = await hre.ethers.getContractAt('GnosisSafe', predictedGnosisSafeAddress);
+    gnosisSafe = GnosisSafeL2__factory.connect(predictedGnosisSafeAddress, deployer);
 
     // Deploy MockERC721 contract
     mockERC721 = await new MockERC721__factory(deployer).deploy();
@@ -123,7 +123,7 @@ describe('LinearERC721VotingWithHatsProposalCreationV2', () => {
       '10031021',
     );
 
-    azorius = await hre.ethers.getContractAt('Azorius', predictedAzoriusAddress);
+    azorius = Azorius__factory.connect(predictedAzoriusAddress, deployer);
 
     // Deploy LinearERC721VotingWithHatsProposalCreationV2
     linearERC721VotingWithHatsMastercopy =
@@ -175,9 +175,9 @@ describe('LinearERC721VotingWithHatsProposalCreationV2', () => {
       '10031021',
     );
 
-    linearERC721VotingWithHats = await hre.ethers.getContractAt(
-      'LinearERC721VotingWithHatsProposalCreationV2',
+    linearERC721VotingWithHats = LinearERC721VotingWithHatsProposalCreationV2__factory.connect(
       predictedLinearERC721VotingWithHatsAddress,
+      deployer,
     );
 
     // Enable the strategy on Azorius
