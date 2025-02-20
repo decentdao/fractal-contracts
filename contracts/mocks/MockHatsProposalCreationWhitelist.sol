@@ -8,4 +8,8 @@ contract MockHatsProposalCreationWhitelist is HatsProposalCreationWhitelistV1 {
         __Ownable_init(msg.sender);
         super.setUp(initializeParams);
     }
+
+    function getVersion() external pure override returns (uint16) {
+        return 1;
+    }
 }

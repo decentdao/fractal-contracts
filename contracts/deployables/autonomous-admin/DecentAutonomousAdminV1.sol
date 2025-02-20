@@ -2,12 +2,14 @@
 pragma solidity ^0.8.28;
 
 import {IHatsElectionsEligibility} from "../../interfaces/hats/modules/IHatsElectionsEligibility.sol";
+import {IDecentAutonomousAdminV1} from "../../interfaces/decent/deployables/IDecentAutonomousAdminV1.sol";
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
 import {ERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
-import {IDecentAutonomousAdminV1} from "../../interfaces/decent/deployables/IDecentAutonomousAdminV1.sol";
 
 contract DecentAutonomousAdminV1 is
     IDecentAutonomousAdminV1,
+    IVersion,
     ERC165,
     FactoryFriendly
 {
@@ -41,5 +43,10 @@ contract DecentAutonomousAdminV1 is
         return
             interfaceId == type(IDecentAutonomousAdminV1).interfaceId ||
             super.supportsInterface(interfaceId);
+    }
+
+    /// @inheritdoc IVersion
+    function getVersion() external pure virtual returns (uint16) {
+        return 1;
     }
 }

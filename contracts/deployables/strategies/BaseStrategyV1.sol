@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {IAzoriusV1} from "../../interfaces/decent/deployables/IAzoriusV1.sol";
 import {IBaseStrategyV1} from "../../interfaces/decent/deployables/IBaseStrategyV1.sol";
 import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
@@ -10,6 +11,7 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
  * The base abstract contract for all voting strategies in Azorius.
  */
 abstract contract BaseStrategyV1 is
+    IVersion,
     OwnableUpgradeable,
     FactoryFriendly,
     IBaseStrategyV1
@@ -63,4 +65,7 @@ abstract contract BaseStrategyV1 is
         azoriusModule = IAzoriusV1(_azoriusModule);
         emit AzoriusSet(_azoriusModule);
     }
+
+    /// @inheritdoc IVersion
+    function getVersion() external pure virtual returns (uint16);
 }

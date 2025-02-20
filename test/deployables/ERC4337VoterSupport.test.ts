@@ -62,4 +62,11 @@ describe('ERC4337VoterSupport', () => {
       });
     });
   });
+
+  describe('Version', function () {
+    it('ERC4337 voter support should have a version', async function () {
+      const version = await erc4337VoterSupport.getVersion();
+      void expect(version).to.equal(1);
+    });
+  });
 });

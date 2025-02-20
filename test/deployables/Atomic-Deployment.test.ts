@@ -552,4 +552,35 @@ describe('Atomic Gnosis Safe Deployment', () => {
       expect(await gnosisSafe.getThreshold()).eq(threshold);
     });
   });
+
+  describe('Version', function () {
+    it('Fractal module should have a version', async function () {
+      const txs: MetaTransaction[] = [
+        await buildContractCall(
+          gnosisSafeProxyFactory,
+          'createProxyWithNonce',
+          [await gnosisSafeL2Singleton.getAddress(), createGnosisSetupCalldata, saltNum],
+          0,
+          false,
+        ),
+        await buildContractCall(
+          moduleProxyFactory,
+          'deployModule',
+          [await fractalModuleSingleton.getAddress(), setModuleCalldata, '10031021'],
+          0,
+          false,
+        ),
+      ];
+      const safeTx = encodeMultiSend(txs);
+      await multiSendCallOnly.multiSend(safeTx);
+
+      const version = await fractalModule.getVersion();
+      void expect(version).to.equal(1);
+    });
+
+    it('Freeze guard should have a version', async function () {
+      const version = await freezeGuardImplementation.getVersion();
+      void expect(version).to.equal(1);
+    });
+  });
 });

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 /**
@@ -12,7 +13,7 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
  * See https://en.wikipedia.org/wiki/Voting#Voting_basis.
  * See https://en.wikipedia.org/wiki/Supermajority.
  */
-abstract contract BaseVotingBasisPercentV1 is OwnableUpgradeable {
+abstract contract BaseVotingBasisPercentV1 is IVersion, OwnableUpgradeable {
     /** The numerator to use when calculating basis (adjustable). */
     uint256 public basisNumerator;
 
@@ -61,4 +62,7 @@ abstract contract BaseVotingBasisPercentV1 is OwnableUpgradeable {
             _yesVotes >
             ((_yesVotes + _noVotes) * basisNumerator) / BASIS_DENOMINATOR;
     }
+
+    /// @inheritdoc IVersion
+    function getVersion() external pure virtual returns (uint16);
 }

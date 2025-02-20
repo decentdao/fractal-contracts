@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {IERC721VotingStrategyV1} from "../../interfaces/decent/deployables/IERC721VotingStrategyV1.sol";
 import {BaseVotingBasisPercentV1} from "./BaseVotingBasisPercentV1.sol";
 import {IAzoriusV1} from "../../interfaces/decent/deployables/IAzoriusV1.sol";
@@ -468,5 +469,20 @@ contract LinearERC721VotingV1 is
         }
 
         emit Voted(_voter, _proposalId, _voteType, _tokenAddresses, _tokenIds);
+    }
+
+    /// @inheritdoc IVersion
+    function getVersion()
+        external
+        pure
+        virtual
+        override(
+            BaseStrategyV1,
+            BaseVotingBasisPercentV1,
+            ERC4337VoterSupportV1
+        )
+        returns (uint16)
+    {
+        return 1;
     }
 }

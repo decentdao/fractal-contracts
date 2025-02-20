@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {IMultisigFreezeGuardV1} from "../../interfaces/decent/deployables/IMultisigFreezeGuardV1.sol";
 import {IBaseFreezeVotingV1} from "../../interfaces/decent/deployables/IBaseFreezeVotingV1.sol";
 import {ISafe} from "../../interfaces/safe/ISafe.sol";
@@ -13,6 +14,7 @@ import {BaseGuard} from "@gnosis-guild/zodiac/contracts/guard/BaseGuard.sol";
  * Implementation of [IMultisigFreezeGuard](./interfaces/IMultisigFreezeGuard.md).
  */
 contract MultisigFreezeGuardV1 is
+    IVersion,
     FactoryFriendly,
     IGuard,
     IMultisigFreezeGuardV1,
@@ -214,5 +216,10 @@ contract MultisigFreezeGuardV1 is
     function _updateExecutionPeriod(uint32 _executionPeriod) internal {
         executionPeriod = _executionPeriod;
         emit ExecutionPeriodUpdated(_executionPeriod);
+    }
+
+    /// @inheritdoc IVersion
+    function getVersion() external pure virtual returns (uint16) {
+        return 1;
     }
 }

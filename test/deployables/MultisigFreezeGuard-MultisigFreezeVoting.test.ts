@@ -1177,4 +1177,21 @@ describe('Child Multisig DAO with Multisig Parent', () => {
       ).to.be.revertedWithCustomError(freezeVoting, 'OwnableUnauthorizedAccount');
     });
   });
+
+  describe('Version', function () {
+    it('Freeze guard should have a version', async function () {
+      const version = await freezeGuard.getVersion();
+      void expect(version).to.equal(1);
+    });
+
+    it('Freeze voting should have a version', async function () {
+      const version = await freezeVoting.getVersion();
+      void expect(version).to.equal(1);
+    });
+
+    it('Votes ERC20 should have a version', async function () {
+      const version = await votesERC20.getVersion();
+      void expect(version).to.equal(1);
+    });
+  });
 });

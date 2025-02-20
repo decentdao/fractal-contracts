@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {BaseFreezeVotingV1} from "./BaseFreezeVotingV1.sol";
 import {ISafe} from "../../interfaces/safe/ISafe.sol";
 
@@ -70,5 +71,10 @@ contract MultisigFreezeVotingV1 is BaseFreezeVotingV1 {
         userHasFreezeVoted[msg.sender][freezeProposalCreatedBlock] = true;
 
         emit FreezeVoteCast(msg.sender, 1);
+    }
+
+    /// @inheritdoc IVersion
+    function getVersion() external pure virtual override returns (uint16) {
+        return 1;
     }
 }

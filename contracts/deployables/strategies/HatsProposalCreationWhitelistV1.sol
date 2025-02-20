@@ -1,10 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IHats} from "../../interfaces/hats/IHats.sol";
 
-abstract contract HatsProposalCreationWhitelistV1 is OwnableUpgradeable {
+abstract contract HatsProposalCreationWhitelistV1 is
+    IVersion,
+    OwnableUpgradeable
+{
     event HatWhitelisted(uint256 hatId);
     event HatRemovedFromWhitelist(uint256 hatId);
 
@@ -102,4 +106,7 @@ abstract contract HatsProposalCreationWhitelistV1 is OwnableUpgradeable {
     function getWhitelistedHatIds() public view returns (uint256[] memory) {
         return whitelistedHatIds;
     }
+
+    /// @inheritdoc IVersion
+    function getVersion() external pure virtual returns (uint16);
 }

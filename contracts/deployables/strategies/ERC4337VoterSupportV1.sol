@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {IOwnershipV1} from "../../interfaces/decent/deployables/IOwnershipV1.sol";
 
-abstract contract ERC4337VoterSupportV1 {
+abstract contract ERC4337VoterSupportV1 is IVersion {
     /**
      * Returns the address of the voter which owns the voting weight
      * @param _msgSender address of the sender. It can be the wallet address, or the smart account address with EOA as owner
@@ -30,4 +31,7 @@ abstract contract ERC4337VoterSupportV1 {
             return _msgSender;
         }
     }
+
+    /// @inheritdoc IVersion
+    function getVersion() external pure virtual returns (uint16);
 }

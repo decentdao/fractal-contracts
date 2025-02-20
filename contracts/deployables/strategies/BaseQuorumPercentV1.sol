@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 /**
  * An Azorius extension contract that enables percent based quorums.
  * Intended to be implemented by [BaseStrategy](./BaseStrategy.md) implementations.
  */
-abstract contract BaseQuorumPercentV1 is OwnableUpgradeable {
+abstract contract BaseQuorumPercentV1 is IVersion, OwnableUpgradeable {
     /** The numerator to use when calculating quorum (adjustable). */
     uint256 public quorumNumerator;
 
@@ -68,4 +69,7 @@ abstract contract BaseQuorumPercentV1 is OwnableUpgradeable {
     function quorumVotes(
         uint32 _proposalId
     ) public view virtual returns (uint256);
+
+    /// @inheritdoc IVersion
+    function getVersion() external pure virtual returns (uint16);
 }

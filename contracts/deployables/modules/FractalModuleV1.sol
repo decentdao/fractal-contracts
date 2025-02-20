@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {IFractalModuleV1} from "../../interfaces/decent/deployables/IFractalModuleV1.sol";
 import {GuardableModule, Enum} from "@gnosis-guild/zodiac/contracts/core/GuardableModule.sol";
 
@@ -13,7 +14,7 @@ import {GuardableModule, Enum} from "@gnosis-guild/zodiac/contracts/core/Guardab
  * transactions on the Safe, which in our implementation is the set of parent
  * DAOs.
  */
-contract FractalModuleV1 is IFractalModuleV1, GuardableModule {
+contract FractalModuleV1 is IVersion, IFractalModuleV1, GuardableModule {
     /** Mapping of whether an address is a controller (typically a parentDAO). */
     mapping(address => bool) public controllers;
 
@@ -93,5 +94,10 @@ contract FractalModuleV1 is IFractalModuleV1, GuardableModule {
             }
         }
         emit ControllersAdded(_controllers);
+    }
+
+    /// @inheritdoc IVersion
+    function getVersion() external pure virtual override returns (uint16) {
+        return 1;
     }
 }
