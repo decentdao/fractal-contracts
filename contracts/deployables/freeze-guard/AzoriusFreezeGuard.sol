@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {IBaseFreezeVoting} from "../../interfaces/decent/IBaseFreezeVoting.sol";
+import {IBaseFreezeVoting} from "../../interfaces/decent/deployables/IBaseFreezeVoting.sol";
 import {IGuard} from "@gnosis-guild/zodiac/contracts/interfaces/IGuard.sol";
 import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
 import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
