@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
-import {IVersion} from "../../interfaces/decent/IVersion.sol";
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
 import {LinearERC721Voting} from "./LinearERC721Voting.sol";
 

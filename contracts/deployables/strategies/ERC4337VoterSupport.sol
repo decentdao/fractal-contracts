@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
-import {IOwnership} from "../../interfaces/IOwnership.sol";
+import {IOwnership} from "../../interfaces/decent/deployables/IOwnership.sol";
 
 abstract contract ERC4337VoterSupport {
     /**

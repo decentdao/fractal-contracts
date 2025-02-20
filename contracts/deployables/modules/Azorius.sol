@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
-import {IBaseStrategy} from "../../interfaces/decent/IBaseStrategy.sol";
-import {IAzorius, Enum} from "../../interfaces/decent/IAzorius.sol";
+import {IBaseStrategy} from "../../interfaces/decent/deployables/IBaseStrategy.sol";
+import {IAzorius, Enum} from "../../interfaces/decent/deployables/IAzorius.sol";
 import {GuardableModule} from "@gnosis-guild/zodiac/contracts/core/GuardableModule.sol";
 
 /**

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
-import {IERC721VotingStrategy} from "../../interfaces/decent/IERC721VotingStrategy.sol";
+import {IERC721VotingStrategy} from "../../interfaces/decent/deployables/IERC721VotingStrategy.sol";
 import {BaseVotingBasisPercent} from "./BaseVotingBasisPercent.sol";
-import {IAzorius} from "../../interfaces/decent/IAzorius.sol";
+import {IAzorius} from "../../interfaces/decent/deployables/IAzorius.sol";
 import {BaseStrategy} from "./BaseStrategy.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 

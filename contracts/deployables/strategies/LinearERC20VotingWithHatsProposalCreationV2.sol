@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 import {LinearERC20Voting} from "./LinearERC20Voting.sol";
 import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
 import {LinearERC20VotingWithHatsProposalCreation} from "./LinearERC20VotingWithHatsProposalCreation.sol";
-import {IVersion} from "../../interfaces/decent/IVersion.sol";
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 
 /**
  * An [Azorius](./Azorius.md) [BaseStrategy](./BaseStrategy.md) implementation that
