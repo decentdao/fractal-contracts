@@ -7,12 +7,12 @@ import hre from 'hardhat';
 import {
   GnosisSafe,
   GnosisSafeProxyFactory,
-  LinearERC20VotingWithHatsProposalCreation,
-  LinearERC20VotingWithHatsProposalCreation__factory,
-  Azorius,
-  Azorius__factory,
-  VotesERC20,
-  VotesERC20__factory,
+  LinearERC20VotingWithHatsProposalCreationV1,
+  LinearERC20VotingWithHatsProposalCreationV1__factory,
+  AzoriusV1,
+  AzoriusV1__factory,
+  VotesERC20V1,
+  VotesERC20V1__factory,
   ModuleProxyFactory,
   GnosisSafeL2__factory,
 } from '../typechain-types';
@@ -33,12 +33,12 @@ import {
 describe('LinearERC20VotingWithHatsProposalCreation', () => {
   // Deployed contracts
   let gnosisSafe: GnosisSafe;
-  let azorius: Azorius;
-  let azoriusMastercopy: Azorius;
-  let linearERC20VotingWithHats: LinearERC20VotingWithHatsProposalCreation;
-  let linearERC20VotingWithHatsMastercopy: LinearERC20VotingWithHatsProposalCreation;
-  let votesERC20Mastercopy: VotesERC20;
-  let votesERC20: VotesERC20;
+  let azorius: AzoriusV1;
+  let azoriusMastercopy: AzoriusV1;
+  let linearERC20VotingWithHats: LinearERC20VotingWithHatsProposalCreationV1;
+  let linearERC20VotingWithHatsMastercopy: LinearERC20VotingWithHatsProposalCreationV1;
+  let votesERC20Mastercopy: VotesERC20V1;
+  let votesERC20: VotesERC20V1;
   let gnosisSafeProxyFactory: GnosisSafeProxyFactory;
   let moduleProxyFactory: ModuleProxyFactory;
 
@@ -90,11 +90,11 @@ describe('LinearERC20VotingWithHatsProposalCreation', () => {
     gnosisSafe = GnosisSafeL2__factory.connect(predictedGnosisSafeAddress, deployer);
 
     // Deploy Votes ERC-20 mastercopy contract
-    votesERC20Mastercopy = await new VotesERC20__factory(deployer).deploy();
+    votesERC20Mastercopy = await new VotesERC20V1__factory(deployer).deploy();
 
     const votesERC20SetupCalldata =
       // eslint-disable-next-line camelcase
-      VotesERC20__factory.createInterface().encodeFunctionData('setUp', [
+      VotesERC20V1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(['string', 'string', 'address[]', 'uint256[]'], ['DCNT', 'DCNT', [], []]),
       ]);
 
@@ -111,14 +111,14 @@ describe('LinearERC20VotingWithHatsProposalCreation', () => {
       '10031021',
     );
 
-    votesERC20 = VotesERC20__factory.connect(predictedVotesERC20Address, deployer);
+    votesERC20 = VotesERC20V1__factory.connect(predictedVotesERC20Address, deployer);
 
     // Deploy Azorius module
-    azoriusMastercopy = await new Azorius__factory(deployer).deploy();
+    azoriusMastercopy = await new AzoriusV1__factory(deployer).deploy();
 
     const azoriusSetupCalldata =
       // eslint-disable-next-line camelcase
-      Azorius__factory.createInterface().encodeFunctionData('setUp', [
+      AzoriusV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address', 'address', 'address[]', 'uint32', 'uint32'],
           [
@@ -145,16 +145,16 @@ describe('LinearERC20VotingWithHatsProposalCreation', () => {
       '10031021',
     );
 
-    azorius = Azorius__factory.connect(predictedAzoriusAddress, deployer);
+    azorius = AzoriusV1__factory.connect(predictedAzoriusAddress, deployer);
 
     // Deploy LinearERC20VotingWithHatsProposalCreation
     linearERC20VotingWithHatsMastercopy =
-      await new LinearERC20VotingWithHatsProposalCreation__factory(deployer).deploy();
+      await new LinearERC20VotingWithHatsProposalCreationV1__factory(deployer).deploy();
 
     const mockHatsContractAddress = '0x1234567890123456789012345678901234567890';
 
     const linearERC20VotingWithHatsSetupCalldata =
-      LinearERC20VotingWithHatsProposalCreation__factory.createInterface().encodeFunctionData(
+      LinearERC20VotingWithHatsProposalCreationV1__factory.createInterface().encodeFunctionData(
         'setUp',
         [
           abiCoder.encode(
@@ -195,7 +195,7 @@ describe('LinearERC20VotingWithHatsProposalCreation', () => {
       '10031021',
     );
 
-    linearERC20VotingWithHats = LinearERC20VotingWithHatsProposalCreation__factory.connect(
+    linearERC20VotingWithHats = LinearERC20VotingWithHatsProposalCreationV1__factory.connect(
       predictedLinearERC20VotingWithHatsAddress,
       deployer,
     );

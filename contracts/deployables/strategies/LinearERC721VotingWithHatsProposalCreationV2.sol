@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {LinearERC721Voting} from "./LinearERC721Voting.sol";
-import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
-import {LinearERC721VotingWithHatsProposalCreation} from "./LinearERC721VotingWithHatsProposalCreation.sol";
+import {LinearERC721VotingV1} from "./LinearERC721VotingV1.sol";
+import {ERC4337VoterSupportV1} from "./ERC4337VoterSupportV1.sol";
+import {LinearERC721VotingWithHatsProposalCreationV1} from "./LinearERC721VotingWithHatsProposalCreationV1.sol";
 import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 
 /**
@@ -12,9 +12,9 @@ import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
  * restricted to users wearing whitelisted Hats.
  */
 contract LinearERC721VotingWithHatsProposalCreationV2 is
-    LinearERC721VotingWithHatsProposalCreation,
+    LinearERC721VotingWithHatsProposalCreationV1,
     IVersion,
-    ERC4337VoterSupport
+    ERC4337VoterSupportV1
 {
     /** @inheritdoc IVersion*/
     function getVersion() external pure override returns (uint16) {
@@ -23,7 +23,7 @@ contract LinearERC721VotingWithHatsProposalCreationV2 is
         return 2;
     }
 
-    /** @inheritdoc LinearERC721Voting*/
+    /** @inheritdoc LinearERC721VotingV1*/
     function vote(
         uint32 _proposalId,
         uint8 _voteType,

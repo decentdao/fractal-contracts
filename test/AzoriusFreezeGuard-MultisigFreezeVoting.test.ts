@@ -4,16 +4,16 @@ import hre, { ethers } from 'hardhat';
 
 import {
   GnosisSafeProxyFactory,
-  LinearERC20Voting,
-  LinearERC20Voting__factory,
-  Azorius,
-  Azorius__factory,
-  AzoriusFreezeGuard,
-  AzoriusFreezeGuard__factory,
-  MultisigFreezeVoting,
-  MultisigFreezeVoting__factory,
-  VotesERC20,
-  VotesERC20__factory,
+  LinearERC20VotingV1,
+  LinearERC20VotingV1__factory,
+  AzoriusV1,
+  AzoriusV1__factory,
+  AzoriusFreezeGuardV1,
+  AzoriusFreezeGuardV1__factory,
+  MultisigFreezeVotingV1,
+  MultisigFreezeVotingV1__factory,
+  VotesERC20V1,
+  VotesERC20V1__factory,
   ModuleProxyFactory,
   GnosisSafeL2__factory,
   GnosisSafeL2,
@@ -38,16 +38,16 @@ describe('Azorius Child DAO with Multisig parent', () => {
   // Deployed contracts
   let parentGnosisSafe: GnosisSafeL2;
   let childGnosisSafe: GnosisSafeL2;
-  let freezeGuard: AzoriusFreezeGuard;
-  let freezeGuardMastercopy: AzoriusFreezeGuard;
-  let azoriusMastercopy: Azorius;
-  let azoriusModule: Azorius;
-  let linearERC20VotingMastercopy: LinearERC20Voting;
-  let linearERC20Voting: LinearERC20Voting;
-  let freezeVotingMastercopy: MultisigFreezeVoting;
-  let freezeVoting: MultisigFreezeVoting;
-  let votesERC20Mastercopy: VotesERC20;
-  let childVotesERC20: VotesERC20;
+  let freezeGuard: AzoriusFreezeGuardV1;
+  let freezeGuardMastercopy: AzoriusFreezeGuardV1;
+  let azoriusMastercopy: AzoriusV1;
+  let azoriusModule: AzoriusV1;
+  let linearERC20VotingMastercopy: LinearERC20VotingV1;
+  let linearERC20Voting: LinearERC20VotingV1;
+  let freezeVotingMastercopy: MultisigFreezeVotingV1;
+  let freezeVoting: MultisigFreezeVotingV1;
+  let votesERC20Mastercopy: VotesERC20V1;
+  let childVotesERC20: VotesERC20V1;
   let gnosisSafeProxyFactory: GnosisSafeProxyFactory;
   let moduleProxyFactory: ModuleProxyFactory;
 
@@ -150,11 +150,11 @@ describe('Azorius Child DAO with Multisig parent', () => {
     childGnosisSafe = GnosisSafeL2__factory.connect(predictedChildGnosisSafeAddress, deployer);
 
     // Deploy Votes ERC-20 Mastercopy
-    votesERC20Mastercopy = await new VotesERC20__factory(deployer).deploy();
+    votesERC20Mastercopy = await new VotesERC20V1__factory(deployer).deploy();
 
     const childVotesERC20SetupData =
       // eslint-disable-next-line camelcase
-      VotesERC20__factory.createInterface().encodeFunctionData('setUp', [
+      VotesERC20V1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['string', 'string', 'address[]', 'uint256[]'],
           [
@@ -170,8 +170,6 @@ describe('Azorius Child DAO with Multisig parent', () => {
         ),
       ]);
 
-    // await childVotesERC20.setUp(childVotesERC20SetupData);
-
     await moduleProxyFactory.deployModule(
       await votesERC20Mastercopy.getAddress(),
       childVotesERC20SetupData,
@@ -185,18 +183,18 @@ describe('Azorius Child DAO with Multisig parent', () => {
       '10031021',
     );
 
-    childVotesERC20 = VotesERC20__factory.connect(predictedChildVotesERC20Address, deployer);
+    childVotesERC20 = VotesERC20V1__factory.connect(predictedChildVotesERC20Address, deployer);
 
     // Token holders delegate their votes to themselves
     await childVotesERC20.connect(childTokenHolder1).delegate(childTokenHolder1.address);
     await childVotesERC20.connect(childTokenHolder2).delegate(childTokenHolder2.address);
 
     // Deploy Azorius module mastercopy
-    azoriusMastercopy = await new Azorius__factory(deployer).deploy();
+    azoriusMastercopy = await new AzoriusV1__factory(deployer).deploy();
 
     const azoriusSetupCalldata =
       // eslint-disable-next-line camelcase
-      Azorius__factory.createInterface().encodeFunctionData('setUp', [
+      AzoriusV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address', 'address', 'address[]', 'uint32', 'uint32'],
           [
@@ -223,14 +221,14 @@ describe('Azorius Child DAO with Multisig parent', () => {
       '10031021',
     );
 
-    azoriusModule = Azorius__factory.connect(predictedAzoriusAddress, deployer);
+    azoriusModule = AzoriusV1__factory.connect(predictedAzoriusAddress, deployer);
 
     // Deploy Linear ERC-20 Voting Strategy Mastercopy
-    linearERC20VotingMastercopy = await new LinearERC20Voting__factory(deployer).deploy();
+    linearERC20VotingMastercopy = await new LinearERC20VotingV1__factory(deployer).deploy();
 
     const linearERC20VotingSetupCalldata =
       // eslint-disable-next-line camelcase
-      LinearERC20Voting__factory.createInterface().encodeFunctionData('setUp', [
+      LinearERC20VotingV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address', 'address', 'uint32', 'uint256', 'uint256', 'uint256'],
           [
@@ -258,7 +256,7 @@ describe('Azorius Child DAO with Multisig parent', () => {
       '10031021',
     );
 
-    linearERC20Voting = LinearERC20Voting__factory.connect(
+    linearERC20Voting = LinearERC20VotingV1__factory.connect(
       predictedLinearERC20VotingAddress,
       deployer,
     );
@@ -269,11 +267,11 @@ describe('Azorius Child DAO with Multisig parent', () => {
       .enableStrategy(await linearERC20Voting.getAddress());
 
     // Deploy MultisigFreezeVoting mastercopy contract
-    freezeVotingMastercopy = await new MultisigFreezeVoting__factory(deployer).deploy();
+    freezeVotingMastercopy = await new MultisigFreezeVotingV1__factory(deployer).deploy();
 
     const freezeVotingSetupCalldata =
       // eslint-disable-next-line camelcase
-      MultisigFreezeVoting__factory.createInterface().encodeFunctionData('setUp', [
+      MultisigFreezeVotingV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'uint256', 'uint32', 'uint32', 'address'],
           [
@@ -299,14 +297,14 @@ describe('Azorius Child DAO with Multisig parent', () => {
       '10031021',
     );
 
-    freezeVoting = MultisigFreezeVoting__factory.connect(predictedFreezeVotingAddress, deployer);
+    freezeVoting = MultisigFreezeVotingV1__factory.connect(predictedFreezeVotingAddress, deployer);
 
     // Deploy and setUp AzoriusFreezeGuard mastercopy contract
-    freezeGuardMastercopy = await new AzoriusFreezeGuard__factory(deployer).deploy();
+    freezeGuardMastercopy = await new AzoriusFreezeGuardV1__factory(deployer).deploy();
 
     const freezeGuardSetupCalldata =
       // eslint-disable-next-line camelcase
-      LinearERC20Voting__factory.createInterface().encodeFunctionData('setUp', [
+      LinearERC20VotingV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address'],
           [
@@ -329,7 +327,7 @@ describe('Azorius Child DAO with Multisig parent', () => {
       '10031021',
     );
 
-    freezeGuard = AzoriusFreezeGuard__factory.connect(predictedFreezeGuardAddress, deployer);
+    freezeGuard = AzoriusFreezeGuardV1__factory.connect(predictedFreezeGuardAddress, deployer);
 
     // Create transaction on child Gnosis Safe to setup Azorius module
     const enableAzoriusModuleData = childGnosisSafe.interface.encodeFunctionData('enableModule', [

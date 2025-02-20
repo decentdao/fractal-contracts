@@ -2,17 +2,17 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import {
-  Azorius__factory,
-  FractalModule,
-  FractalModule__factory,
+  AzoriusV1__factory,
+  FractalModuleV1,
+  FractalModuleV1__factory,
   GnosisSafeL2,
   GnosisSafeL2__factory,
   GnosisSafeProxyFactory,
   ModuleProxyFactory,
   MultiSendCallOnly,
   MultiSendCallOnly__factory,
-  MultisigFreezeGuard,
-  MultisigFreezeGuard__factory,
+  MultisigFreezeGuardV1,
+  MultisigFreezeGuardV1__factory,
 } from '../typechain-types';
 import {
   getGnosisSafeL2Singleton,
@@ -37,10 +37,10 @@ describe('Atomic Gnosis Safe Deployment', () => {
   let gnosisSafe: GnosisSafeL2;
   let moduleProxyFactory: ModuleProxyFactory;
   let multiSendCallOnly: MultiSendCallOnly;
-  let freezeGuard: MultisigFreezeGuard;
-  let freezeGuardImplementation: MultisigFreezeGuard;
-  let fractalModuleSingleton: FractalModule;
-  let fractalModule: FractalModule;
+  let freezeGuard: MultisigFreezeGuardV1;
+  let freezeGuardImplementation: MultisigFreezeGuardV1;
+  let fractalModuleSingleton: FractalModuleV1;
+  let fractalModule: FractalModuleV1;
 
   // Predicted Contracts
   let predictedFractalModule: string;
@@ -97,10 +97,10 @@ describe('Atomic Gnosis Safe Deployment', () => {
 
     /// /////////////  GUARD ///////////////////
     // DEPLOY GUARD
-    freezeGuardImplementation = await new MultisigFreezeGuard__factory(deployer).deploy();
+    freezeGuardImplementation = await new MultisigFreezeGuardV1__factory(deployer).deploy();
     freezeGuardFactoryInit =
       // eslint-disable-next-line camelcase
-      MultisigFreezeGuard__factory.createInterface().encodeFunctionData('setUp', [
+      MultisigFreezeGuardV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['uint256', 'uint256', 'address', 'address', 'address'],
           [10, 20, owner1.address, owner1.address, await gnosisSafe.getAddress()],
@@ -114,16 +114,16 @@ describe('Atomic Gnosis Safe Deployment', () => {
       '10031021',
     );
 
-    freezeGuard = MultisigFreezeGuard__factory.connect(predictedFreezeGuard, deployer);
+    freezeGuard = MultisigFreezeGuardV1__factory.connect(predictedFreezeGuard, deployer);
 
     /// /////////////// MODULE ////////////////
     // DEPLOY Fractal Module
-    fractalModuleSingleton = await new FractalModule__factory(deployer).deploy();
+    fractalModuleSingleton = await new FractalModuleV1__factory(deployer).deploy();
 
     // SETUP Module
     setModuleCalldata =
       // eslint-disable-next-line camelcase
-      FractalModule__factory.createInterface().encodeFunctionData('setUp', [
+      FractalModuleV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address', 'address', 'address[]'],
           [
@@ -142,7 +142,7 @@ describe('Atomic Gnosis Safe Deployment', () => {
       '10031021',
     );
 
-    fractalModule = FractalModule__factory.connect(predictedFractalModule, deployer);
+    fractalModule = FractalModuleV1__factory.connect(predictedFractalModule, deployer);
 
     // TX Array
     sigs =
@@ -221,9 +221,9 @@ describe('Atomic Gnosis Safe Deployment', () => {
       );
       const encodedSetupAzoriusData =
         // eslint-disable-next-line camelcase
-        Azorius__factory.createInterface().encodeFunctionData('setUp', [encodedInitAzoriusData]);
+        AzoriusV1__factory.createInterface().encodeFunctionData('setUp', [encodedInitAzoriusData]);
 
-      const azoriusSingleton = await new Azorius__factory(deployer).deploy();
+      const azoriusSingleton = await new AzoriusV1__factory(deployer).deploy();
 
       const predictedAzoriusModule = await calculateProxyAddress(
         moduleProxyFactory,
@@ -233,7 +233,7 @@ describe('Atomic Gnosis Safe Deployment', () => {
       );
 
       // eslint-disable-next-line camelcase
-      const azoriusContract = Azorius__factory.connect(predictedAzoriusModule, deployer);
+      const azoriusContract = AzoriusV1__factory.connect(predictedAzoriusModule, deployer);
 
       const txs: MetaTransaction[] = [
         await buildContractCall(
@@ -341,9 +341,9 @@ describe('Atomic Gnosis Safe Deployment', () => {
       );
       const encodedSetupAzoriusData =
         // eslint-disable-next-line camelcase
-        Azorius__factory.createInterface().encodeFunctionData('setUp', [encodedInitAzoriusData]);
+        AzoriusV1__factory.createInterface().encodeFunctionData('setUp', [encodedInitAzoriusData]);
 
-      const azoriusSingleton = await new Azorius__factory(deployer).deploy();
+      const azoriusSingleton = await new AzoriusV1__factory(deployer).deploy();
 
       const predictedAzoriusModule = await calculateProxyAddress(
         moduleProxyFactory,
@@ -353,7 +353,7 @@ describe('Atomic Gnosis Safe Deployment', () => {
       );
 
       // eslint-disable-next-line camelcase
-      const azoriusContract = Azorius__factory.connect(predictedAzoriusModule, deployer);
+      const azoriusContract = AzoriusV1__factory.connect(predictedAzoriusModule, deployer);
 
       const internalTxs: MetaTransaction[] = [
         await buildContractCall(

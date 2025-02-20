@@ -1,8 +1,8 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {IMultisigFreezeGuard} from "../../interfaces/decent/deployables/IMultisigFreezeGuard.sol";
-import {IBaseFreezeVoting} from "../../interfaces/decent/deployables/IBaseFreezeVoting.sol";
+import {IMultisigFreezeGuardV1} from "../../interfaces/decent/deployables/IMultisigFreezeGuardV1.sol";
+import {IBaseFreezeVotingV1} from "../../interfaces/decent/deployables/IBaseFreezeVotingV1.sol";
 import {ISafe} from "../../interfaces/safe/ISafe.sol";
 import {IGuard} from "@gnosis-guild/zodiac/contracts/interfaces/IGuard.sol";
 import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
@@ -12,10 +12,10 @@ import {BaseGuard} from "@gnosis-guild/zodiac/contracts/guard/BaseGuard.sol";
 /**
  * Implementation of [IMultisigFreezeGuard](./interfaces/IMultisigFreezeGuard.md).
  */
-contract MultisigFreezeGuard is
+contract MultisigFreezeGuardV1 is
     FactoryFriendly,
     IGuard,
-    IMultisigFreezeGuard,
+    IMultisigFreezeGuardV1,
     BaseGuard
 {
     /** Timelock period (in blocks). */
@@ -28,7 +28,7 @@ contract MultisigFreezeGuard is
      * Reference to the [IBaseFreezeVoting](./interfaces/IBaseFreezeVoting.md)
      * implementation that determines whether the Safe is frozen.
      */
-    IBaseFreezeVoting public freezeVoting;
+    IBaseFreezeVotingV1 public freezeVoting;
 
     /** Reference to the Safe that can be frozen. */
     ISafe public childGnosisSafe;
@@ -81,7 +81,7 @@ contract MultisigFreezeGuard is
         _updateTimelockPeriod(_timelockPeriod);
         _updateExecutionPeriod(_executionPeriod);
         __Ownable_init(_owner);
-        freezeVoting = IBaseFreezeVoting(_freezeVoting);
+        freezeVoting = IBaseFreezeVotingV1(_freezeVoting);
         childGnosisSafe = ISafe(_childGnosisSafe);
 
         emit MultisigFreezeGuardSetup(
@@ -92,7 +92,7 @@ contract MultisigFreezeGuard is
         );
     }
 
-    /** @inheritdoc IMultisigFreezeGuard*/
+    /** @inheritdoc IMultisigFreezeGuardV1*/
     function timelockTransaction(
         address to,
         uint256 value,
@@ -139,12 +139,12 @@ contract MultisigFreezeGuard is
         emit TransactionTimelocked(msg.sender, transactionHash, signatures);
     }
 
-    /** @inheritdoc IMultisigFreezeGuard*/
+    /** @inheritdoc IMultisigFreezeGuardV1*/
     function updateTimelockPeriod(uint32 _timelockPeriod) external onlyOwner {
         _updateTimelockPeriod(_timelockPeriod);
     }
 
-    /** @inheritdoc IMultisigFreezeGuard*/
+    /** @inheritdoc IMultisigFreezeGuardV1*/
     function updateExecutionPeriod(uint32 _executionPeriod) external onlyOwner {
         executionPeriod = _executionPeriod;
     }
@@ -197,7 +197,7 @@ contract MultisigFreezeGuard is
         // not implementated
     }
 
-    /** @inheritdoc IMultisigFreezeGuard*/
+    /** @inheritdoc IMultisigFreezeGuardV1*/
     function getTransactionTimelockedBlock(
         bytes32 _signaturesHash
     ) public view returns (uint32) {

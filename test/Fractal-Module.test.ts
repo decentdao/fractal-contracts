@@ -2,11 +2,11 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import {
-  VotesERC20__factory,
-  FractalModule,
-  FractalModule__factory,
-  MultisigFreezeGuard,
-  MultisigFreezeGuard__factory,
+  VotesERC20V1__factory,
+  FractalModuleV1,
+  FractalModuleV1__factory,
+  MultisigFreezeGuardV1,
+  MultisigFreezeGuardV1__factory,
   ModuleProxyFactory,
   GnosisSafeProxyFactory,
   GnosisSafeL2,
@@ -36,9 +36,9 @@ describe('Fractal Module Tests', () => {
   // Deployed contracts
   let gnosisSafe: GnosisSafeL2;
   let multiSendCallOnly: MultiSendCallOnly;
-  let freezeGuard: MultisigFreezeGuard;
-  let moduleImpl: FractalModule;
-  let fractalModule: FractalModule;
+  let freezeGuard: MultisigFreezeGuardV1;
+  let moduleImpl: FractalModuleV1;
+  let fractalModule: FractalModuleV1;
 
   // Wallets
   let deployer: SignerWithAddress;
@@ -88,10 +88,10 @@ describe('Fractal Module Tests', () => {
 
     /// /////////////  GUARD ///////////////////
     // DEPLOY GUARD
-    freezeGuard = await new MultisigFreezeGuard__factory(deployer).deploy();
+    freezeGuard = await new MultisigFreezeGuardV1__factory(deployer).deploy();
     freezeGuardSetup =
       // eslint-disable-next-line camelcase
-      MultisigFreezeGuard__factory.createInterface().encodeFunctionData('setUp', [
+      MultisigFreezeGuardV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['uint256', 'uint256', 'address', 'address', 'address'],
           [10, 10, owner1.address, owner1.address, await gnosisSafe.getAddress()],
@@ -100,12 +100,12 @@ describe('Fractal Module Tests', () => {
 
     /// /////////////// MODULE ////////////////
     // DEPLOY Fractal Module
-    moduleImpl = await new FractalModule__factory(deployer).deploy();
+    moduleImpl = await new FractalModuleV1__factory(deployer).deploy();
 
     // SETUP Module
     setModuleCalldata =
       // eslint-disable-next-line camelcase
-      FractalModule__factory.createInterface().encodeFunctionData('setUp', [
+      FractalModuleV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address', 'address', 'address[]'],
           [
@@ -124,7 +124,7 @@ describe('Fractal Module Tests', () => {
       '10031021',
     );
 
-    fractalModule = FractalModule__factory.connect(predictedFractalModule, deployer);
+    fractalModule = FractalModuleV1__factory.connect(predictedFractalModule, deployer);
   });
 
   describe('Fractal Module', () => {
@@ -258,11 +258,11 @@ describe('Fractal Module Tests', () => {
       await multiSendCallOnly.multiSend(safeTx);
 
       // Deploy token mastercopy
-      const votesERC20Mastercopy = await new VotesERC20__factory(deployer).deploy();
+      const votesERC20Mastercopy = await new VotesERC20V1__factory(deployer).deploy();
 
       const votesERC20SetupData =
         // eslint-disable-next-line camelcase
-        VotesERC20__factory.createInterface().encodeFunctionData('setUp', [
+        VotesERC20V1__factory.createInterface().encodeFunctionData('setUp', [
           abiCoder.encode(
             ['string', 'string', 'address[]', 'uint256[]'],
             ['DCNT', 'DCNT', [await gnosisSafe.getAddress()], [1000]],
@@ -282,7 +282,7 @@ describe('Fractal Module Tests', () => {
         '10031021',
       );
 
-      const votesERC20 = VotesERC20__factory.connect(predictedVotesERC20Address, deployer);
+      const votesERC20 = VotesERC20V1__factory.connect(predictedVotesERC20Address, deployer);
 
       expect(await votesERC20.balanceOf(await gnosisSafe.getAddress())).to.eq(1000);
       expect(await votesERC20.balanceOf(owner1.address)).to.eq(0);
@@ -290,7 +290,10 @@ describe('Fractal Module Tests', () => {
       // CLAWBACK FUNDS
       const clawBackCalldata =
         // eslint-disable-next-line camelcase
-        VotesERC20__factory.createInterface().encodeFunctionData('transfer', [owner1.address, 500]);
+        VotesERC20V1__factory.createInterface().encodeFunctionData('transfer', [
+          owner1.address,
+          500,
+        ]);
       const txData =
         // eslint-disable-next-line camelcase
         abiCoder.encode(

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
-import {LinearERC20Voting} from "./LinearERC20Voting.sol";
-import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
-import {LinearERC20VotingWithHatsProposalCreation} from "./LinearERC20VotingWithHatsProposalCreation.sol";
+import {LinearERC20VotingV1} from "./LinearERC20VotingV1.sol";
+import {ERC4337VoterSupportV1} from "./ERC4337VoterSupportV1.sol";
+import {LinearERC20VotingWithHatsProposalCreationV1} from "./LinearERC20VotingWithHatsProposalCreationV1.sol";
 import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 
 /**
@@ -12,9 +12,9 @@ import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
  * restricted to users wearing whitelisted Hats.
  */
 contract LinearERC20VotingWithHatsProposalCreationV2 is
-    LinearERC20VotingWithHatsProposalCreation,
+    LinearERC20VotingWithHatsProposalCreationV1,
     IVersion,
-    ERC4337VoterSupport
+    ERC4337VoterSupportV1
 {
     /** @inheritdoc IVersion*/
     function getVersion() external pure override returns (uint16) {
@@ -23,7 +23,7 @@ contract LinearERC20VotingWithHatsProposalCreationV2 is
         return 2;
     }
 
-    /** @inheritdoc LinearERC20Voting*/
+    /** @inheritdoc LinearERC20VotingV1*/
     function vote(
         uint32 _proposalId,
         uint8 _voteType

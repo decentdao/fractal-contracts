@@ -2,8 +2,8 @@
 pragma solidity ^0.8.28;
 
 import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
-import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
-import {LinearERC721Voting} from "./LinearERC721Voting.sol";
+import {ERC4337VoterSupportV1} from "./ERC4337VoterSupportV1.sol";
+import {LinearERC721VotingV1} from "./LinearERC721VotingV1.sol";
 
 /**
  * An Azorius strategy that allows multiple ERC721 tokens to be registered as governance tokens,
@@ -18,8 +18,8 @@ import {LinearERC721Voting} from "./LinearERC721Voting.sol";
  */
 contract LinearERC721VotingV2 is
     IVersion,
-    LinearERC721Voting,
-    ERC4337VoterSupport
+    LinearERC721VotingV1,
+    ERC4337VoterSupportV1
 {
     /** @inheritdoc IVersion*/
     function getVersion() external pure virtual returns (uint16) {
@@ -27,7 +27,7 @@ contract LinearERC721VotingV2 is
         return 2;
     }
 
-    /** @inheritdoc LinearERC721Voting*/
+    /** @inheritdoc LinearERC721VotingV1*/
     function vote(
         uint32 _proposalId,
         uint8 _voteType,

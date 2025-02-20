@@ -12,7 +12,7 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
  * See https://en.wikipedia.org/wiki/Voting#Voting_basis.
  * See https://en.wikipedia.org/wiki/Supermajority.
  */
-abstract contract BaseVotingBasisPercent is OwnableUpgradeable {
+abstract contract BaseVotingBasisPercentV1 is OwnableUpgradeable {
     /** The numerator to use when calculating basis (adjustable). */
     uint256 public basisNumerator;
 

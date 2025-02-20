@@ -3,12 +3,12 @@ import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 
 import {
-  VotesERC20,
-  VotesERC20__factory,
-  MultisigFreezeVoting,
-  MultisigFreezeVoting__factory,
-  MultisigFreezeGuard,
-  MultisigFreezeGuard__factory,
+  VotesERC20V1,
+  VotesERC20V1__factory,
+  MultisigFreezeVotingV1,
+  MultisigFreezeVotingV1__factory,
+  MultisigFreezeGuardV1,
+  MultisigFreezeGuardV1__factory,
   GnosisSafeL2__factory,
   GnosisSafeL2,
 } from '../typechain-types';
@@ -30,11 +30,11 @@ import time from './time';
 describe('Child Multisig DAO with Multisig Parent', () => {
   // Deployed contracts
   let childGnosisSafe: GnosisSafeL2;
-  let freezeGuard: MultisigFreezeGuard;
-  let freezeVotingMastercopy: MultisigFreezeVoting;
-  let freezeVoting: MultisigFreezeVoting;
-  let votesERC20Mastercopy: VotesERC20;
-  let votesERC20: VotesERC20;
+  let freezeGuard: MultisigFreezeGuardV1;
+  let freezeVotingMastercopy: MultisigFreezeVotingV1;
+  let freezeVoting: MultisigFreezeVotingV1;
+  let votesERC20Mastercopy: VotesERC20V1;
+  let votesERC20: VotesERC20V1;
 
   // Wallets
   let deployer: SignerWithAddress;
@@ -135,12 +135,12 @@ describe('Child Multisig DAO with Multisig Parent', () => {
     childGnosisSafe = GnosisSafeL2__factory.connect(predictedChildGnosisSafeAddress, deployer);
 
     // Deploy token mastercopy
-    votesERC20Mastercopy = await new VotesERC20__factory(deployer).deploy();
+    votesERC20Mastercopy = await new VotesERC20V1__factory(deployer).deploy();
 
     const abiCoder = new ethers.AbiCoder(); // encode data
     const votesERC20SetupData =
       // eslint-disable-next-line camelcase
-      VotesERC20__factory.createInterface().encodeFunctionData('setUp', [
+      VotesERC20V1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['string', 'string', 'address[]', 'uint256[]'],
           ['DCNT', 'DCNT', [await childGnosisSafe.getAddress()], [1000]],
@@ -160,15 +160,15 @@ describe('Child Multisig DAO with Multisig Parent', () => {
       '10031021',
     );
 
-    votesERC20 = VotesERC20__factory.connect(predictedVotesERC20Address, deployer);
+    votesERC20 = VotesERC20V1__factory.connect(predictedVotesERC20Address, deployer);
 
     // Deploy MultisigFreezeVoting mastercopy contract
-    freezeVotingMastercopy = await new MultisigFreezeVoting__factory(deployer).deploy();
+    freezeVotingMastercopy = await new MultisigFreezeVotingV1__factory(deployer).deploy();
 
     // Initialize MultisigFreezeVoting contract
     const freezeVotingSetupData =
       // eslint-disable-next-line camelcase
-      MultisigFreezeVoting__factory.createInterface().encodeFunctionData('setUp', [
+      MultisigFreezeVotingV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'uint256', 'uint32', 'uint32', 'address'],
           [
@@ -193,15 +193,15 @@ describe('Child Multisig DAO with Multisig Parent', () => {
       '10031021',
     );
 
-    freezeVoting = MultisigFreezeVoting__factory.connect(predictedFreezeVotingAddress, deployer);
+    freezeVoting = MultisigFreezeVotingV1__factory.connect(predictedFreezeVotingAddress, deployer);
 
     // Deploy FreezeGuard mastercopy contract
-    const freezeGuardMastercopy = await new MultisigFreezeGuard__factory(deployer).deploy();
+    const freezeGuardMastercopy = await new MultisigFreezeGuardV1__factory(deployer).deploy();
 
     // Deploy MultisigFreezeGuard contract with a 60 block timelock period and 60 block execution period
     const freezeGuardSetupData =
       // eslint-disable-next-line camelcase
-      MultisigFreezeGuard__factory.createInterface().encodeFunctionData('setUp', [
+      MultisigFreezeGuardV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['uint32', 'uint32', 'address', 'address', 'address'],
           [
@@ -227,7 +227,7 @@ describe('Child Multisig DAO with Multisig Parent', () => {
       '10031021',
     );
 
-    freezeGuard = MultisigFreezeGuard__factory.connect(predictedFreezeGuardAddress, deployer);
+    freezeGuard = MultisigFreezeGuardV1__factory.connect(predictedFreezeGuardAddress, deployer);
 
     // Create transaction to set the guard address
     const setGuardData = childGnosisSafe.interface.encodeFunctionData('setGuard', [

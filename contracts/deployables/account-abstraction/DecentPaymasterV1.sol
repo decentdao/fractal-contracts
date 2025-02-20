@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {BasePaymaster, IEntryPoint} from "./BasePaymaster.sol";
+import {BasePaymasterV1, IEntryPoint} from "./BasePaymasterV1.sol";
 import {IDecentPaymasterV1} from "../../interfaces/decent/deployables/IDecentPaymasterV1.sol";
 import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {PackedUserOperation, IPaymaster} from "@account-abstraction/contracts/interfaces/IPaymaster.sol";
@@ -10,7 +10,7 @@ import {ERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 contract DecentPaymasterV1 is
     IDecentPaymasterV1,
     IVersion,
-    BasePaymaster,
+    BasePaymasterV1,
     ERC165
 {
     // Mapping: strategy address => function selector => is approved
@@ -72,7 +72,7 @@ contract DecentPaymasterV1 is
         return approvedFunctions[strategy][selector];
     }
 
-    /// @inheritdoc BasePaymaster
+    /// @inheritdoc BasePaymasterV1
     function _validatePaymasterUserOp(
         PackedUserOperation calldata userOp,
         bytes32,

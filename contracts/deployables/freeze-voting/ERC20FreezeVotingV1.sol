@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {BaseFreezeVoting, IBaseFreezeVoting} from "./BaseFreezeVoting.sol";
+import {BaseFreezeVotingV1} from "./BaseFreezeVotingV1.sol";
 import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
 
@@ -9,7 +9,7 @@ import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
  * A [BaseFreezeVoting](./BaseFreezeVoting.md) implementation which handles
  * freezes on ERC20 based token voting DAOs.
  */
-contract ERC20FreezeVoting is BaseFreezeVoting {
+contract ERC20FreezeVotingV1 is BaseFreezeVotingV1 {
     /** A reference to the ERC20 voting token of the subDAO. */
     IVotes public votesERC20;
 
@@ -50,7 +50,7 @@ contract ERC20FreezeVoting is BaseFreezeVoting {
         emit ERC20FreezeVotingSetUp(_owner, _votesERC20);
     }
 
-    /** @inheritdoc BaseFreezeVoting*/
+    /** @inheritdoc BaseFreezeVotingV1*/
     function castFreezeVote() external override {
         uint256 userVotes;
 

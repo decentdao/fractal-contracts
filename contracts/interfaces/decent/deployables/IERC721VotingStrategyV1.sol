@@ -5,7 +5,7 @@ pragma solidity ^0.8.28;
  * Interface of functions required for ERC-721 freeze voting associated with an ERC-721
  * voting strategy.
  */
-interface IERC721VotingStrategy {
+interface IERC721VotingStrategyV1 {
     /**
      * Returns the current token weight for the given ERC-721 token address.
      *

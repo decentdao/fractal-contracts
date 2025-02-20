@@ -5,14 +5,14 @@ import hre, { ethers } from 'hardhat';
 import {
   GnosisSafe,
   GnosisSafeProxyFactory,
-  LinearERC20Voting,
-  LinearERC20Voting__factory,
+  LinearERC20VotingV1,
+  LinearERC20VotingV1__factory,
   MockVotingStrategy,
   MockVotingStrategy__factory,
-  Azorius,
-  Azorius__factory,
-  VotesERC20,
-  VotesERC20__factory,
+  AzoriusV1,
+  AzoriusV1__factory,
+  VotesERC20V1,
+  VotesERC20V1__factory,
   ModuleProxyFactory,
   GnosisSafeL2__factory,
 } from '../typechain-types';
@@ -34,13 +34,13 @@ import time from './time';
 describe('Safe with Azorius module and linearERC20Voting', () => {
   // Deployed contracts
   let gnosisSafe: GnosisSafe;
-  let azorius: Azorius;
-  let azoriusMastercopy: Azorius;
-  let linearERC20Voting: LinearERC20Voting;
-  let linearERC20VotingMastercopy: LinearERC20Voting;
+  let azorius: AzoriusV1;
+  let azoriusMastercopy: AzoriusV1;
+  let linearERC20Voting: LinearERC20VotingV1;
+  let linearERC20VotingMastercopy: LinearERC20VotingV1;
   let mockVotingStrategy: MockVotingStrategy;
-  let votesERC20Mastercopy: VotesERC20;
-  let votesERC20: VotesERC20;
+  let votesERC20Mastercopy: VotesERC20V1;
+  let votesERC20: VotesERC20V1;
   let gnosisSafeProxyFactory: GnosisSafeProxyFactory;
   let moduleProxyFactory: ModuleProxyFactory;
 
@@ -106,11 +106,11 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
     gnosisSafe = GnosisSafeL2__factory.connect(predictedGnosisSafeAddress, deployer);
 
     // Deploy Votes ERC-20 mastercopy contract
-    votesERC20Mastercopy = await new VotesERC20__factory(deployer).deploy();
+    votesERC20Mastercopy = await new VotesERC20V1__factory(deployer).deploy();
 
     const votesERC20SetupCalldata =
       // eslint-disable-next-line camelcase
-      VotesERC20__factory.createInterface().encodeFunctionData('setUp', [
+      VotesERC20V1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['string', 'string', 'address[]', 'uint256[]'],
           [
@@ -140,7 +140,7 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
       '10031021',
     );
 
-    votesERC20 = VotesERC20__factory.connect(predictedVotesERC20Address, deployer);
+    votesERC20 = VotesERC20V1__factory.connect(predictedVotesERC20Address, deployer);
 
     // Token holders delegate votes
     // Token holder 1 delegates to token holder 2, so final vote counts should be:
@@ -152,11 +152,11 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
     await votesERC20.connect(tokenHolder3).delegate(tokenHolder3.address);
 
     // Deploy Azorius module
-    azoriusMastercopy = await new Azorius__factory(deployer).deploy();
+    azoriusMastercopy = await new AzoriusV1__factory(deployer).deploy();
 
     const azoriusSetupCalldata =
       // eslint-disable-next-line camelcase
-      Azorius__factory.createInterface().encodeFunctionData('setUp', [
+      AzoriusV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address', 'address', 'address[]', 'uint32', 'uint32'],
           [
@@ -183,14 +183,14 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
       '10031021',
     );
 
-    azorius = Azorius__factory.connect(predictedAzoriusAddress, deployer);
+    azorius = AzoriusV1__factory.connect(predictedAzoriusAddress, deployer);
 
     // Deploy Linear ERC20 Voting Mastercopy
-    linearERC20VotingMastercopy = await new LinearERC20Voting__factory(deployer).deploy();
+    linearERC20VotingMastercopy = await new LinearERC20VotingV1__factory(deployer).deploy();
 
     const linearERC20VotingSetupCalldata =
       // eslint-disable-next-line camelcase
-      LinearERC20Voting__factory.createInterface().encodeFunctionData('setUp', [
+      LinearERC20VotingV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'address', 'address', 'uint32', 'uint256', 'uint256', 'uint256'],
           [
@@ -218,7 +218,7 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
       '10031021',
     );
 
-    linearERC20Voting = LinearERC20Voting__factory.connect(
+    linearERC20Voting = LinearERC20VotingV1__factory.connect(
       predictedLinearERC20VotingAddress,
       deployer,
     );
@@ -1159,11 +1159,11 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
       const abiCoder = new ethers.AbiCoder();
 
       // Deploy Linear ERC20 Voting Strategy
-      linearERC20Voting = await new LinearERC20Voting__factory(deployer).deploy();
+      linearERC20Voting = await new LinearERC20VotingV1__factory(deployer).deploy();
 
       const linearERC20VotingSetupCalldata =
         // eslint-disable-next-line camelcase
-        LinearERC20Voting__factory.createInterface().encodeFunctionData('setUp', [
+        LinearERC20VotingV1__factory.createInterface().encodeFunctionData('setUp', [
           abiCoder.encode(
             ['address', 'address', 'address', 'uint32', 'uint256', 'uint256', 'uint256'],
             [
@@ -1224,11 +1224,11 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
       const abiCoder = new ethers.AbiCoder();
 
       // Deploy Azorius module
-      azorius = await new Azorius__factory(deployer).deploy();
+      azorius = await new AzoriusV1__factory(deployer).deploy();
 
       const azoriusSetupCalldata =
         // eslint-disable-next-line camelcase
-        Azorius__factory.createInterface().encodeFunctionData('setUp', [
+        AzoriusV1__factory.createInterface().encodeFunctionData('setUp', [
           abiCoder.encode(
             ['address', 'address', 'address', 'address[]', 'uint256', 'uint256'],
             [
@@ -1255,7 +1255,7 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
         '10031021',
       );
 
-      azorius = Azorius__factory.connect(predictedAzoriusAddress, deployer);
+      azorius = AzoriusV1__factory.connect(predictedAzoriusAddress, deployer);
 
       expect(await azorius.isStrategyEnabled(tokenHolder1.address)).to.eq(true);
       expect(await azorius.isStrategyEnabled(tokenHolder2.address)).to.eq(true);

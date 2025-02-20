@@ -12,7 +12,7 @@ import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
  * transactions on the Safe, which in our implementation is the set of parent
  * DAOs.
  */
-interface IFractalModule {
+interface IFractalModuleV1 {
     /**
      * Allows an authorized address to execute arbitrary transactions on the Safe.
      *

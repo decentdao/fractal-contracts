@@ -2,12 +2,12 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import {
-  VotesERC20,
-  VotesERC20__factory,
-  ERC20FreezeVoting,
-  ERC20FreezeVoting__factory,
-  MultisigFreezeGuard,
-  MultisigFreezeGuard__factory,
+  VotesERC20V1,
+  VotesERC20V1__factory,
+  ERC20FreezeVotingV1,
+  ERC20FreezeVotingV1__factory,
+  MultisigFreezeGuardV1,
+  MultisigFreezeGuardV1__factory,
   GnosisSafeL2__factory,
   GnosisSafeL2,
 } from '../typechain-types';
@@ -28,12 +28,12 @@ import time from './time';
 describe('Child Multisig DAO with Azorius Parent', () => {
   // Deployed contracts
   let gnosisSafe: GnosisSafeL2;
-  let freezeGuardMastercopy: MultisigFreezeGuard;
-  let freezeGuard: MultisigFreezeGuard;
-  let freezeVotingMastercopy: ERC20FreezeVoting;
-  let freezeVoting: ERC20FreezeVoting;
-  let votesERC20Mastercopy: VotesERC20;
-  let votesERC20: VotesERC20;
+  let freezeGuardMastercopy: MultisigFreezeGuardV1;
+  let freezeGuard: MultisigFreezeGuardV1;
+  let freezeVotingMastercopy: ERC20FreezeVotingV1;
+  let freezeVoting: ERC20FreezeVotingV1;
+  let votesERC20Mastercopy: VotesERC20V1;
+  let votesERC20: VotesERC20V1;
 
   // Wallets
   let deployer: SignerWithAddress;
@@ -90,12 +90,12 @@ describe('Child Multisig DAO with Azorius Parent', () => {
     gnosisSafe = GnosisSafeL2__factory.connect(predictedGnosisSafeAddress, deployer);
 
     // Deploy token mastercopy
-    votesERC20Mastercopy = await new VotesERC20__factory(deployer).deploy();
+    votesERC20Mastercopy = await new VotesERC20V1__factory(deployer).deploy();
 
     const abiCoder = new ethers.AbiCoder(); // encode data
     const votesERC20SetupData =
       // eslint-disable-next-line camelcase
-      VotesERC20__factory.createInterface().encodeFunctionData('setUp', [
+      VotesERC20V1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['string', 'string', 'address[]', 'uint256[]'],
           [
@@ -120,19 +120,19 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    votesERC20 = VotesERC20__factory.connect(predictedVotesERC20Address, deployer);
+    votesERC20 = VotesERC20V1__factory.connect(predictedVotesERC20Address, deployer);
 
     // Vetoers delegate their votes to themselves
     await votesERC20.connect(tokenVetoer1).delegate(tokenVetoer1.address);
     await votesERC20.connect(tokenVetoer2).delegate(tokenVetoer2.address);
 
     // Deploy ERC20FreezeVoting mastercopy contract
-    freezeVotingMastercopy = await new ERC20FreezeVoting__factory(deployer).deploy();
+    freezeVotingMastercopy = await new ERC20FreezeVotingV1__factory(deployer).deploy();
 
     // Initialize FreezeVoting contract
     const freezeVotingSetupData =
       // eslint-disable-next-line camelcase
-      ERC20FreezeVoting__factory.createInterface().encodeFunctionData('setUp', [
+      ERC20FreezeVotingV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['address', 'uint256', 'uint32', 'uint32', 'address'],
           [
@@ -158,15 +158,15 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    freezeVoting = ERC20FreezeVoting__factory.connect(predictedFreezeVotingAddress, deployer);
+    freezeVoting = ERC20FreezeVotingV1__factory.connect(predictedFreezeVotingAddress, deployer);
 
     // Deploy FreezeGuard mastercopy contract
-    freezeGuardMastercopy = await new MultisigFreezeGuard__factory(deployer).deploy();
+    freezeGuardMastercopy = await new MultisigFreezeGuardV1__factory(deployer).deploy();
 
     // Deploy MultisigFreezeGuard contract with a 60 block timelock period, and a 60 block execution period
     const freezeGuardSetupData =
       // eslint-disable-next-line camelcase
-      MultisigFreezeGuard__factory.createInterface().encodeFunctionData('setUp', [
+      MultisigFreezeGuardV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
           ['uint32', 'uint32', 'address', 'address', 'address'],
           [
@@ -192,7 +192,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    freezeGuard = MultisigFreezeGuard__factory.connect(predictedFreezeGuardAddress, deployer);
+    freezeGuard = MultisigFreezeGuardV1__factory.connect(predictedFreezeGuardAddress, deployer);
 
     // Create transaction to set the guard address
     const setGuardData = gnosisSafe.interface.encodeFunctionData('setGuard', [
