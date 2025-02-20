@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
-import {IAzorius} from "../../interfaces/decent/deployables/IAzorius.sol";
+import {IAzoriusV1} from "../../interfaces/decent/deployables/IAzoriusV1.sol";
 import {IBaseStrategy} from "../../interfaces/decent/deployables/IBaseStrategy.sol";
 import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -19,7 +19,7 @@ abstract contract BaseStrategy is
 
     error OnlyAzorius();
 
-    IAzorius public azoriusModule;
+    IAzoriusV1 public azoriusModule;
 
     /**
      * Ensures that only the [Azorius](./Azorius.md) contract that pertains to this
@@ -36,7 +36,7 @@ abstract contract BaseStrategy is
 
     /** @inheritdoc IBaseStrategy*/
     function setAzorius(address _azoriusModule) external onlyOwner {
-        azoriusModule = IAzorius(_azoriusModule);
+        azoriusModule = IAzoriusV1(_azoriusModule);
         emit AzoriusSet(_azoriusModule);
     }
 
@@ -60,7 +60,7 @@ abstract contract BaseStrategy is
      * @param _azoriusModule address of the Azorius module
      */
     function _setAzorius(address _azoriusModule) internal {
-        azoriusModule = IAzorius(_azoriusModule);
+        azoriusModule = IAzoriusV1(_azoriusModule);
         emit AzoriusSet(_azoriusModule);
     }
 }

@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import {IERC721VotingStrategy} from "../../interfaces/decent/deployables/IERC721VotingStrategy.sol";
 import {BaseVotingBasisPercent} from "./BaseVotingBasisPercent.sol";
-import {IAzorius} from "../../interfaces/decent/deployables/IAzorius.sol";
+import {IAzoriusV1} from "../../interfaces/decent/deployables/IAzoriusV1.sol";
 import {BaseStrategy} from "./BaseStrategy.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
