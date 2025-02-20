@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.28;
+pragma solidity ^0.8.28;
 
 import {BasePaymaster, IEntryPoint} from "./BasePaymaster.sol";
 import {IDecentPaymasterV1} from "../../interfaces/decent/IDecentPaymasterV1.sol";

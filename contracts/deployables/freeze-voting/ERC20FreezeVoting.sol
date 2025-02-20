@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity =0.8.19;
+pragma solidity ^0.8.28;
 
 import {BaseFreezeVoting, IBaseFreezeVoting} from "./BaseFreezeVoting.sol";
 import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";

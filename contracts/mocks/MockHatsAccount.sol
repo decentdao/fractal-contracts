@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.19;
+pragma solidity ^0.8.28;
 
 contract MockHatsAccount {
     // see https://github.com/Hats-Protocol/hats-account/blob/00650b3de756352d303ca08e4b024376f1d1db98/src/HatsAccountBase.sol#L41

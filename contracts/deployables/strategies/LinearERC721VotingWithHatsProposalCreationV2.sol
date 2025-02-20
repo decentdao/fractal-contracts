@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.19;
+pragma solidity ^0.8.28;
 
 import {LinearERC721Voting} from "./LinearERC721Voting.sol";
 import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
