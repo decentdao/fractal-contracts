@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
 import {IBaseFreezeVotingV1} from "../../interfaces/decent/deployables/IBaseFreezeVotingV1.sol";
 
@@ -21,7 +22,11 @@ import {IBaseFreezeVotingV1} from "../../interfaces/decent/deployables/IBaseFree
  * Following a successful freeze vote, the childDAO will be unable to execute transactions, due to
  * a Safe Transaction Guard, until the `freezePeriod` has elapsed.
  */
-abstract contract BaseFreezeVotingV1 is FactoryFriendly, IBaseFreezeVotingV1 {
+abstract contract BaseFreezeVotingV1 is
+    IVersion,
+    FactoryFriendly,
+    IBaseFreezeVotingV1
+{
     /** Block number the freeze proposal was created at. */
     uint32 public freezeProposalCreatedBlock;
 
@@ -136,4 +141,7 @@ abstract contract BaseFreezeVotingV1 is FactoryFriendly, IBaseFreezeVotingV1 {
         freezePeriod = _freezePeriod;
         emit FreezePeriodUpdated(_freezePeriod);
     }
+
+    /// @inheritdoc IVersion
+    function getVersion() external pure virtual returns (uint16);
 }

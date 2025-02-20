@@ -1035,4 +1035,16 @@ describe('Safe with Azorius module and linearERC721Voting', () => {
       expect(await linearERC721Voting.isPassed(0)).to.eq(false);
     });
   });
+
+  describe('Version', function () {
+    it('Azorius module should have a version', async function () {
+      const version = await azorius.getVersion();
+      void expect(version).to.equal(1);
+    });
+
+    it('Linear ERC721 voting should have a version', async function () {
+      const version = await linearERC721Voting.getVersion();
+      void expect(version).to.equal(1);
+    });
+  });
 });

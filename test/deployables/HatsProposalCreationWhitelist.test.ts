@@ -183,4 +183,11 @@ describe('HatsProposalCreationWhitelist', () => {
       (await mockHatsProposalCreationWhitelist.getWhitelistedHatIds()).includes(proposerHatId),
     ).to.equal(false);
   });
+
+  describe('Version', function () {
+    it('Hats proposal creation whitelist should have a version', async function () {
+      const version = await mockHatsProposalCreationWhitelist.getVersion();
+      void expect(version).to.equal(1);
+    });
+  });
 });

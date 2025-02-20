@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {IBaseFreezeVotingV1} from "../../interfaces/decent/deployables/IBaseFreezeVotingV1.sol";
 import {IGuard} from "@gnosis-guild/zodiac/contracts/interfaces/IGuard.sol";
 import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
@@ -13,7 +14,7 @@ import {BaseGuard} from "@gnosis-guild/zodiac/contracts/guard/BaseGuard.sol";
  *
  * See https://docs.safe.global/learn/safe-core/safe-core-protocol/guards.
  */
-contract AzoriusFreezeGuardV1 is FactoryFriendly, IGuard, BaseGuard {
+contract AzoriusFreezeGuardV1 is IVersion, FactoryFriendly, IGuard, BaseGuard {
     /**
      * A reference to the freeze voting contract, which manages the freeze
      * voting process and maintains the frozen / unfrozen state of the DAO.
@@ -83,5 +84,10 @@ contract AzoriusFreezeGuardV1 is FactoryFriendly, IGuard, BaseGuard {
         bool
     ) external view override(BaseGuard, IGuard) {
         // not implementated
+    }
+
+    /// @inheritdoc IVersion
+    function getVersion() external pure virtual returns (uint16) {
+        return 1;
     }
 }

@@ -443,4 +443,11 @@ describe('DecentPaymasterV1', function () {
       void expect(supported).to.be.false;
     });
   });
+
+  describe('Version', function () {
+    it('Should have a version', async function () {
+      const version = await decentPaymaster.getVersion();
+      void expect(version).to.equal(1);
+    });
+  });
 });

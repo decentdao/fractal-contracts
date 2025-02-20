@@ -1122,4 +1122,31 @@ describe('Azorius Child DAO with Multisig parent', () => {
       expect(await freezeVoting.isFrozen()).to.eq(false);
     });
   });
+
+  describe('Version', function () {
+    it('Azorius module should have a version', async function () {
+      const version = await azoriusModule.getVersion();
+      void expect(version).to.equal(1);
+    });
+
+    it('Linear ERC20 voting should have a version', async function () {
+      const version = await linearERC20Voting.getVersion();
+      void expect(version).to.equal(1);
+    });
+
+    it('Freeze voting should have a version', async function () {
+      const version = await freezeVoting.getVersion();
+      void expect(version).to.equal(1);
+    });
+
+    it('Freeze guard should have a version', async function () {
+      const version = await freezeGuard.getVersion();
+      void expect(version).to.equal(1);
+    });
+
+    it('Child votes ERC20 should have a version', async function () {
+      const version = await childVotesERC20.getVersion();
+      void expect(version).to.equal(1);
+    });
+  });
 });

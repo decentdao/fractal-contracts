@@ -7,12 +7,7 @@ import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {PackedUserOperation, IPaymaster} from "@account-abstraction/contracts/interfaces/IPaymaster.sol";
 import {ERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
-contract DecentPaymasterV1 is
-    IDecentPaymasterV1,
-    IVersion,
-    BasePaymasterV1,
-    ERC165
-{
+contract DecentPaymasterV1 is IDecentPaymasterV1, BasePaymasterV1, ERC165 {
     // Mapping: strategy address => function selector => is approved
     mapping(address => mapping(bytes4 => bool)) public approvedFunctions;
 
@@ -116,7 +111,7 @@ contract DecentPaymasterV1 is
     }
 
     /// @inheritdoc IVersion
-    function getVersion() public pure override returns (uint16) {
+    function getVersion() public pure virtual override returns (uint16) {
         return 1;
     }
 }

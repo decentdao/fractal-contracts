@@ -8,4 +8,8 @@ contract MockERC4337VoterSupport is ERC4337VoterSupportV1 {
     function voter(address _msgSender) external view returns (address) {
         return _voter(_msgSender);
     }
+
+    function getVersion() external pure override returns (uint16) {
+        return 1;
+    }
 }

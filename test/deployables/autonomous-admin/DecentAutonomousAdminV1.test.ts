@@ -169,4 +169,11 @@ describe('DecentAutonomousAdminHatV1', function () {
       });
     });
   });
+
+  describe('Version', function () {
+    it('Should have a version', async function () {
+      const version = await decentAutonomousAdminInstance.getVersion();
+      void expect(version).to.equal(1);
+    });
+  });
 });

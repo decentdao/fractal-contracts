@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {BaseFreezeVotingV1} from "./BaseFreezeVotingV1.sol";
 import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
@@ -88,5 +89,10 @@ contract ERC20FreezeVotingV1 is BaseFreezeVotingV1 {
         userHasFreezeVoted[msg.sender][freezeProposalCreatedBlock] = true;
 
         emit FreezeVoteCast(msg.sender, userVotes);
+    }
+
+    /// @inheritdoc IVersion
+    function getVersion() external pure virtual override returns (uint16) {
+        return 1;
     }
 }

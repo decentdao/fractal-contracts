@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.28;
 
+import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {LinearERC20VotingV1} from "./LinearERC20VotingV1.sol";
 import {HatsProposalCreationWhitelistV1} from "./HatsProposalCreationWhitelistV1.sol";
 import {IHats} from "../../interfaces/hats/IHats.sol";
@@ -75,5 +76,16 @@ contract LinearERC20VotingWithHatsProposalCreationV1 is
         returns (bool)
     {
         return HatsProposalCreationWhitelistV1.isProposer(_address);
+    }
+
+    /// @inheritdoc IVersion
+    function getVersion()
+        external
+        pure
+        virtual
+        override(HatsProposalCreationWhitelistV1, LinearERC20VotingV1)
+        returns (uint16)
+    {
+        return 1;
     }
 }

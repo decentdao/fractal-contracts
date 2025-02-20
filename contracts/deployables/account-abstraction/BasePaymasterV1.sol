@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.28;
 
+import "../../interfaces/decent/deployables/IVersion.sol";
 import "@account-abstraction/contracts/interfaces/IPaymaster.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 import "@account-abstraction/contracts/core/UserOperationLib.sol";
@@ -12,7 +13,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
  * provides helper methods for staking.
  * Validates that the postOp is called only by the entryPoint.
  */
-abstract contract BasePaymasterV1 is IPaymaster, OwnableUpgradeable {
+abstract contract BasePaymasterV1 is IPaymaster, IVersion, OwnableUpgradeable {
     IEntryPoint public entryPoint;
 
     uint256 internal constant PAYMASTER_VALIDATION_GAS_OFFSET =
@@ -161,4 +162,7 @@ abstract contract BasePaymasterV1 is IPaymaster, OwnableUpgradeable {
     function _requireFromEntryPoint() internal virtual {
         require(msg.sender == address(entryPoint), "Sender not EntryPoint");
     }
+
+    /// @inheritdoc IVersion
+    function getVersion() external pure virtual returns (uint16);
 }

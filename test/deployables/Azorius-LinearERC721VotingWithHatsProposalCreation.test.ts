@@ -258,4 +258,16 @@ describe('LinearERC721VotingWithHatsProposalCreation', () => {
       'InvalidInitialization',
     );
   });
+
+  describe('Version', function () {
+    it('Azorius module should have a version', async function () {
+      const version = await azorius.getVersion();
+      void expect(version).to.equal(1);
+    });
+
+    it('Linear ERC721 voting with hats should have a version', async function () {
+      const version = await linearERC721VotingWithHats.getVersion();
+      void expect(version).to.equal(1);
+    });
+  });
 });

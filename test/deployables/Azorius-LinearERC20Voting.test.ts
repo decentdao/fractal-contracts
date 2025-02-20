@@ -1729,4 +1729,21 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
       expect(await linearERC20Voting.isPassed(0)).to.eq(false);
     });
   });
+
+  describe('Version', function () {
+    it('Azorius module should have a version', async function () {
+      const version = await azorius.getVersion();
+      void expect(version).to.equal(1);
+    });
+
+    it('Linear ERC20 voting should have a version', async function () {
+      const version = await linearERC20Voting.getVersion();
+      void expect(version).to.equal(1);
+    });
+
+    it('Votes ERC20 should have a version', async function () {
+      const version = await votesERC20.getVersion();
+      void expect(version).to.equal(1);
+    });
+  });
 });

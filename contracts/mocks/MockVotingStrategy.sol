@@ -39,4 +39,8 @@ contract MockVotingStrategy is BaseStrategyV1 {
     function votingEndBlock(uint32) external pure override returns (uint32) {
         return 0;
     }
+
+    function getVersion() external pure override returns (uint16) {
+        return 1;
+    }
 }
