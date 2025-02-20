@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-pragma solidity =0.8.19;
+pragma solidity ^0.8.28;
 
 import {IERC721VotingStrategy} from "../../interfaces/decent/IERC721VotingStrategy.sol";
 import {BaseVotingBasisPercent} from "./BaseVotingBasisPercent.sol";

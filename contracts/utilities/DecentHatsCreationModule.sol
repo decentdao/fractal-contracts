@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.28;
+pragma solidity ^0.8.28;
 
 import {DecentHatsModuleUtils} from "./DecentHatsModuleUtils.sol";
 import {IERC6551Registry} from "../interfaces/erc6551/IERC6551Registry.sol";
