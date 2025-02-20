@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity =0.8.19;
 
-import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
-import {LinearERC721VotingExtensible} from "./LinearERC721VotingExtensible.sol";
 import {IVersion} from "../../interfaces/decent/IVersion.sol";
+import {ERC4337VoterSupport} from "./ERC4337VoterSupport.sol";
+import {LinearERC721Voting} from "./LinearERC721Voting.sol";
 
 /**
  * An Azorius strategy that allows multiple ERC721 tokens to be registered as governance tokens,
@@ -17,8 +17,8 @@ import {IVersion} from "../../interfaces/decent/IVersion.sol";
  * "total signers" required, rather than a percentage of the tokens.
  */
 contract LinearERC721VotingV2 is
-    LinearERC721VotingExtensible,
     IVersion,
+    LinearERC721Voting,
     ERC4337VoterSupport
 {
     /** @inheritdoc IVersion*/
@@ -27,7 +27,7 @@ contract LinearERC721VotingV2 is
         return 2;
     }
 
-    /** @inheritdoc LinearERC721VotingExtensible*/
+    /** @inheritdoc LinearERC721Voting*/
     function vote(
         uint32 _proposalId,
         uint8 _voteType,
