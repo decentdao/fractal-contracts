@@ -9,7 +9,7 @@ import {
   MockSmartAccount__factory,
   MockNonOwnership,
   MockNonOwnership__factory,
-} from '../typechain-types';
+} from '../../typechain-types';
 
 describe('ERC4337VoterSupport', () => {
   let smartAccount: MockSmartAccount;

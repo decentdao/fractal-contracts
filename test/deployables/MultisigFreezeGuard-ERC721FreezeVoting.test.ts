@@ -2,38 +2,46 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import {
-  VotesERC20V1,
-  VotesERC20V1__factory,
-  ERC20FreezeVotingV1,
-  ERC20FreezeVotingV1__factory,
+  ERC721FreezeVotingV1,
+  ERC721FreezeVotingV1__factory,
   MultisigFreezeGuardV1,
   MultisigFreezeGuardV1__factory,
+  ERC20FreezeVotingV1__factory,
+  MockERC721,
+  MockERC721__factory,
+  AzoriusV1,
+  AzoriusV1__factory,
+  LinearERC721VotingV1,
+  LinearERC721VotingV1__factory,
   GnosisSafeL2__factory,
   GnosisSafeL2,
-} from '../typechain-types';
+} from '../../typechain-types';
 import {
   getGnosisSafeL2Singleton,
   getGnosisSafeProxyFactory,
   getModuleProxyFactory,
-} from './GlobalSafeDeployments.test';
+} from '../global/GlobalSafeDeployments.test';
 import {
   buildSignatureBytes,
   buildSafeTransaction,
   safeSignTypedData,
   predictGnosisSafeAddress,
   calculateProxyAddress,
-} from './helpers';
-import time from './time';
+} from '../helpers';
+import time from '../time';
 
 describe('Child Multisig DAO with Azorius Parent', () => {
   // Deployed contracts
   let gnosisSafe: GnosisSafeL2;
   let freezeGuardMastercopy: MultisigFreezeGuardV1;
   let freezeGuard: MultisigFreezeGuardV1;
-  let freezeVotingMastercopy: ERC20FreezeVotingV1;
-  let freezeVoting: ERC20FreezeVotingV1;
-  let votesERC20Mastercopy: VotesERC20V1;
-  let votesERC20: VotesERC20V1;
+  let freezeVotingMastercopy: ERC721FreezeVotingV1;
+  let freezeVoting: ERC721FreezeVotingV1;
+  let mockNFT: MockERC721;
+  let linearERC721Voting: LinearERC721VotingV1;
+  let linearERC721VotingMastercopy: LinearERC721VotingV1;
+  let azoriusMastercopy: AzoriusV1;
+  let azorius: AzoriusV1;
 
   // Wallets
   let deployer: SignerWithAddress;
@@ -42,13 +50,20 @@ describe('Child Multisig DAO with Azorius Parent', () => {
   let owner3: SignerWithAddress;
   let tokenVetoer1: SignerWithAddress;
   let tokenVetoer2: SignerWithAddress;
+  let vetoer1Ids: number[];
+  let vetoer2Ids: number[];
   let freezeGuardOwner: SignerWithAddress;
+  let mintNFTData: string;
 
   // Gnosis
   let createGnosisSetupCalldata: string;
 
   const threshold = 2;
   const saltNum = BigInt('0x856d90216588f9ffc124d1480a440e1c012c7a816952bc968d737bae5d4e139c');
+
+  async function mintNFT(contract: MockERC721, receiver: SignerWithAddress): Promise<void> {
+    await contract.connect(receiver).mint(receiver.address);
+  }
 
   beforeEach(async () => {
     [deployer, owner1, owner2, owner3, tokenVetoer1, tokenVetoer2, freezeGuardOwner] =
@@ -89,45 +104,104 @@ describe('Child Multisig DAO with Azorius Parent', () => {
     // eslint-disable-next-line camelcase
     gnosisSafe = GnosisSafeL2__factory.connect(predictedGnosisSafeAddress, deployer);
 
-    // Deploy token mastercopy
-    votesERC20Mastercopy = await new VotesERC20V1__factory(deployer).deploy();
-
     const abiCoder = new ethers.AbiCoder(); // encode data
-    const votesERC20SetupData =
+
+    // Deploy Mock NFT
+    mockNFT = await new MockERC721__factory(deployer).deploy();
+
+    // dish out NFTs
+    await mintNFT(mockNFT, tokenVetoer1);
+    await mintNFT(mockNFT, tokenVetoer2);
+    await mintNFT(mockNFT, tokenVetoer2);
+    vetoer1Ids = [0];
+    vetoer2Ids = [1, 2];
+
+    mintNFTData = mockNFT.interface.encodeFunctionData('mint', [deployer.address]);
+
+    // Deploy Azorius module
+    azoriusMastercopy = await new AzoriusV1__factory(deployer).deploy();
+
+    const azoriusSetupCalldata =
       // eslint-disable-next-line camelcase
-      VotesERC20V1__factory.createInterface().encodeFunctionData('setUp', [
+      AzoriusV1__factory.createInterface().encodeFunctionData('setUp', [
         abiCoder.encode(
-          ['string', 'string', 'address[]', 'uint256[]'],
+          ['address', 'address', 'address', 'address[]', 'uint32', 'uint32'],
           [
-            'DCNT',
-            'DCNT',
-            [tokenVetoer1.address, tokenVetoer2.address, await gnosisSafe.getAddress()],
-            [500, 600, 1000],
+            owner1.address,
+            await gnosisSafe.getAddress(),
+            await gnosisSafe.getAddress(),
+            [],
+            60, // timelock period in blocks
+            60, // execution period in blocks
           ],
         ),
       ]);
 
     await moduleProxyFactory.deployModule(
-      await votesERC20Mastercopy.getAddress(),
-      votesERC20SetupData,
+      await azoriusMastercopy.getAddress(),
+      azoriusSetupCalldata,
       '10031021',
     );
 
-    const predictedVotesERC20Address = await calculateProxyAddress(
+    const predictedAzoriusAddress = await calculateProxyAddress(
       moduleProxyFactory,
-      await votesERC20Mastercopy.getAddress(),
-      votesERC20SetupData,
+      await azoriusMastercopy.getAddress(),
+      azoriusSetupCalldata,
       '10031021',
     );
 
-    votesERC20 = VotesERC20V1__factory.connect(predictedVotesERC20Address, deployer);
+    azorius = AzoriusV1__factory.connect(predictedAzoriusAddress, deployer);
 
-    // Vetoers delegate their votes to themselves
-    await votesERC20.connect(tokenVetoer1).delegate(tokenVetoer1.address);
-    await votesERC20.connect(tokenVetoer2).delegate(tokenVetoer2.address);
+    // Deploy Linear ERC721 Voting Mastercopy
+    linearERC721VotingMastercopy = await new LinearERC721VotingV1__factory(deployer).deploy();
 
-    // Deploy ERC20FreezeVoting mastercopy contract
-    freezeVotingMastercopy = await new ERC20FreezeVotingV1__factory(deployer).deploy();
+    const linearERC721VotingSetupCalldata =
+      // eslint-disable-next-line camelcase
+      LinearERC721VotingV1__factory.createInterface().encodeFunctionData('setUp', [
+        abiCoder.encode(
+          [
+            'address',
+            'address[]',
+            'uint256[]',
+            'address',
+            'uint32',
+            'uint256',
+            'uint256',
+            'uint256',
+          ],
+          [
+            owner1.address, // owner
+            [await mockNFT.getAddress()], // NFT addresses
+            [500], // NFT weights
+            await azorius.getAddress(), // Azorius module
+            60, // voting period in blocks
+            2, // quorom threshold
+            2, // proposer threshold
+            500000, // basis numerator, denominator is 1,000,000, so basis percentage is 50% (simple majority)
+          ],
+        ),
+      ]);
+
+    await moduleProxyFactory.deployModule(
+      await linearERC721VotingMastercopy.getAddress(),
+      linearERC721VotingSetupCalldata,
+      '10031021',
+    );
+
+    const predictedlinearERC721VotingAddress = await calculateProxyAddress(
+      moduleProxyFactory,
+      await linearERC721VotingMastercopy.getAddress(),
+      linearERC721VotingSetupCalldata,
+      '10031021',
+    );
+
+    linearERC721Voting = LinearERC721VotingV1__factory.connect(
+      predictedlinearERC721VotingAddress,
+      deployer,
+    );
+
+    // Deploy ERC721FreezeVoting mastercopy contract
+    freezeVotingMastercopy = await new ERC721FreezeVotingV1__factory(deployer).deploy();
 
     // Initialize FreezeVoting contract
     const freezeVotingSetupData =
@@ -137,10 +211,10 @@ describe('Child Multisig DAO with Azorius Parent', () => {
           ['address', 'uint256', 'uint32', 'uint32', 'address'],
           [
             freezeGuardOwner.address,
-            1090, // freeze votes threshold
+            501, // freeze votes threshold
             10, // freeze proposal period
             200, // freeze period
-            await votesERC20.getAddress(),
+            await linearERC721Voting.getAddress(), // strategy address
           ],
         ),
       ]);
@@ -158,7 +232,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       '10031021',
     );
 
-    freezeVoting = ERC20FreezeVotingV1__factory.connect(predictedFreezeVotingAddress, deployer);
+    freezeVoting = ERC721FreezeVotingV1__factory.connect(predictedFreezeVotingAddress, deployer);
 
     // Deploy FreezeGuard mastercopy contract
     freezeGuardMastercopy = await new MultisigFreezeGuardV1__factory(deployer).deploy();
@@ -226,15 +300,12 @@ describe('Child Multisig DAO with Azorius Parent', () => {
         signatureBytes,
       ),
     ).to.emit(gnosisSafe, 'ExecutionSuccess');
-
-    // Gnosis Safe received the 1,000 tokens
-    expect(await votesERC20.balanceOf(await gnosisSafe.getAddress())).to.eq(1000);
   });
 
   describe('FreezeGuard Functionality', () => {
     it('Freeze parameters correctly setup', async () => {
       // Frozen Params init correctly
-      expect(await freezeVoting.freezeVotesThreshold()).to.eq(1090);
+      expect(await freezeVoting.freezeVotesThreshold()).to.eq(501);
       expect(await freezeVoting.freezeProposalPeriod()).to.eq(10);
       expect(await freezeVoting.freezePeriod()).to.eq(200);
       expect(await freezeVoting.owner()).to.eq(freezeGuardOwner.address);
@@ -245,26 +316,26 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       expect(await freezeVoting.freezeProposalCreatedBlock()).to.eq(0);
 
       // Vetoer 1 casts 500 freeze votes
-      await freezeVoting.connect(tokenVetoer1).castFreezeVote();
+      await freezeVoting
+        .connect(tokenVetoer1)
+        ['castFreezeVote(address[],uint256[])']([await mockNFT.getAddress()], vetoer1Ids);
       expect(await freezeVoting.isFrozen()).to.eq(false);
       expect(await freezeVoting.freezeProposalVoteCount()).to.eq(500);
       const latestBlock = await hre.ethers.provider.getBlock('latest');
       expect(await freezeVoting.freezeProposalCreatedBlock()).to.eq(latestBlock!.number);
 
-      await freezeVoting.connect(tokenVetoer2).castFreezeVote();
+      await freezeVoting
+        .connect(tokenVetoer2)
+        [
+          'castFreezeVote(address[],uint256[])'
+        ]([await mockNFT.getAddress(), await mockNFT.getAddress()], vetoer2Ids);
       expect(await freezeVoting.isFrozen()).to.eq(true);
     });
 
     it('A transaction can be timelocked and executed', async () => {
-      // Create transaction to set the guard address
-      const tokenTransferData = votesERC20.interface.encodeFunctionData('transfer', [
-        deployer.address,
-        1000,
-      ]);
-
       const tx = buildSafeTransaction({
-        to: await votesERC20.getAddress(),
-        data: tokenTransferData,
+        to: await mockNFT.getAddress(),
+        data: mintNFTData,
         safeTxGas: 1000000,
         nonce: await gnosisSafe.nonce(),
       });
@@ -313,20 +384,13 @@ describe('Child Multisig DAO with Azorius Parent', () => {
         signatureBytes,
       );
 
-      expect(await votesERC20.balanceOf(await gnosisSafe.getAddress())).to.eq(0);
-      expect(await votesERC20.balanceOf(deployer.address)).to.eq(1000);
+      expect(await mockNFT.balanceOf(deployer.address)).to.eq(1);
     });
 
     it("A transaction cannot be executed if it hasn't yet been timelocked", async () => {
-      // Create transaction to set the guard address
-      const tokenTransferData = votesERC20.interface.encodeFunctionData('transfer', [
-        deployer.address,
-        1000,
-      ]);
-
       const tx = buildSafeTransaction({
-        to: await votesERC20.getAddress(),
-        data: tokenTransferData,
+        to: await mockNFT.getAddress(),
+        data: mintNFTData,
         safeTxGas: 1000000,
         nonce: await gnosisSafe.nonce(),
       });
@@ -354,15 +418,9 @@ describe('Child Multisig DAO with Azorius Parent', () => {
     });
 
     it("A transaction cannot be timelocked if the signatures aren't valid", async () => {
-      // Create transaction to set the guard address
-      const tokenTransferData = votesERC20.interface.encodeFunctionData('transfer', [
-        deployer.address,
-        1000,
-      ]);
-
       const tx = buildSafeTransaction({
-        to: await votesERC20.getAddress(),
-        data: tokenTransferData,
+        to: await mockNFT.getAddress(),
+        data: mintNFTData,
         safeTxGas: 1000000,
         nonce: await gnosisSafe.nonce(),
       });
@@ -389,15 +447,9 @@ describe('Child Multisig DAO with Azorius Parent', () => {
     });
 
     it('A transaction cannot be executed if the timelock period has not ended yet', async () => {
-      // Create transaction to set the guard address
-      const tokenTransferData = votesERC20.interface.encodeFunctionData('transfer', [
-        deployer.address,
-        1000,
-      ]);
-
       const tx = buildSafeTransaction({
-        to: await votesERC20.getAddress(),
-        data: tokenTransferData,
+        to: await mockNFT.getAddress(),
+        data: mintNFTData,
         safeTxGas: 1000000,
         nonce: await gnosisSafe.nonce(),
       });
@@ -440,20 +492,16 @@ describe('Child Multisig DAO with Azorius Parent', () => {
 
     it('A DAO may execute txs during a the freeze proposal period if the freeze threshold is not met', async () => {
       // Vetoer 1 casts 500 freeze votes
-      await freezeVoting.connect(tokenVetoer1).castFreezeVote();
+      await freezeVoting
+        .connect(tokenVetoer1)
+        ['castFreezeVote(address[],uint256[])']([await mockNFT.getAddress()], vetoer1Ids);
 
       // Check that the DAO has been frozen
       expect(await freezeVoting.isFrozen()).to.eq(false);
 
-      // Create transaction to set the guard address
-      const tokenTransferData1 = votesERC20.interface.encodeFunctionData('transfer', [
-        deployer.address,
-        1000,
-      ]);
-
       const tx1 = buildSafeTransaction({
-        to: await votesERC20.getAddress(),
-        data: tokenTransferData1,
+        to: await mockNFT.getAddress(),
+        data: mintNFTData,
         safeTxGas: 1000000,
         nonce: await gnosisSafe.nonce(),
       });
@@ -502,7 +550,9 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       expect(await freezeVoting.freezeProposalCreatedBlock()).to.eq(0);
 
       // Vetoer 1 casts 500 freeze votes
-      await freezeVoting.connect(tokenVetoer1).castFreezeVote();
+      await freezeVoting
+        .connect(tokenVetoer1)
+        ['castFreezeVote(address[],uint256[])']([await mockNFT.getAddress()], vetoer1Ids);
       expect(await freezeVoting.isFrozen()).to.eq(false);
       expect(await freezeVoting.freezeProposalVoteCount()).to.eq(500);
       let latestBlock = await hre.ethers.provider.getBlock('latest');
@@ -511,7 +561,9 @@ describe('Child Multisig DAO with Azorius Parent', () => {
       // Move time forward to elapse freeze proposal period
       await time.advanceBlocks(10);
 
-      await freezeVoting.connect(tokenVetoer1).castFreezeVote();
+      await freezeVoting
+        .connect(tokenVetoer1)
+        ['castFreezeVote(address[],uint256[])']([await mockNFT.getAddress()], vetoer1Ids);
       expect(await freezeVoting.freezeProposalVoteCount()).to.eq(500);
       latestBlock = await hre.ethers.provider.getBlock('latest');
       expect(await freezeVoting.freezeProposalCreatedBlock()).to.eq(latestBlock!.number);
@@ -519,31 +571,35 @@ describe('Child Multisig DAO with Azorius Parent', () => {
     });
 
     it('A user cannot vote twice to freeze a dao during the same voting period', async () => {
-      await freezeVoting.connect(tokenVetoer1).castFreezeVote();
+      await freezeVoting
+        .connect(tokenVetoer1)
+        ['castFreezeVote(address[],uint256[])']([await mockNFT.getAddress()], vetoer1Ids);
       await expect(
-        freezeVoting.connect(tokenVetoer1).castFreezeVote(),
-      ).to.be.revertedWithCustomError(freezeVoting, 'AlreadyVoted');
+        freezeVoting
+          .connect(tokenVetoer1)
+          ['castFreezeVote(address[],uint256[])']([await mockNFT.getAddress()], vetoer1Ids),
+      ).to.be.revertedWithCustomError(freezeVoting, 'NoVotes()');
       expect(await freezeVoting.freezeProposalVoteCount()).to.eq(500);
     });
 
     it('An unfrozen DAO may not execute a previously passed transaction', async () => {
       // Vetoer 1 casts 500 freeze votes
-      await freezeVoting.connect(tokenVetoer1).castFreezeVote();
-      // Vetoer 2 casts 600 freeze votes
-      await freezeVoting.connect(tokenVetoer2).castFreezeVote();
+      await freezeVoting
+        .connect(tokenVetoer1)
+        ['castFreezeVote(address[],uint256[])']([await mockNFT.getAddress()], vetoer1Ids);
+      // Vetoer 2 casts 1000 freeze votes
+      await freezeVoting
+        .connect(tokenVetoer2)
+        [
+          'castFreezeVote(address[],uint256[])'
+        ]([await mockNFT.getAddress(), await mockNFT.getAddress()], vetoer2Ids);
 
       // Check that the DAO has been frozen
       expect(await freezeVoting.isFrozen()).to.eq(true);
 
-      // Create transaction to set the guard address
-      const tokenTransferData1 = votesERC20.interface.encodeFunctionData('transfer', [
-        deployer.address,
-        1000,
-      ]);
-
       const tx1 = buildSafeTransaction({
-        to: await votesERC20.getAddress(),
-        data: tokenTransferData1,
+        to: await mockNFT.getAddress(),
+        data: mintNFTData,
         safeTxGas: 1000000,
         nonce: await gnosisSafe.nonce(),
       });
@@ -609,24 +665,24 @@ describe('Child Multisig DAO with Azorius Parent', () => {
 
     it('Unfrozen DAOs may execute txs', async () => {
       // Vetoer 1 casts 500 freeze votes
-      await freezeVoting.connect(tokenVetoer1).castFreezeVote();
-      // Vetoer 2 casts 600 freeze votes
-      await freezeVoting.connect(tokenVetoer2).castFreezeVote();
+      await freezeVoting
+        .connect(tokenVetoer1)
+        ['castFreezeVote(address[],uint256[])']([await mockNFT.getAddress()], vetoer1Ids);
+      // Vetoer 2 casts 1000 freeze votes
+      await freezeVoting
+        .connect(tokenVetoer2)
+        [
+          'castFreezeVote(address[],uint256[])'
+        ]([await mockNFT.getAddress(), await mockNFT.getAddress()], vetoer2Ids);
 
       // Check that the DAO has been frozen
       expect(await freezeVoting.isFrozen()).to.eq(true);
       await freezeVoting.connect(freezeGuardOwner).unfreeze();
       expect(await freezeVoting.isFrozen()).to.eq(false);
 
-      // Create transaction to set the guard address
-      const tokenTransferData1 = votesERC20.interface.encodeFunctionData('transfer', [
-        deployer.address,
-        1000,
-      ]);
-
       const tx1 = buildSafeTransaction({
-        to: await votesERC20.getAddress(),
-        data: tokenTransferData1,
+        to: await mockNFT.getAddress(),
+        data: mintNFTData,
         safeTxGas: 1000000,
         nonce: await gnosisSafe.nonce(),
       });
@@ -673,11 +729,19 @@ describe('Child Multisig DAO with Azorius Parent', () => {
 
     it('You must have voting weight to cast a freeze vote', async () => {
       await expect(
-        freezeVoting.connect(freezeGuardOwner).castFreezeVote(),
+        freezeVoting
+          .connect(freezeGuardOwner)
+          ['castFreezeVote(address[],uint256[])']([await mockNFT.getAddress()], vetoer1Ids),
       ).to.be.revertedWithCustomError(freezeVoting, 'NoVotes()');
-      freezeVoting.connect(tokenVetoer1).castFreezeVote();
+      freezeVoting
+        .connect(tokenVetoer1)
+        ['castFreezeVote(address[],uint256[])']([await mockNFT.getAddress()], vetoer1Ids);
       await expect(
-        freezeVoting.connect(freezeGuardOwner).castFreezeVote(),
+        freezeVoting
+          .connect(freezeGuardOwner)
+          [
+            'castFreezeVote(address[],uint256[])'
+          ]([await mockNFT.getAddress(), await mockNFT.getAddress()], vetoer2Ids),
       ).to.be.revertedWithCustomError(freezeVoting, 'NoVotes()');
     });
 
@@ -698,7 +762,7 @@ describe('Child Multisig DAO with Azorius Parent', () => {
     });
 
     it('Only the freeze voting owner can update the freeze votes threshold', async () => {
-      expect(await freezeVoting.freezeVotesThreshold()).to.eq(1090);
+      expect(await freezeVoting.freezeVotesThreshold()).to.eq(501);
 
       await freezeVoting.connect(freezeGuardOwner).updateFreezeVotesThreshold(2000);
 

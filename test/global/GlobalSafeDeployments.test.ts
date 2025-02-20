@@ -10,7 +10,7 @@ import {
   GnosisSafeL2__factory,
   MockContract,
   MockContract__factory,
-} from '../typechain-types';
+} from '../../typechain-types';
 
 let gnosisSafeProxyFactory: GnosisSafeProxyFactory;
 let moduleProxyFactory: ModuleProxyFactory;

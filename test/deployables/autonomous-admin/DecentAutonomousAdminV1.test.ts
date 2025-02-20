@@ -10,9 +10,9 @@ import {
   MockHats__factory,
   MockHatsElectionsEligibility,
   MockHatsElectionsEligibility__factory,
-} from '../../typechain-types';
-import { topHatIdToHatId } from '../helpers';
-import { currentBlockTimestamp, setTime } from '../time';
+} from '../../../typechain-types';
+import { topHatIdToHatId } from '../../helpers';
+import { currentBlockTimestamp, setTime } from '../../time';
 
 describe('DecentAutonomousAdminHatV1', function () {
   // Signer accounts

@@ -15,20 +15,19 @@ import {
   MockERC721__factory,
   ModuleProxyFactory,
   GnosisSafeL2__factory,
-} from '../typechain-types';
-
+} from '../../typechain-types';
 import {
   getGnosisSafeL2Singleton,
   getGnosisSafeProxyFactory,
   getModuleProxyFactory,
-} from './GlobalSafeDeployments.test';
+} from '../global/GlobalSafeDeployments.test';
 import {
   calculateProxyAddress,
   predictGnosisSafeAddress,
   buildSafeTransaction,
   safeSignTypedData,
   buildSignatureBytes,
-} from './helpers';
+} from '../helpers';
 
 describe('LinearERC721VotingWithHatsProposalCreation', () => {
   // Deployed contracts
