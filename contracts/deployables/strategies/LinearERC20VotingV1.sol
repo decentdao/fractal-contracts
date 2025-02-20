@@ -4,6 +4,7 @@ pragma solidity ^0.8.28;
 import {BaseStrategyV1} from "./BaseStrategyV1.sol";
 import {BaseQuorumPercentV1} from "./BaseQuorumPercentV1.sol";
 import {BaseVotingBasisPercentV1} from "./BaseVotingBasisPercentV1.sol";
+import {ERC4337VoterSupportV1} from "./ERC4337VoterSupportV1.sol";
 import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
 
 /**
@@ -14,7 +15,8 @@ import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
 contract LinearERC20VotingV1 is
     BaseStrategyV1,
     BaseQuorumPercentV1,
-    BaseVotingBasisPercentV1
+    BaseVotingBasisPercentV1,
+    ERC4337VoterSupportV1
 {
     /**
      * The voting options for a Proposal.
@@ -130,11 +132,12 @@ contract LinearERC20VotingV1 is
      * @param _voteType Proposal support as defined in VoteType (NO, YES, ABSTAIN)
      */
     function vote(uint32 _proposalId, uint8 _voteType) external virtual {
+        address voter = _voter(msg.sender);
         _vote(
             _proposalId,
-            msg.sender,
+            voter,
             _voteType,
-            getVotingWeight(msg.sender, _proposalId)
+            getVotingWeight(voter, _proposalId)
         );
     }
 
