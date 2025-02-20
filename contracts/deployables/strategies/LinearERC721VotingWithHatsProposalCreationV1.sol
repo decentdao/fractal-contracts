@@ -4,7 +4,6 @@ pragma solidity ^0.8.28;
 import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {LinearERC721VotingV1} from "./LinearERC721VotingV1.sol";
 import {HatsProposalCreationWhitelistV1} from "./HatsProposalCreationWhitelistV1.sol";
-import {IHats} from "../../interfaces/hats/IHats.sol";
 
 /**
  * An [Azorius](./Azorius.md) [BaseStrategy](./BaseStrategy.md) implementation that
