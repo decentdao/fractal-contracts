@@ -87,7 +87,7 @@ describe('LinearERC20VotingWithHatsProposalCreationV2', () => {
       saltNum,
     );
 
-    gnosisSafe = await hre.ethers.getContractAt('GnosisSafe', predictedGnosisSafeAddress);
+    gnosisSafe = GnosisSafeL2__factory.connect(predictedGnosisSafeAddress, deployer);
 
     // Deploy Votes ERC-20 mastercopy contract
     votesERC20Mastercopy = await new VotesERC20__factory(deployer).deploy();
@@ -111,7 +111,8 @@ describe('LinearERC20VotingWithHatsProposalCreationV2', () => {
       '10031021',
     );
 
-    votesERC20 = await hre.ethers.getContractAt('VotesERC20', predictedVotesERC20Address);
+    votesERC20 = VotesERC20__factory.connect(predictedVotesERC20Address, deployer);
+
     // Deploy Azorius module
     azoriusMastercopy = await new Azorius__factory(deployer).deploy();
 
@@ -144,7 +145,7 @@ describe('LinearERC20VotingWithHatsProposalCreationV2', () => {
       '10031021',
     );
 
-    azorius = await hre.ethers.getContractAt('Azorius', predictedAzoriusAddress);
+    azorius = Azorius__factory.connect(predictedAzoriusAddress, deployer);
 
     // Deploy LinearERC20VotingWithHatsProposalCreationV2
     linearERC20VotingWithHatsMastercopy =
@@ -194,9 +195,9 @@ describe('LinearERC20VotingWithHatsProposalCreationV2', () => {
       '10031021',
     );
 
-    linearERC20VotingWithHats = await hre.ethers.getContractAt(
-      'LinearERC20VotingWithHatsProposalCreationV2',
+    linearERC20VotingWithHats = LinearERC20VotingWithHatsProposalCreationV2__factory.connect(
       predictedLinearERC20VotingWithHatsAddress,
+      deployer,
     );
 
     // Enable the strategy on Azorius

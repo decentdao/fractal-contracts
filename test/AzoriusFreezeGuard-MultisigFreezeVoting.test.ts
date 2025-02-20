@@ -144,16 +144,10 @@ describe('Azorius Child DAO with Multisig parent', () => {
     );
 
     // Get Parent Gnosis Safe
-    parentGnosisSafe = await hre.ethers.getContractAt(
-      'GnosisSafeL2',
-      predictedParentGnosisSafeAddress,
-    );
+    parentGnosisSafe = GnosisSafeL2__factory.connect(predictedParentGnosisSafeAddress, deployer);
 
     // Get Child Gnosis Safe
-    childGnosisSafe = await hre.ethers.getContractAt(
-      'GnosisSafeL2',
-      predictedChildGnosisSafeAddress,
-    );
+    childGnosisSafe = GnosisSafeL2__factory.connect(predictedChildGnosisSafeAddress, deployer);
 
     // Deploy Votes ERC-20 Mastercopy
     votesERC20Mastercopy = await new VotesERC20__factory(deployer).deploy();
@@ -191,7 +185,7 @@ describe('Azorius Child DAO with Multisig parent', () => {
       '10031021',
     );
 
-    childVotesERC20 = await hre.ethers.getContractAt('VotesERC20', predictedChildVotesERC20Address);
+    childVotesERC20 = VotesERC20__factory.connect(predictedChildVotesERC20Address, deployer);
 
     // Token holders delegate their votes to themselves
     await childVotesERC20.connect(childTokenHolder1).delegate(childTokenHolder1.address);
@@ -229,7 +223,7 @@ describe('Azorius Child DAO with Multisig parent', () => {
       '10031021',
     );
 
-    azoriusModule = await hre.ethers.getContractAt('Azorius', predictedAzoriusAddress);
+    azoriusModule = Azorius__factory.connect(predictedAzoriusAddress, deployer);
 
     // Deploy Linear ERC-20 Voting Strategy Mastercopy
     linearERC20VotingMastercopy = await new LinearERC20Voting__factory(deployer).deploy();
@@ -264,9 +258,9 @@ describe('Azorius Child DAO with Multisig parent', () => {
       '10031021',
     );
 
-    linearERC20Voting = await hre.ethers.getContractAt(
-      'LinearERC20Voting',
+    linearERC20Voting = LinearERC20Voting__factory.connect(
       predictedLinearERC20VotingAddress,
+      deployer,
     );
 
     // Enable the Linear Token Voting strategy on Azorius
@@ -305,10 +299,7 @@ describe('Azorius Child DAO with Multisig parent', () => {
       '10031021',
     );
 
-    freezeVoting = await hre.ethers.getContractAt(
-      'MultisigFreezeVoting',
-      predictedFreezeVotingAddress,
-    );
+    freezeVoting = MultisigFreezeVoting__factory.connect(predictedFreezeVotingAddress, deployer);
 
     // Deploy and setUp AzoriusFreezeGuard mastercopy contract
     freezeGuardMastercopy = await new AzoriusFreezeGuard__factory(deployer).deploy();
@@ -338,7 +329,7 @@ describe('Azorius Child DAO with Multisig parent', () => {
       '10031021',
     );
 
-    freezeGuard = await hre.ethers.getContractAt('AzoriusFreezeGuard', predictedFreezeGuardAddress);
+    freezeGuard = AzoriusFreezeGuard__factory.connect(predictedFreezeGuardAddress, deployer);
 
     // Create transaction on child Gnosis Safe to setup Azorius module
     const enableAzoriusModuleData = childGnosisSafe.interface.encodeFunctionData('enableModule', [

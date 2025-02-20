@@ -1,6 +1,6 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import hre, { ethers } from 'hardhat';
+import { ethers } from 'hardhat';
 import {
   DecentPaymasterV1,
   MockEntryPoint,
@@ -79,10 +79,7 @@ describe('DecentPaymasterV1', function () {
       '10031021',
     );
 
-    decentPaymaster = await hre.ethers.getContractAt(
-      'DecentPaymasterV1',
-      predictedDecentPaymasterAddress,
-    );
+    decentPaymaster = DecentPaymasterV1__factory.connect(predictedDecentPaymasterAddress, owner);
 
     // Create mock UserOperation
     const mockCallData = ethers.concat([

@@ -114,7 +114,7 @@ describe('Atomic Gnosis Safe Deployment', () => {
       '10031021',
     );
 
-    freezeGuard = await hre.ethers.getContractAt('MultisigFreezeGuard', predictedFreezeGuard);
+    freezeGuard = MultisigFreezeGuard__factory.connect(predictedFreezeGuard, deployer);
 
     /// /////////////// MODULE ////////////////
     // DEPLOY Fractal Module
@@ -142,7 +142,7 @@ describe('Atomic Gnosis Safe Deployment', () => {
       '10031021',
     );
 
-    fractalModule = await hre.ethers.getContractAt('FractalModule', predictedFractalModule);
+    fractalModule = FractalModule__factory.connect(predictedFractalModule, deployer);
 
     // TX Array
     sigs =

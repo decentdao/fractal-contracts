@@ -103,7 +103,7 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
       saltNum,
     );
 
-    gnosisSafe = await hre.ethers.getContractAt('GnosisSafe', predictedGnosisSafeAddress);
+    gnosisSafe = GnosisSafeL2__factory.connect(predictedGnosisSafeAddress, deployer);
 
     // Deploy Votes ERC-20 mastercopy contract
     votesERC20Mastercopy = await new VotesERC20__factory(deployer).deploy();
@@ -140,7 +140,7 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
       '10031021',
     );
 
-    votesERC20 = await hre.ethers.getContractAt('VotesERC20', predictedVotesERC20Address);
+    votesERC20 = VotesERC20__factory.connect(predictedVotesERC20Address, deployer);
 
     // Token holders delegate votes
     // Token holder 1 delegates to token holder 2, so final vote counts should be:
@@ -183,7 +183,7 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
       '10031021',
     );
 
-    azorius = await hre.ethers.getContractAt('Azorius', predictedAzoriusAddress);
+    azorius = Azorius__factory.connect(predictedAzoriusAddress, deployer);
 
     // Deploy Linear ERC20 Voting Mastercopy
     linearERC20VotingMastercopy = await new LinearERC20Voting__factory(deployer).deploy();
@@ -218,9 +218,9 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
       '10031021',
     );
 
-    linearERC20Voting = await hre.ethers.getContractAt(
-      'LinearERC20Voting',
+    linearERC20Voting = LinearERC20Voting__factory.connect(
       predictedLinearERC20VotingAddress,
+      deployer,
     );
 
     // Enable the Linear Voting strategy on Azorius
@@ -1255,7 +1255,7 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
         '10031021',
       );
 
-      azorius = await hre.ethers.getContractAt('Azorius', predictedAzoriusAddress);
+      azorius = Azorius__factory.connect(predictedAzoriusAddress, deployer);
 
       expect(await azorius.isStrategyEnabled(tokenHolder1.address)).to.eq(true);
       expect(await azorius.isStrategyEnabled(tokenHolder2.address)).to.eq(true);
@@ -1292,9 +1292,9 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
         '10031021',
       );
 
-      mockVotingStrategy = await hre.ethers.getContractAt(
-        'MockVotingStrategy',
+      mockVotingStrategy = MockVotingStrategy__factory.connect(
         predictedMockVotingStrategyAddress,
+        deployer,
       );
 
       // Enable the Mock Voting strategy on Azorius
