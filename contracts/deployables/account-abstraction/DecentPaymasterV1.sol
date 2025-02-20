@@ -37,8 +37,7 @@ contract DecentPaymasterV1 is
             initializeParams,
             (address, address)
         );
-        __BasePaymaster_init(IEntryPoint(_entryPoint));
-        transferOwnership(_owner);
+        __BasePaymaster_init(_owner, IEntryPoint(_entryPoint));
     }
 
     /**

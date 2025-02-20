@@ -326,7 +326,7 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
     it('A non-owner cannot change the Azorius Module on the Strategy', async () => {
       await expect(
         linearERC20Voting.connect(tokenHolder1).setAzorius(deployer.address),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(linearERC20Voting, 'OwnableUnauthorizedAccount');
     });
 
     it('The owner can update the voting period', async () => {
@@ -339,7 +339,7 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
     it('A non-owner cannot update the strategy voting period', async () => {
       await expect(
         linearERC20Voting.connect(tokenHolder1).updateVotingPeriod(120),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(linearERC20Voting, 'OwnableUnauthorizedAccount');
     });
 
     it('The owner can update the timelock period', async () => {
@@ -350,9 +350,9 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
     });
 
     it('A non-owner cannot update the strategy timelock period', async () => {
-      await expect(azorius.connect(tokenHolder1).updateTimelockPeriod(120)).to.be.revertedWith(
-        'Ownable: caller is not the owner',
-      );
+      await expect(
+        azorius.connect(tokenHolder1).updateTimelockPeriod(120),
+      ).to.be.revertedWithCustomError(azorius, 'OwnableUnauthorizedAccount');
     });
 
     it('Getting proposal state on an invalid proposal ID reverts', async () => {
@@ -1090,9 +1090,9 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
 
       expect(await azorius.timelockPeriod()).to.eq(70);
 
-      await expect(azorius.connect(tokenHolder1).updateTimelockPeriod(80)).to.be.revertedWith(
-        'Ownable: caller is not the owner',
-      );
+      await expect(
+        azorius.connect(tokenHolder1).updateTimelockPeriod(80),
+      ).to.be.revertedWithCustomError(azorius, 'OwnableUnauthorizedAccount');
     });
 
     it('Only the owner can update the execution period on Azorius', async () => {
@@ -1102,9 +1102,9 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
 
       expect(await azorius.executionPeriod()).to.eq(100);
 
-      await expect(azorius.connect(tokenHolder1).updateExecutionPeriod(110)).to.be.revertedWith(
-        'Ownable: caller is not the owner',
-      );
+      await expect(
+        azorius.connect(tokenHolder1).updateExecutionPeriod(110),
+      ).to.be.revertedWithCustomError(azorius, 'OwnableUnauthorizedAccount');
     });
 
     it('Only the owner can update the quorum numerator on the ERC20LinearVoting', async () => {
@@ -1116,7 +1116,7 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
 
       await expect(
         linearERC20Voting.connect(tokenHolder1).updateQuorumNumerator(700000),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(linearERC20Voting, 'OwnableUnauthorizedAccount');
     });
 
     it('Quorum numerator cannot be updated to a value larger than the denominator', async () => {
@@ -1134,7 +1134,7 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
 
       await expect(
         linearERC20Voting.connect(tokenHolder1).updateBasisNumerator(700000),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(linearERC20Voting, 'OwnableUnauthorizedAccount');
     });
 
     it('Basis numerator cannot be updated to a value larger than the denominator', async () => {
@@ -1152,7 +1152,7 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
 
       await expect(
         linearERC20Voting.connect(tokenHolder1).updateRequiredProposerWeight(2),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(linearERC20Voting, 'OwnableUnauthorizedAccount');
     });
 
     it('Linear ERC20 voting contract cannot be setup with an invalid governance token address', async () => {

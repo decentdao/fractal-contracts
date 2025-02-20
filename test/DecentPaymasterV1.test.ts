@@ -118,8 +118,9 @@ describe('DecentPaymasterV1', function () {
         ['address'],
         [await entryPoint.getAddress()],
       );
-      await expect(decentPaymaster.setUp(initializeParams)).to.be.revertedWith(
-        'Initializable: contract is already initialized',
+      await expect(decentPaymaster.setUp(initializeParams)).to.be.revertedWithCustomError(
+        decentPaymaster,
+        'InvalidInitialization',
       );
     });
 
@@ -169,7 +170,7 @@ describe('DecentPaymasterV1', function () {
         decentPaymaster
           .connect(nonOwner)
           .setStrategyFunctionApproval(strategy.address, selectors, approved),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(decentPaymaster, 'OwnableUnauthorizedAccount');
     });
 
     it('Should revert when arrays have different lengths', async function () {

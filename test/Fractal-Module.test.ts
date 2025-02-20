@@ -172,9 +172,9 @@ describe('Fractal Module Tests', () => {
       await multiSendCallOnly.multiSend(safeTx);
 
       // ADD Controller
-      await expect(fractalModule.connect(owner3).addControllers([owner3.address])).to.revertedWith(
-        'Ownable: caller is not the owner',
-      );
+      await expect(
+        fractalModule.connect(owner3).addControllers([owner3.address]),
+      ).to.revertedWithCustomError(fractalModule, 'OwnableUnauthorizedAccount');
       expect(await fractalModule.controllers(owner3.address)).eq(false);
       await expect(fractalModule.connect(owner1).addControllers([owner3.address])).to.emit(
         fractalModule,
@@ -185,7 +185,7 @@ describe('Fractal Module Tests', () => {
       // REMOVE Controller
       await expect(
         fractalModule.connect(owner3).removeControllers([owner3.address]),
-      ).to.revertedWith('Ownable: caller is not the owner');
+      ).to.revertedWithCustomError(fractalModule, 'OwnableUnauthorizedAccount');
       expect(await fractalModule.controllers(owner3.address)).eq(true);
       await expect(fractalModule.connect(owner1).removeControllers([owner3.address])).to.emit(
         fractalModule,

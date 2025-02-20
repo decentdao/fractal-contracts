@@ -92,9 +92,9 @@ describe('HatsProposalCreationWhitelist', () => {
       [await hatsProtocol.getAddress(), [proposerHatId]],
     );
 
-    await expect(mockHatsProposalCreationWhitelist.setUp(setupParams)).to.be.revertedWith(
-      'Initializable: contract is already initialized',
-    );
+    await expect(
+      mockHatsProposalCreationWhitelist.setUp(setupParams),
+    ).to.be.revertedWithCustomError(mockHatsProposalCreationWhitelist, 'InvalidInitialization');
   });
 
   it('Cannot initialize with no whitelisted hats', async () => {
@@ -121,7 +121,10 @@ describe('HatsProposalCreationWhitelist', () => {
 
     await expect(
       mockHatsProposalCreationWhitelist.connect(hatWearer1).whitelistHat(nonProposerHatId),
-    ).to.be.revertedWith('Ownable: caller is not the owner');
+    ).to.be.revertedWithCustomError(
+      mockHatsProposalCreationWhitelist,
+      'OwnableUnauthorizedAccount',
+    );
   });
 
   it('Only owner can remove a hat from whitelist', async () => {
@@ -133,7 +136,10 @@ describe('HatsProposalCreationWhitelist', () => {
 
     await expect(
       mockHatsProposalCreationWhitelist.connect(hatWearer1).removeHatFromWhitelist(proposerHatId),
-    ).to.be.revertedWith('Ownable: caller is not the owner');
+    ).to.be.revertedWithCustomError(
+      mockHatsProposalCreationWhitelist,
+      'OwnableUnauthorizedAccount',
+    );
   });
 
   it('Correctly identifies proposers based on whitelisted hats', async () => {

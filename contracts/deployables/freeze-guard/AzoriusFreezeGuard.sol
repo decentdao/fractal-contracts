@@ -2,10 +2,10 @@
 pragma solidity ^0.8.28;
 
 import {IBaseFreezeVoting} from "../../interfaces/decent/IBaseFreezeVoting.sol";
-import {IGuard} from "@gnosis.pm/zodiac/contracts/interfaces/IGuard.sol";
-import {FactoryFriendly} from "@gnosis.pm/zodiac/contracts/factory/FactoryFriendly.sol";
+import {IGuard} from "@gnosis-guild/zodiac/contracts/interfaces/IGuard.sol";
+import {FactoryFriendly} from "@gnosis-guild/zodiac/contracts/factory/FactoryFriendly.sol";
 import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
-import {BaseGuard} from "@gnosis.pm/zodiac/contracts/guard/BaseGuard.sol";
+import {BaseGuard} from "@gnosis-guild/zodiac/contracts/guard/BaseGuard.sol";
 
 /**
  * A Safe Transaction Guard contract that prevents an [Azorius](./azorius/Azorius.md)
@@ -39,13 +39,11 @@ contract AzoriusFreezeGuard is FactoryFriendly, IGuard, BaseGuard {
      * `address _freezeVoting`
      */
     function setUp(bytes memory initializeParams) public override initializer {
-        __Ownable_init();
         (address _owner, address _freezeVoting) = abi.decode(
             initializeParams,
             (address, address)
         );
-
-        transferOwnership(_owner);
+        __Ownable_init(_owner);
         freezeVoting = IBaseFreezeVoting(_freezeVoting);
 
         emit AzoriusFreezeGuardSetUp(msg.sender, _owner, _freezeVoting);
