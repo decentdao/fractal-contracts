@@ -142,7 +142,7 @@ describe('DecentHatsModificationModule', () => {
     mockSablier = await new MockSablierV2LockupLinear__factory(deployer).deploy();
     mockSablierAddress = await mockSablier.getAddress();
 
-    mockERC20 = await new MockERC20__factory(deployer).deploy('MockERC20', 'MCK');
+    mockERC20 = await new MockERC20__factory(deployer).deploy();
     mockERC20Address = await mockERC20.getAddress();
 
     await mockERC20.mint(gnosisSafeAddress, ethers.parseEther('1000000'));

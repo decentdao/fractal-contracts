@@ -1263,38 +1263,9 @@ describe('Safe with Azorius module and linearERC20Voting', () => {
     });
 
     it('Only a valid proposer can submit proposals', async () => {
-      const abiCoder = new ethers.AbiCoder();
-
       // Deploy Mock Voting Strategy
-      const mockVotingStrategyMastercopy = await new MockVotingStrategy__factory(deployer).deploy();
-
-      const mockVotingStrategySetupCalldata =
-        // eslint-disable-next-line camelcase
-        MockVotingStrategy__factory.createInterface().encodeFunctionData('setUp', [
-          abiCoder.encode(
-            ['address'],
-            [
-              tokenHolder1.address, // tokenHolder1 is the only valid proposer
-            ],
-          ),
-        ]);
-
-      await moduleProxyFactory.deployModule(
-        await mockVotingStrategyMastercopy.getAddress(),
-        mockVotingStrategySetupCalldata,
-        '10031021',
-      );
-
-      const predictedMockVotingStrategyAddress = await calculateProxyAddress(
-        moduleProxyFactory,
-        await mockVotingStrategyMastercopy.getAddress(),
-        mockVotingStrategySetupCalldata,
-        '10031021',
-      );
-
-      mockVotingStrategy = MockVotingStrategy__factory.connect(
-        predictedMockVotingStrategyAddress,
-        deployer,
+      mockVotingStrategy = await new MockVotingStrategy__factory(deployer).deploy(
+        tokenHolder1.address,
       );
 
       // Enable the Mock Voting strategy on Azorius
