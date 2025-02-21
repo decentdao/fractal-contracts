@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 /**
  * Defines the current state of votes on a particular Proposal.
  */
-struct ProposalVotes {
+struct ProposalVotesV1 {
     uint32 votingStartBlock; // block that voting starts at
     uint32 votingEndBlock; // block that voting ends
     uint256 noVotes; // current number of NO votes for the Proposal

@@ -9,7 +9,7 @@ import {BaseStrategyV1} from "./BaseStrategyV1.sol";
 import {ERC4337VoterSupportV1} from "./ERC4337VoterSupportV1.sol";
 import {ERC721VotingWeightSupportV1} from "./ERC721VotingWeightSupportV1.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {ProposalVotes} from "./ProposalVotes.sol";
+import {ProposalVotesV1} from "./ProposalVotesV1.sol";
 
 /**
  * An Azorius strategy that allows multiple ERC721 tokens to be registered as governance tokens,
@@ -40,7 +40,7 @@ contract LinearERC721VotingV1 is
     }
 
     /** `proposalId` to `ProposalVotes`, the voting state of a Proposal. */
-    mapping(uint256 => ProposalVotes) public proposalVotes;
+    mapping(uint256 => ProposalVotesV1) public proposalVotes;
 
     /** The list of ERC-721 tokens that can vote. */
     address[] public tokenAddresses;
@@ -440,7 +440,7 @@ contract LinearERC721VotingV1 is
 
         if (weight == 0) revert NoVotingWeight();
 
-        ProposalVotes storage proposal = proposalVotes[_proposalId];
+        ProposalVotesV1 storage proposal = proposalVotes[_proposalId];
 
         if (proposal.votingEndBlock == 0) revert InvalidProposal();
 
@@ -467,7 +467,8 @@ contract LinearERC721VotingV1 is
         override(
             BaseStrategyV1,
             BaseVotingBasisPercentV1,
-            ERC4337VoterSupportV1
+            ERC4337VoterSupportV1,
+            ERC721VotingWeightSupportV1
         )
         returns (uint16)
     {

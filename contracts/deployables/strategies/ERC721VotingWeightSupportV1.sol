@@ -4,9 +4,9 @@ pragma solidity ^0.8.28;
 import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {IERC721VotingWeightV1, ERC721VotingToken, ERC721VotingWeight} from "../../interfaces/decent/deployables/IERC721VotingWeightV1.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {ProposalVotes} from "./ProposalVotes.sol";
+import {ProposalVotesV1} from "./ProposalVotesV1.sol";
 
-abstract contract ERC721VotingWeightSupportV1 {
+abstract contract ERC721VotingWeightSupportV1 is IVersion {
     function _getCurrentVotingWeight(
         address _address,
         mapping(address => uint256) storage _tokenWeights,
@@ -35,7 +35,7 @@ abstract contract ERC721VotingWeightSupportV1 {
         address _address,
         uint32 _proposalId,
         mapping(address => uint256) storage _tokenWeights,
-        mapping(uint256 => ProposalVotes) storage _proposalVotes,
+        mapping(uint256 => ProposalVotesV1) storage _proposalVotes,
         address[] memory _tokenAddresses,
         uint256[] memory _tokenIds
     ) internal view returns (ERC721VotingWeight memory) {
@@ -85,4 +85,7 @@ abstract contract ERC721VotingWeightSupportV1 {
 
         return result;
     }
+
+    /// @inheritdoc IVersion
+    function getVersion() external pure virtual returns (uint16);
 }
