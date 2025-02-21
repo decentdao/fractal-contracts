@@ -2,11 +2,14 @@
 pragma solidity ^0.8.28;
 
 import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
+import {IERC721VotingWeightV1, ERC721VotingWeight, ERC721VotingToken} from "../../interfaces/decent/deployables/IERC721VotingWeightV1.sol";
 import {IERC721VotingStrategyV1} from "../../interfaces/decent/deployables/IERC721VotingStrategyV1.sol";
 import {BaseVotingBasisPercentV1} from "./BaseVotingBasisPercentV1.sol";
 import {BaseStrategyV1} from "./BaseStrategyV1.sol";
 import {ERC4337VoterSupportV1} from "./ERC4337VoterSupportV1.sol";
+import {ERC721VotingWeightSupportV1} from "./ERC721VotingWeightSupportV1.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {ProposalVotes} from "./ProposalVotes.sol";
 
 /**
  * An Azorius strategy that allows multiple ERC721 tokens to be registered as governance tokens,
@@ -23,7 +26,9 @@ contract LinearERC721VotingV1 is
     BaseStrategyV1,
     BaseVotingBasisPercentV1,
     IERC721VotingStrategyV1,
-    ERC4337VoterSupportV1
+    ERC4337VoterSupportV1,
+    IERC721VotingWeightV1,
+    ERC721VotingWeightSupportV1
 {
     /**
      * The voting options for a Proposal.
@@ -32,22 +37,6 @@ contract LinearERC721VotingV1 is
         NO, // disapproves of executing the Proposal
         YES, // approves of executing the Proposal
         ABSTAIN // neither YES nor NO, i.e. voting "present"
-    }
-
-    /**
-     * Defines the current state of votes on a particular Proposal.
-     */
-    struct ProposalVotes {
-        uint32 votingStartBlock; // block that voting starts at
-        uint32 votingEndBlock; // block that voting ends
-        uint256 noVotes; // current number of NO votes for the Proposal
-        uint256 yesVotes; // current number of YES votes for the Proposal
-        uint256 abstainVotes; // current number of ABSTAIN votes for the Proposal
-        /**
-         * ERC-721 contract address to individual NFT id to bool
-         * of whether it has voted on this proposal.
-         */
-        mapping(address => mapping(uint256 => bool)) hasVoted;
     }
 
     /** `proposalId` to `ProposalVotes`, the voting state of a Proposal. */
@@ -483,5 +472,38 @@ contract LinearERC721VotingV1 is
         returns (uint16)
     {
         return 1;
+    }
+
+    /** @inheritdoc IERC721VotingWeightV1*/
+    function getCurrentVotingWeight(
+        address _voter,
+        address[] calldata _tokenAddresses,
+        uint256[] calldata _tokenIds
+    ) external view override returns (uint256) {
+        return
+            _getCurrentVotingWeight(
+                _voter,
+                tokenWeights,
+                _tokenAddresses,
+                _tokenIds
+            );
+    }
+
+    /** @inheritdoc IERC721VotingWeightV1*/
+    function getVotingWeight(
+        address _voter,
+        uint32 _proposalId,
+        address[] calldata _tokenAddresses,
+        uint256[] calldata _tokenIds
+    ) public view override returns (ERC721VotingWeight memory) {
+        return
+            _getVotingWeight(
+                _voter,
+                _proposalId,
+                tokenWeights,
+                proposalVotes,
+                _tokenAddresses,
+                _tokenIds
+            );
     }
 }
