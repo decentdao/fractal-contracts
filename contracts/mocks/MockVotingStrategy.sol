@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LGPL-3.0-only
+// SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.28;
 
 import {BaseStrategyV1} from "../deployables/strategies/BaseStrategyV1.sol";

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.28;
 
 import {ERC4337VoterSupportV1} from "../deployables/strategies/ERC4337VoterSupportV1.sol";

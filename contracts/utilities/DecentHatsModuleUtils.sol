@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.28;
 
 import {IERC6551Registry} from "../interfaces/erc6551/IERC6551Registry.sol";

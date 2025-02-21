@@ -1,9 +1,8 @@
-//SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.28;
 
 import {IVersion} from "../../interfaces/decent/deployables/IVersion.sol";
 import {BaseFreezeVotingV1} from "./BaseFreezeVotingV1.sol";
-import {Enum} from "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
 
 /**
