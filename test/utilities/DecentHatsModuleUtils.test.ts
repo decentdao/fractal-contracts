@@ -68,7 +68,7 @@ describe('DecentHatsModuleUtils', () => {
     mockHatsAccount = await new MockHatsAccount__factory(deployer).deploy();
     mockHatsModuleFactory = await new MockHatsModuleFactory__factory(deployer).deploy();
     mockSablier = await new MockSablierV2LockupLinear__factory(deployer).deploy();
-    mockERC20 = await new MockERC20__factory(deployer).deploy('MockERC20', 'MCK');
+    mockERC20 = await new MockERC20__factory(deployer).deploy();
     // deploy keyValuePairs contract
     keyValuePairs = await new KeyValuePairs__factory(deployer).deploy();
     keyValuePairsAddress = await keyValuePairs.getAddress();
