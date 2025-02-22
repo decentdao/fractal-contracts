@@ -1133,16 +1133,14 @@ describe('AzoriusV1', () => {
 
   describe('Version', () => {
     it('should return correct version number', async () => {
-      const avatar = await new MockAvatar__factory(owner).deploy();
-
       const azorius = await deployAzoriusProxy(
         azoriusMastercopy,
         owner,
-        await avatar.getAddress(),
-        await avatar.getAddress(),
+        ethers.ZeroAddress,
+        ethers.ZeroAddress,
         [],
-        100,
-        200,
+        0,
+        0,
       );
 
       expect(await azorius.getVersion()).to.equal(1);
