@@ -12,9 +12,9 @@ import {
   ModuleProxyFactory,
   MockAvatar,
   MockAvatar__factory,
-} from '../../typechain-types';
-import { getModuleProxyFactory } from '../global/GlobalSafeDeployments.test';
-import { calculateProxyAddress } from '../helpers';
+} from '../../../typechain-types';
+import { getModuleProxyFactory } from '../../global/GlobalSafeDeployments.test';
+import { calculateProxyAddress } from '../../helpers';
 
 // Helper functions for deploying AzoriusV1 instances
 async function deployAzoriusProxy(
