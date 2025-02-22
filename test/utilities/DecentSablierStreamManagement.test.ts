@@ -1,8 +1,7 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-/* eslint-disable-next-line import/no-extraneous-dependencies */
-import { ethers } from 'ethers';
-import hre from 'hardhat';
+import type { ContractTransactionResponse, BigNumberish } from 'ethers';
+import { ethers } from 'hardhat';
 import {
   DecentAutonomousAdminV1,
   DecentAutonomousAdminV1__factory,
@@ -70,10 +69,10 @@ describe('DecentSablierStreamManagement', () => {
 
   let currentBlockTimestamp: number;
 
-  let streamId: ethers.BigNumberish;
+  let streamId: BigNumberish;
 
-  let enableModuleTx: ethers.ContractTransactionResponse;
-  let createAndDeclareTreeWithRolesAndStreamsTx: ethers.ContractTransactionResponse;
+  let enableModuleTx: ContractTransactionResponse;
+  let createAndDeclareTreeWithRolesAndStreamsTx: ContractTransactionResponse;
   const streamFundsMax = ethers.parseEther('100');
 
   let roleHatId: bigint;
@@ -83,7 +82,7 @@ describe('DecentSablierStreamManagement', () => {
   let hatsElectionsEligibilityImplementation: MockHatsElectionsEligibility;
 
   beforeEach(async () => {
-    const signers = await hre.ethers.getSigners();
+    const signers = await ethers.getSigners();
     const [deployer] = signers;
     [, dao] = signers;
 
@@ -114,16 +113,16 @@ describe('DecentSablierStreamManagement', () => {
       [
         [dao.address],
         1,
-        hre.ethers.ZeroAddress,
-        hre.ethers.ZeroHash,
-        hre.ethers.ZeroAddress,
-        hre.ethers.ZeroAddress,
+        ethers.ZeroAddress,
+        ethers.ZeroHash,
+        ethers.ZeroAddress,
+        ethers.ZeroAddress,
         0,
-        hre.ethers.ZeroAddress,
+        ethers.ZeroAddress,
       ],
     );
 
-    const saltNum = BigInt(`0x${Buffer.from(hre.ethers.randomBytes(32)).toString('hex')}`);
+    const saltNum = BigInt(`0x${Buffer.from(ethers.randomBytes(32)).toString('hex')}`);
 
     const predictedGnosisSafeAddress = await predictGnosisSafeAddress(
       createGnosisSetupCalldata,
@@ -160,7 +159,7 @@ describe('DecentSablierStreamManagement', () => {
       signers: [dao],
     });
 
-    currentBlockTimestamp = (await hre.ethers.provider.getBlock('latest'))!.timestamp;
+    currentBlockTimestamp = (await ethers.provider.getBlock('latest'))!.timestamp;
 
     mockHats = await new MockHats__factory(deployer).deploy();
     mockHatsAddress = await mockHats.getAddress();
@@ -263,15 +262,13 @@ describe('DecentSablierStreamManagement', () => {
   });
 
   describe('Withdrawing From Stream', () => {
-    let withdrawTx: ethers.ContractTransactionResponse;
+    let withdrawTx: ContractTransactionResponse;
 
     describe('When the stream has funds', () => {
       beforeEach(async () => {
         // Advance time to the end of the stream
-        await hre.ethers.provider.send('evm_setNextBlockTimestamp', [
-          currentBlockTimestamp + 2592000,
-        ]);
-        await hre.ethers.provider.send('evm_mine', []);
+        await ethers.provider.send('evm_setNextBlockTimestamp', [currentBlockTimestamp + 2592000]);
+        await ethers.provider.send('evm_mine', []);
 
         // No action has been taken yet on the stream. Balance should be untouched.
         expect(await mockSablier.withdrawableAmountOf(streamId)).to.eq(streamFundsMax);
@@ -316,10 +313,8 @@ describe('DecentSablierStreamManagement', () => {
     describe('When the stream has no funds', () => {
       beforeEach(async () => {
         // Advance time to the end of the stream
-        await hre.ethers.provider.send('evm_setNextBlockTimestamp', [
-          currentBlockTimestamp + 2592000,
-        ]);
-        await hre.ethers.provider.send('evm_mine', []);
+        await ethers.provider.send('evm_setNextBlockTimestamp', [currentBlockTimestamp + 2592000]);
+        await ethers.provider.send('evm_mine', []);
 
         const recipientHatAccount = await getHatAccount(
           roleHatId,
@@ -369,15 +364,13 @@ describe('DecentSablierStreamManagement', () => {
   });
 
   describe('Cancelling From Stream', () => {
-    let cancelTx: ethers.ContractTransactionResponse;
+    let cancelTx: ContractTransactionResponse;
 
     describe('When the stream is active', () => {
       beforeEach(async () => {
         // Advance time to before the end of the stream
-        await hre.ethers.provider.send('evm_setNextBlockTimestamp', [
-          currentBlockTimestamp + 60000,
-        ]); // 1 minute from now
-        await hre.ethers.provider.send('evm_mine', []);
+        await ethers.provider.send('evm_setNextBlockTimestamp', [currentBlockTimestamp + 60000]); // 1 minute from now
+        await ethers.provider.send('evm_mine', []);
 
         cancelTx = await executeSafeTransaction({
           safe: gnosisSafe,
@@ -409,10 +402,10 @@ describe('DecentSablierStreamManagement', () => {
     describe('When the stream has expired', () => {
       beforeEach(async () => {
         // Advance time to the end of the stream
-        await hre.ethers.provider.send('evm_setNextBlockTimestamp', [
+        await ethers.provider.send('evm_setNextBlockTimestamp', [
           currentBlockTimestamp + 2592000 + 60000,
         ]); // 30 days from now + 1 minute
-        await hre.ethers.provider.send('evm_mine', []);
+        await ethers.provider.send('evm_mine', []);
 
         cancelTx = await executeSafeTransaction({
           safe: gnosisSafe,
@@ -442,10 +435,8 @@ describe('DecentSablierStreamManagement', () => {
     describe('When the stream has been previously cancelled', () => {
       beforeEach(async () => {
         // Advance time to before the end of the stream
-        await hre.ethers.provider.send('evm_setNextBlockTimestamp', [
-          currentBlockTimestamp + 120000,
-        ]); // 2 minutes from now
-        await hre.ethers.provider.send('evm_mine', []);
+        await ethers.provider.send('evm_setNextBlockTimestamp', [currentBlockTimestamp + 120000]); // 2 minutes from now
+        await ethers.provider.send('evm_mine', []);
 
         const stream = await mockSablier.getStream(streamId);
         expect(stream.endTime).to.be.greaterThan(currentBlockTimestamp);
@@ -461,10 +452,8 @@ describe('DecentSablierStreamManagement', () => {
           signers: [dao],
         });
 
-        await hre.ethers.provider.send('evm_setNextBlockTimestamp', [
-          currentBlockTimestamp + 240000,
-        ]); // 4 minutes from now
-        await hre.ethers.provider.send('evm_mine', []);
+        await ethers.provider.send('evm_setNextBlockTimestamp', [currentBlockTimestamp + 240000]); // 4 minutes from now
+        await ethers.provider.send('evm_mine', []);
 
         cancelTx = await executeSafeTransaction({
           safe: gnosisSafe,

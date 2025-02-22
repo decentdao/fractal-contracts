@@ -1,7 +1,7 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { mine } from '@nomicfoundation/hardhat-network-helpers';
 import { expect } from 'chai';
-import hre, { ethers } from 'hardhat';
+import { ethers } from 'hardhat';
 import {
   AzoriusV1,
   AzoriusV1__factory,
@@ -742,7 +742,7 @@ describe('AzoriusV1', () => {
           .connect(proposer)
           .submitProposal(await mockStrategy.getAddress(), '0x', [proposalTx], proposalMetadata);
 
-        const receipt = await hre.ethers.provider.getTransactionReceipt(tx.hash);
+        const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
         if (!receipt) throw new Error('Transaction failed');
 
         const event = azorius.interface.decodeEventLog(
