@@ -4,14 +4,14 @@ import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import {
   AzoriusV1,
-  MockVotingStrategy,
-  MockERC20,
-  MockVotingStrategy__factory,
-  MockERC20__factory,
   AzoriusV1__factory,
   ModuleProxyFactory,
   MockAvatar,
   MockAvatar__factory,
+  MockERC20,
+  MockERC20__factory,
+  MockVotingStrategy,
+  MockVotingStrategy__factory,
 } from '../../../typechain-types';
 import { getModuleProxyFactory } from '../../global/GlobalSafeDeployments.test';
 import { calculateProxyAddress } from '../../helpers';
