@@ -1,7 +1,6 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
-import hre from 'hardhat';
-
+import { ethers } from 'hardhat';
 import {
   MockDecentHatsModuleUtils,
   MockDecentHatsModuleUtils__factory,
@@ -22,12 +21,10 @@ import {
   KeyValuePairs,
   KeyValuePairs__factory,
 } from '../../typechain-types';
-
 import {
   getGnosisSafeL2Singleton,
   getGnosisSafeProxyFactory,
 } from '../global/GlobalSafeDeployments.test';
-
 import {
   getHatAccount,
   topHatIdToHatId,
@@ -58,7 +55,7 @@ describe('DecentHatsModuleUtils', () => {
   let mockHatsElectionsEligibilityImplementationAddress: string;
 
   beforeEach(async () => {
-    const signers = await hre.ethers.getSigners();
+    const signers = await ethers.getSigners();
     [deployer, safeSigner, wearer] = signers;
 
     // Deploy mock contracts
@@ -82,15 +79,15 @@ describe('DecentHatsModuleUtils', () => {
       [
         [safeSigner.address],
         1,
-        hre.ethers.ZeroAddress,
-        hre.ethers.ZeroHash,
-        hre.ethers.ZeroAddress,
-        hre.ethers.ZeroAddress,
+        ethers.ZeroAddress,
+        ethers.ZeroHash,
+        ethers.ZeroAddress,
+        ethers.ZeroAddress,
         0,
-        hre.ethers.ZeroAddress,
+        ethers.ZeroAddress,
       ],
     );
-    const saltNum = BigInt(`0x${Buffer.from(hre.ethers.randomBytes(32)).toString('hex')}`);
+    const saltNum = BigInt(`0x${Buffer.from(ethers.randomBytes(32)).toString('hex')}`);
 
     const predictedGnosisSafeAddress = await predictGnosisSafeAddress(
       createGnosisSetupCalldata,
@@ -149,7 +146,7 @@ describe('DecentHatsModuleUtils', () => {
     });
 
     // Deploy mock eligibility implementation
-    const MockHatsElectionsEligibility = await hre.ethers.getContractFactory(
+    const MockHatsElectionsEligibility = await ethers.getContractFactory(
       'MockHatsElectionsEligibility',
     );
     const mockHatsElectionsEligibility = await MockHatsElectionsEligibility.deploy();
@@ -157,7 +154,7 @@ describe('DecentHatsModuleUtils', () => {
       await mockHatsElectionsEligibility.getAddress();
 
     // Mint tokens to mockDecentHatsUtils for Sablier streams
-    await mockERC20.mint(await gnosisSafe.getAddress(), hre.ethers.parseEther('1000000'));
+    await mockERC20.mint(await gnosisSafe.getAddress(), ethers.parseEther('1000000'));
 
     await executeSafeTransaction({
       safe: gnosisSafe,
@@ -253,13 +250,11 @@ describe('DecentHatsModuleUtils', () => {
       });
 
       expect(await mockHats.isWearerOfHat.staticCall(wearer.address, roleHatId)).to.equal(true);
-      expect(await mockHats.getHatEligibilityModule(roleHatId)).to.not.equal(
-        hre.ethers.ZeroAddress,
-      );
+      expect(await mockHats.getHatEligibilityModule(roleHatId)).to.not.equal(ethers.ZeroAddress);
     });
 
     it('Creates an untermed hat with a stream', async () => {
-      const currentBlockTimestamp = (await hre.ethers.provider.getBlock('latest'))!.timestamp;
+      const currentBlockTimestamp = (await ethers.provider.getBlock('latest'))!.timestamp;
       const hatParams = {
         wearer: wearer.address,
         details: '',
@@ -274,8 +269,8 @@ describe('DecentHatsModuleUtils', () => {
               cliff: 0,
               end: currentBlockTimestamp + 2592000, // 30 days
             },
-            broker: { account: hre.ethers.ZeroAddress, fee: 0 },
-            totalAmount: hre.ethers.parseEther('100'),
+            broker: { account: ethers.ZeroAddress, fee: 0 },
+            totalAmount: ethers.parseEther('100'),
             cancelable: true,
             transferable: false,
           },
@@ -324,7 +319,7 @@ describe('DecentHatsModuleUtils', () => {
       const event = streamCreatedEvents[0];
 
       expect(event.args.sender).to.equal(await mockDecentHatsModuleUtils.getAddress());
-      expect(event.args.totalAmount).to.equal(hre.ethers.parseEther('100'));
+      expect(event.args.totalAmount).to.equal(ethers.parseEther('100'));
       const expectedResult = `${hatId}:${streamCreatedEvents[0].args.streamId}`;
       await expect(processRoleHatTx)
         .to.emit(keyValuePairs, 'ValueUpdated')
@@ -332,7 +327,7 @@ describe('DecentHatsModuleUtils', () => {
     });
 
     it('Creates a termed hat with a stream', async () => {
-      const currentBlockTimestamp = (await hre.ethers.provider.getBlock('latest'))!.timestamp;
+      const currentBlockTimestamp = (await ethers.provider.getBlock('latest'))!.timestamp;
       const termEndDateTs = BigInt(Math.floor(Date.now() / 1000) + 100000);
       const hatParams = {
         wearer: wearer.address,
@@ -348,8 +343,8 @@ describe('DecentHatsModuleUtils', () => {
               cliff: 0,
               end: currentBlockTimestamp + 2592000, // 30 days
             },
-            broker: { account: hre.ethers.ZeroAddress, fee: 0 },
-            totalAmount: hre.ethers.parseEther('100'),
+            broker: { account: ethers.ZeroAddress, fee: 0 },
+            totalAmount: ethers.parseEther('100'),
             cancelable: true,
             transferable: false,
           },
@@ -385,9 +380,7 @@ describe('DecentHatsModuleUtils', () => {
       });
 
       expect(await mockHats.isWearerOfHat.staticCall(wearer.address, roleHatId)).to.equal(true);
-      expect(await mockHats.getHatEligibilityModule(roleHatId)).to.not.equal(
-        hre.ethers.ZeroAddress,
-      );
+      expect(await mockHats.getHatEligibilityModule(roleHatId)).to.not.equal(ethers.ZeroAddress);
 
       const streamCreatedEvents = await mockSablier.queryFilter(
         mockSablier.filters.StreamCreated(),
@@ -404,7 +397,7 @@ describe('DecentHatsModuleUtils', () => {
       const event = streamCreatedEvents[0];
 
       expect(event.args.sender).to.equal(await mockDecentHatsModuleUtils.getAddress());
-      expect(event.args.totalAmount).to.equal(hre.ethers.parseEther('100'));
+      expect(event.args.totalAmount).to.equal(ethers.parseEther('100'));
       const expectedResult = `${hatId}:${streamCreatedEvents[0].args.streamId}`;
       await expect(processRoleHatTx)
         .to.emit(keyValuePairs, 'ValueUpdated')
