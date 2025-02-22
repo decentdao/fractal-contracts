@@ -4,17 +4,17 @@ import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import {
   AzoriusV1,
-  MockVotingStrategy,
-  MockERC20,
-  MockVotingStrategy__factory,
-  MockERC20__factory,
   AzoriusV1__factory,
   ModuleProxyFactory,
   MockAvatar,
   MockAvatar__factory,
-} from '../../typechain-types';
-import { getModuleProxyFactory } from '../global/GlobalSafeDeployments.test';
-import { calculateProxyAddress } from '../helpers';
+  MockERC20,
+  MockERC20__factory,
+  MockVotingStrategy,
+  MockVotingStrategy__factory,
+} from '../../../typechain-types';
+import { getModuleProxyFactory } from '../../global/GlobalSafeDeployments.test';
+import { calculateProxyAddress } from '../../helpers';
 
 // Helper functions for deploying AzoriusV1 instances
 async function deployAzoriusProxy(
@@ -1133,16 +1133,14 @@ describe('AzoriusV1', () => {
 
   describe('Version', () => {
     it('should return correct version number', async () => {
-      const avatar = await new MockAvatar__factory(owner).deploy();
-
       const azorius = await deployAzoriusProxy(
         azoriusMastercopy,
         owner,
-        await avatar.getAddress(),
-        await avatar.getAddress(),
+        ethers.ZeroAddress,
+        ethers.ZeroAddress,
         [],
-        100,
-        200,
+        0,
+        0,
       );
 
       expect(await azorius.getVersion()).to.equal(1);
